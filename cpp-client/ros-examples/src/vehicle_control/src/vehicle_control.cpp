@@ -29,7 +29,6 @@ ros::Subscriber state_sensor_sub;
 monodrive_msgs::StateSensor state_data;
 
 void control_vehicle(){
-    std::cout << "-----control---------" << std::endl;
     monodrive_msgs::VehicleState vs;
     for(auto& vehicle : state_data.vehicles){
         if(vehicle.name == "Ego"){
@@ -56,11 +55,9 @@ void control_vehicle(){
     else{
         nextPointIndex += 3;
     }
-    std::cout << lane_points[nearestIndex].transpose()<< std::endl << lane_points[nextPointIndex].transpose() << std::endl;
     Eigen::VectorXd forwardVector(3);
     forwardVector << 1, 0, 0;
     forwardVector = orientation * forwardVector;
-    std::cout << forwardVector.transpose() << std::endl;
     auto nextPoint = lane_points[nextPointIndex];
     Eigen::VectorXd dirToNextPoint = nextPoint - position;
     dirToNextPoint.normalize();

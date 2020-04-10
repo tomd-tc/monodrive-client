@@ -9,7 +9,7 @@
   "server_port": 8999,
   "simulation_mode": 0,
   "traffic_configuration": {
-    "max_vehicles": 10,
+    "max_vehicles": 0,
     "min_desired_speed": 0.0,
     "max_desired_speed": 0.0,
     "spawn_leash_distance": 15000,
