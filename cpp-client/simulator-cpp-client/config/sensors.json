@@ -1,0 +1,31 @@
+[
+{
+      "_description": "8Mp Camera (3840x1920 pixels), IMX424 image Hfov/Vfov = 28/14 Long Range 27 fps",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8091,
+    "location": {
+      "x": 50.0,
+      "y": 20.0,
+      "z": 120.0
+    },
+    "rotation": {
+      "pitch": -5.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 256.0,
+      "y": 256.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 100.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  }
+]

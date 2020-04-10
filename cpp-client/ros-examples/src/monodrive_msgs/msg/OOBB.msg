@@ -1,0 +1,5 @@
+string name
+geometry_msgs/Quaternion orientation
+geometry_msgs/Vector3 center
+geometry_msgs/Vector3 scale
+geometry_msgs/Vector3 extents

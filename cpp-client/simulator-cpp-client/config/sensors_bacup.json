@@ -1,0 +1,776 @@
+[
+  {
+    "type": "GPS",
+    "packet_size": 1472,
+    "listen_port": 8400,
+    "synchronized_display": true,
+    "location": {
+      "x": -75.0,
+      "y": -25.0,
+      "z": 245.0
+    },
+    "rotation": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    }
+  },
+  {
+    "type": "IMU",
+    "packet_size": 1472,
+    "listen_port": 8500,
+    "synchronized_display": true,
+    "location": {
+      "x": -75.0,
+      "y": -25.0,
+      "z": 245.0
+    },
+    "rotation": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    }
+  },
+  {
+    "type": "Collision",
+    "listen_port": 8800,
+    "packet_size": 1472,
+    "debug_drawing": true,
+    "desired_tags": [
+      "vt"
+    ],
+    "undesired_tags": [
+      "static"
+    ]
+  },
+  {
+    "type": "ViewportCamera",
+    "listen_port": 0,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 512.0,
+      "y": 512.0
+    },
+   "max_distance": 50000.0,
+   "dynamic_range":  50,
+   "fov": 60.0,
+   "focal_length": 9.0,
+   "fstop": 1.4,
+   "min_shutter":  0.000500,
+   "max_shutter":  0.001400,
+   "sensor_size":  9.07,
+  "channels" : "bgra"
+},
+    {
+      "_description": "8Mp Camera (3840x1920 pixels), IMX424 image Hfov/Vfov = 28/14 Long Range 27 fps",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8000,
+    "location": {
+      "x": 50.0,
+      "y": 20.0,
+      "z": 120.0
+    },
+    "rotation": {
+      "pitch": -5.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 3840.0,
+      "y": 1920.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 100.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+      {"_description": "8Mp Camera (3840x1920 pixels), IMX424 imager Hfov/Vfov = 100/60 Short Range 27 fps",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8008,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 3840.0,
+      "y": 1920.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+  {"_description": "4Mp Camera (2880x1440 pixels), IMX424 imager Hfov/Vfov = 85/42",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8009,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 2880.0,
+      "y": 1440.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+      "_description":"4Mp Camera (2880x1440 pixels), IMX424 imager Hfov/Vfov = 85/42",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8010,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 2880.0,
+      "y": 1440.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+      "_description":"2Mp Camera (1920x960 pixels), IMX424 imager Hfov/Vfov = 72/33",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8011,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 1920.0,
+      "y": 960.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+      "_description":"2Mp Camera (1920x960 pixels), IMX424 imager Hfov/Vfov = 72/33",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8012,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 1920.0,
+      "y": 960.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+      "_description":"2Mp Camera (1920x960 pixels), IMX424 imager Hfov/Vfov = 72/33",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8013,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 1920.0,
+      "y": 960.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+      "_description":"2Mp Camera (1620x1280 pixels), OX3A imager Hfov/Vfov = 195/150",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8014,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 1620.0,
+      "y": 1280.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+     "_description":"2Mp Camera (1620x1280 pixels), OX3A imager Hfov/Vfov = 195/150",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8015,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 1620.0,
+      "y": 1280.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+      "_description":"2Mp Camera (1620x1280 pixels), OX3A imager Hfov/Vfov = 195/150",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8016,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 1620.0,
+      "y": 1280.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+      "_description":"2Mp Camera (1620x1280 pixels), OX3A imager Hfov/Vfov = 195/150",
+    "type": "Camera",
+    "packet_size": 23552,
+    "listen_port": 8017,
+    "location": {
+      "x": -800.0,
+      "y": 0.0,
+      "z": 400.0
+    },
+    "rotation": {
+      "pitch": -15.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "stream_dimensions": {
+      "x": 1620.0,
+      "y": 1280.0
+    },
+    "max_distance": 50000.0,
+    "dynamic_range": 50,
+    "fov": 60.0,
+    "focal_length": 9.0,
+    "fstop": 1.4,
+    "min_shutter": 0.000500,
+    "max_shutter": 0.001400,
+    "sensor_size": 9.07,
+    "channels": "bgra"
+  },
+    {
+    "type": "Radar",
+    "id": "1",
+    "packet_size": 64000,
+    "listen_port": 8091,
+      "gpu_number":1,
+  "synchronized_display": true,
+  "paint_targets": false,
+  "target_paint_lifetime": 1.0,
+  "send_radar_cube": false,
+  "location": {
+    "x": 250.0,
+    "y": 0.0,
+    "z": 50.0
+  },
+  "rotation": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0
+  },
+  "num_samples_per_sweep":345,
+  "fs": 50000000,
+  "fc": 77000000000.0,
+  "num_sweeps": 32,
+  "sweep_time" : 0.0000069,
+  "bandwidth" : 172500000,
+  "max_radar_returns": 1000,
+  "elements": 8,
+  "transmitter": {
+    "peak_power": 5.0,
+    "aperture": 0.000859,
+    "gain": 13.50
+  },
+  "receiver": {
+    "aperture": 0.000798,
+    "nf": 10.0,
+    "noise_temp": 290.0,
+    "nb": 74000000.0,
+    "gain": 10.0
+  },
+  "sbr": {
+    "long_range_scan_distance": 150.0,
+    "short_range_scan_distance": 60.0,
+    "long_range_fov": 20.0,
+    "short_range_fov": 60.0,
+    "elevation_fov": 10.0,
+    "rescan_density": 20.0,
+    "debug_frustum": false,
+    "debug_scan": false,
+    "debug_rescan": false
+  }
+},
+    {
+    "type": "Radar",
+    "id": "2",
+    "packet_size": 64000,
+    "listen_port": 8092,
+      "gpu_number":1,
+  "synchronized_display": true,
+  "paint_targets": false,
+  "target_paint_lifetime": 0.5,
+  "send_radar_cube": false,
+  "location": {
+    "x": 250.0,
+    "y": 0.0,
+    "z": 50.0
+  },
+  "rotation": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0
+  },
+  "num_samples_per_sweep":345,
+  "fs": 50000000,
+  "fc": 77000000000.0,
+  "num_sweeps": 32,
+  "sweep_time" : 0.0000069,
+  "bandwidth" : 172500000,
+  "max_radar_returns": 1000,
+  "elements": 8,
+  "transmitter": {
+    "peak_power": 5.0,
+    "aperture": 0.000859,
+    "gain": 13.50
+  },
+  "receiver": {
+    "aperture": 0.000798,
+    "nf": 10.0,
+    "noise_temp": 290.0,
+    "nb": 74000000.0,
+    "gain": 10.0
+  },
+  "sbr": {
+    "long_range_scan_distance": 150.0,
+    "short_range_scan_distance": 60.0,
+    "long_range_fov": 20.0,
+    "short_range_fov": 60.0,
+    "elevation_fov": 10.0,
+    "rescan_density": 20.0,
+    "debug_frustum": false,
+    "debug_scan": false,
+    "debug_rescan": false
+  }
+  },
+  {
+    "type": "Radar",
+    "id": "3",
+    "packet_size": 64000,
+    "listen_port": 8093,
+      "gpu_number":1,
+  "synchronized_display": true,
+  "paint_targets": false,
+  "target_paint_lifetime": 0.5,
+  "send_radar_cube": false,
+  "location": {
+    "x": 250.0,
+    "y": 0.0,
+    "z": 50.0
+  },
+  "rotation": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0
+  },
+  "num_samples_per_sweep":345,
+  "fs": 50000000,
+  "fc": 77000000000.0,
+  "num_sweeps": 32,
+  "sweep_time" : 0.0000069,
+  "bandwidth" : 172500000,
+  "max_radar_returns": 1000,
+  "elements": 8,
+  "transmitter": {
+    "peak_power": 5.0,
+    "aperture": 0.000859,
+    "gain": 13.50
+  },
+  "receiver": {
+    "aperture": 0.000798,
+    "nf": 10.0,
+    "noise_temp": 290.0,
+    "nb": 74000000.0,
+    "gain": 10.0
+  },
+  "sbr": {
+    "long_range_scan_distance": 150.0,
+    "short_range_scan_distance": 60.0,
+    "long_range_fov": 20.0,
+    "short_range_fov": 60.0,
+    "elevation_fov": 10.0,
+    "rescan_density": 20.0,
+    "debug_frustum": false,
+    "debug_scan": false,
+    "debug_rescan": false
+  }
+},
+      {
+    "type": "Radar",
+    "id": "4",
+    "packet_size": 64000,
+    "listen_port": 8094,
+      "gpu_number":1,
+  "synchronized_display": true,
+  "paint_targets": false,
+  "target_paint_lifetime": 0.5,
+  "send_radar_cube": false,
+  "location": {
+    "x": 250.0,
+    "y": 0.0,
+    "z": 50.0
+  },
+  "rotation": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0
+  },
+  "num_samples_per_sweep":345,
+  "fs": 50000000,
+  "fc": 77000000000.0,
+  "num_sweeps": 32,
+  "sweep_time" : 0.0000069,
+  "bandwidth" : 172500000,
+  "max_radar_returns": 1000,
+  "elements": 8,
+  "transmitter": {
+    "peak_power": 5.0,
+    "aperture": 0.000859,
+    "gain": 13.50
+  },
+  "receiver": {
+    "aperture": 0.000798,
+    "nf": 10.0,
+    "noise_temp": 290.0,
+    "nb": 74000000.0,
+    "gain": 10.0
+  },
+  "sbr": {
+    "long_range_scan_distance": 150.0,
+    "short_range_scan_distance": 60.0,
+    "long_range_fov": 20.0,
+    "short_range_fov": 60.0,
+    "elevation_fov": 10.0,
+    "rescan_density": 20.0,
+    "debug_frustum": false,
+    "debug_scan": false,
+    "debug_rescan": false
+  }
+  },
+  {
+    "type": "Radar",
+    "id": "5",
+    "packet_size": 64000,
+    "listen_port": 8095,
+      "gpu_number":1,
+  "synchronized_display": true,
+  "paint_targets": false,
+  "target_paint_lifetime": 0.5,
+  "send_radar_cube": false,
+  "location": {
+    "x": 250.0,
+    "y": 0.0,
+    "z": 50.0
+  },
+  "rotation": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0
+  },
+  "num_samples_per_sweep":345,
+  "fs": 50000000,
+  "fc": 77000000000.0,
+  "num_sweeps": 32,
+  "sweep_time" : 0.0000069,
+  "bandwidth" : 172500000,
+  "max_radar_returns": 1000,
+  "elements": 8,
+  "transmitter": {
+    "peak_power": 5.0,
+    "aperture": 0.000859,
+    "gain": 13.50
+  },
+  "receiver": {
+    "aperture": 0.000798,
+    "nf": 10.0,
+    "noise_temp": 290.0,
+    "nb": 74000000.0,
+    "gain": 10.0
+  },
+  "sbr": {
+    "long_range_scan_distance": 150.0,
+    "short_range_scan_distance": 60.0,
+    "long_range_fov": 20.0,
+    "short_range_fov": 60.0,
+    "elevation_fov": 10.0,
+    "rescan_density": 20.0,
+    "debug_frustum": false,
+    "debug_scan": false,
+    "debug_rescan": false
+  }
+},
+      {
+    "type": "Radar",
+    "id": "6",
+    "packet_size": 64000,
+    "listen_port": 8096,
+      "gpu_number":1,
+  "synchronized_display": true,
+  "paint_targets": false,
+  "target_paint_lifetime": 0.5,
+  "send_radar_cube": false,
+  "location": {
+    "x": 250.0,
+    "y": 0.0,
+    "z": 50.0
+  },
+  "rotation": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0
+  },
+  "num_samples_per_sweep":345,
+  "fs": 50000000,
+  "fc": 77000000000.0,
+  "num_sweeps": 32,
+  "sweep_time" : 0.0000069,
+  "bandwidth" : 172500000,
+  "max_radar_returns": 1000,
+  "elements": 8,
+  "transmitter": {
+    "peak_power": 5.0,
+    "aperture": 0.000859,
+    "gain": 13.50
+  },
+  "receiver": {
+    "aperture": 0.000798,
+    "nf": 10.0,
+    "noise_temp": 290.0,
+    "nb": 74000000.0,
+    "gain": 10.0
+  },
+  "sbr": {
+    "long_range_scan_distance": 150.0,
+    "short_range_scan_distance": 60.0,
+    "long_range_fov": 20.0,
+    "short_range_fov": 60.0,
+    "elevation_fov": 10.0,
+    "rescan_density": 20.0,
+    "debug_frustum": false,
+    "debug_scan": false,
+    "debug_rescan": false
+  }
+  },
+  {
+    "type": "Radar",
+    "id": "7",
+    "packet_size": 64000,
+    "listen_port": 8097,
+      "gpu_number":1,
+  "synchronized_display": true,
+  "paint_targets": false,
+  "target_paint_lifetime": 0.5,
+  "send_radar_cube": false,
+  "location": {
+    "x": 250.0,
+    "y": 0.0,
+    "z": 50.0
+  },
+  "rotation": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0
+  },
+  "num_samples_per_sweep":345,
+  "fs": 50000000,
+  "fc": 77000000000.0,
+  "num_sweeps": 32,
+  "sweep_time" : 0.0000069,
+  "bandwidth" : 172500000,
+  "max_radar_returns": 1000,
+
+  "elements": 8,
+  "transmitter": {
+    "peak_power": 5.0,
+    "aperture": 0.000859,
+    "gain": 13.50
+  },
+  "receiver": {
+    "aperture": 0.000798,
+    "nf": 10.0,
+    "noise_temp": 290.0,
+    "nb": 74000000.0,
+    "gain": 10.0
+  },
+  "sbr": {
+    "long_range_scan_distance": 150.0,
+    "short_range_scan_distance": 60.0,
+    "long_range_fov": 20.0,
+    "short_range_fov": 60.0,
+    "elevation_fov": 10.0,
+    "rescan_density": 20.0,
+    "debug_frustum": false,
+    "debug_scan": false,
+    "debug_rescan": false
+  }
+},
+  {
+    "type": "Lidar",
+    "packet_size": 1472,
+    "listen_port": 8200,
+    "synchronized_display": true,
+    "location": {
+      "x": -75.0,
+      "y": -25.0,
+      "z": 350.0
+    },
+    "rotation": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    },
+    "max_distance": 8000.0,
+    "horizontal_resolution": 0.4,
+    "rpms": 300.0,
+    "n_lasers": 16,
+    "reset_angle": 0.0
+  }
+]
