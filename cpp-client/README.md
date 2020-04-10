@@ -43,7 +43,6 @@
 sudo apt-get install ros-melodic-rosbridge-suite
 ````
 
-
 ### monoDrive ROS Packages and example build
 
 1. Execute the following to build the ROS packages: 
@@ -57,7 +56,33 @@ source devel/setup.bash
 echo "source <path/to/devel/setup.bash>" >> ~/.bashrc
 ```
 
-3. TODO: Add launch file, for now go to the next step
+### monoDrive Simulator and Client network setup
+
+*If you are running both the client and simulator on the same machine you can skip this section as the networking defaults are for local host.*
+
+If you are running the simulator and client on separate machines the following networking settings must be configured.
+
+1. Set the IP address and port IDs for the machine running the simulator and the machine running the ros bridge
+
+    - In the configuration file, `simulator_control/confg/simulator.json`, set the IP and port (default is `9090`) of the machine that will host the **ros bridge**:
+    ```json
+    "ros": {
+        "port": 9090,
+        "server": "192.168.86.167"
+    },
+    ```
+
+    - and the IP and port of the **simulator**:
+
+    ```json
+    "server_ip": "192.168.86.168",
+    "server_port": 8999,
+    ```
+
+2. Forward the ports on both machines (`9090` and `8999`) from step 1 or disable the firewalls on both machines.
+
+
+### Launching the example
 
 4. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
     1. Launch rosbridge, you can leave this running: 
@@ -74,4 +99,3 @@ echo "source <path/to/devel/setup.bash>" >> ~/.bashrc
     ```bash
     rosrun simulator_control node
     ```
-
