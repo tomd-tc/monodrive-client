@@ -30,6 +30,8 @@ target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 find_library(LIBRT rt)
 find_package(Threads)
 
+target_link_libraries(${PROJECT_NAME} -lstdc++fs)
+
 if(LIBRT)
 	target_link_libraries(${PROJECT_NAME} ${LIBRT})
 endif(LIBRT)

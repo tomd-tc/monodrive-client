@@ -154,7 +154,6 @@ target_link_libraries(${PROJECT_NAME}_node
 )
 
 target_link_libraries(${PROJECT_NAME}_node -lstdc++fs)
-
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 target_include_directories(${PROJECT_NAME}_node PUBLIC ${EIGEN3_INCLUDE_DIR})

@@ -12,25 +12,10 @@ Configuration::Configuration(
     const fs::path& weatherConfigPath,
     const fs::path& scenarioConfigPath
 ){
-	simulator = load(simulatorConfigPath.string());
-    vehicle   = load(vehicleConfigPath.string());
-    weather   = load(weatherConfigPath.string());
-    scenario  = load(scenarioConfigPath.string());
-}
-
-Configuration::Configuration(
-	const std::string& simulator_config_path,
-	const std::string& vehicle_config_path,
-	const std::string& weather_config_path,
-	const std::string& scenario_config_path
-)
-{
-	simulator = load(simulator_config_path);
-    vehicle   = load(vehicle_config_path);
-    weather   = load(weather_config_path);
-    scenario  = load(scenario_config_path);
-	//This can now be constructed in code by the user;	
-	//std::string sensor_config_path = "../config/sensors.json"; 
+	simulator = load(simulatorConfigPath);
+    vehicle   = load(vehicleConfigPath);
+    weather   = load(weatherConfigPath);
+    scenario  = load(scenarioConfigPath);
 }
 
 // Configuration::Configuration(int argc, char** argv)
@@ -79,10 +64,10 @@ Configuration::Configuration(
 //     scenario  = load(scenario_config_path);
 // }
 
-nlohmann::json Configuration::load(const std::string& path)
+nlohmann::json Configuration::load(const fs::path& path)
 {
     nlohmann::json j;
-    std::cout << path << std::endl;
+    std::cout << path.string() << std::endl;
     try
     {
         std::ifstream in(path, std::ifstream::in);
