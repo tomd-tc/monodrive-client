@@ -40,6 +40,7 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
     state_config.ros.advertise = true;
     state_config.ros.topic = "/monodrive/state_sensor";
     state_config.ros.message_type = "monodrive_msgs/StateSensor";
+    state_config.ros.queue_size = 0;
     sensors.emplace_back(state_config);
 
     std::cout<<"***********ALL SENSOR CONFIGS*******"<<std::endl;
@@ -90,7 +91,7 @@ int main(int argc, char** argv)
     if(!sim0.send_command(ApiMessage(777, SpawnVehicleCommand_ID, true, config.vehicle)))
         return 0;
 
-    float fps = 60.f;
+    float fps = 100.f;
     run_monodrive(fps, sim0);
 
     return 0;

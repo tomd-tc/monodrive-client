@@ -40,6 +40,7 @@ class SensorBaseConfig
             std::string topic{""};
             std::string message_type{""};
             bool send_tf{false};
+            int queue_size{1};
         }ros;
         friend void to_json(nlohmann::json& j,const SensorBaseConfig& config);
         friend void from_json(const json& j, SensorBaseConfig& config);
@@ -317,7 +318,8 @@ void inline to_json(json& j, const SensorBaseConfig::ROS& ros)
         {"advertise", ros.advertise},
         {"topic", ros.topic},
         {"message_type", ros.message_type},
-        {"send_tf", ros.send_tf}
+        {"send_tf", ros.send_tf},
+        {"queue_size", ros.queue_size}
     };
 }
 void inline from_json(const json& j, SensorBaseConfig::ROS& ros)
@@ -327,6 +329,7 @@ void inline from_json(const json& j, SensorBaseConfig::ROS& ros)
     json_get(j,"topic", ros.topic);
     json_get(j,"message_type", ros.message_type);
     json_get(j,"send_tf", ros.send_tf);
+    json_get(j, "queue_size", ros.queue_size);
 }
 void inline to_json(json& j, const SensorBaseConfig& config)
 {

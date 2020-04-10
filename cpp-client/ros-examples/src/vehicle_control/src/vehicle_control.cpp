@@ -13,6 +13,7 @@
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
 
+
 using namespace lane_spline;
 LaneSpline lanespline;
 
@@ -72,7 +73,6 @@ void control_vehicle(){
     msg.drive_mode = 1;
 
     vehicle_control_pub.publish(msg);
-    std::cout << "angle: " << angle << std::endl;
 }
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
     // create vehicle controller publisher and sensor subscriber
     node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
     vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
-    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, &state_sensor_callback);
+    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 0, &state_sensor_callback);
 
     ros::Rate rate(100);
 
