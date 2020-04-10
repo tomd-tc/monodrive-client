@@ -36,7 +36,7 @@
 # monoDrive ROS Client
 
 ## Ubuntu 18.04 Prerequisites
-- [monoDrive c++ client](#monodrive-c++-client)
+- [monoDrive c++ client](https://github.com/monoDriveIO/monodrive-client/blob/master/cpp-client/README.md#monodrive-c++-client)
 - [ROS](http://wiki.ros.org/melodic/Installation/Ubuntu) *Note: Tested with melodic*
 - ROS Bridge: 
 ```bash 
