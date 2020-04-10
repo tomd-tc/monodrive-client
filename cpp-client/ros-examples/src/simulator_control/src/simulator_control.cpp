@@ -67,10 +67,6 @@ int main(int argc, char** argv)
     fs::path path(ros::package::getPath("simulator_control"));
     fs::path configPath = path / "config";
 
-    //Single Simulator Example
-    string server0_ip = "127.0.0.1";
-    int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
-    
     //Read JSON files in cpp_client/config directory
     Configuration config(
         configPath / "simulator.json",
@@ -79,6 +75,8 @@ int main(int argc, char** argv)
         configPath / "scenario.json");
     
     vehicle_name = config.vehicle["name"];
+    std::string server0_ip = config.simulator["server_ip"];
+    int server_port = config.simulator["server_port"];
 
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
     sim0.configure();

@@ -5,8 +5,8 @@
     "server": "127.0.0.1"
   },
   "server_ip": "127.0.0.1",
-   "map": "Straightaway5k",
   "server_port": 8999,
+  "map": "Straightaway5k",
   "simulation_mode": 0,
   "traffic_configuration": {
     "max_vehicles": 0,

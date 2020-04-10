@@ -75,3 +75,24 @@ echo "source <path/to/devel/setup.bash>" >> ~/.bashrc
     rosrun simulator_control node
     ```
 
+### Connnecting to monoDrive Simulator from ROS Client
+
+The current deployment of the monoDrive Simulator and ROS Client supports networked access to the Simulator from the Client. To get this working, the correct server and rosbridge IP and porst must be set and ports need to be open on both machine's firwalls.
+
+In the configuration file in `simulator_control/confg/simulator.json` set the IP and port (default is `9090`) of the machine that will host the ros bridge:
+
+```json
+  "ros": {
+    "port": 9090,
+    "server": "192.168.86.167"
+  },
+```
+
+and the IP and port of the simulator:
+
+```json
+  "server_ip": "192.168.86.168",
+  "server_port": 8999,
+```
+
+Now on the server and client machines make sure that the port specified are open in the firewall (or just disable the firewall)
