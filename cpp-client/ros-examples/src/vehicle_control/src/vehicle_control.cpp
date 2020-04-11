@@ -3,10 +3,11 @@
 #include <thread>         // std::thread
 #include <memory>
 #include <vector>
+#include <future>
+#include <chrono>
 
 //monoDrive Includes
 #include "LaneSpline.h"
-#include <future>
 
 #include "ros/ros.h"
 #include "ros/package.h"
@@ -26,6 +27,11 @@ std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
 ros::Subscriber state_sensor_sub;
+
+// Debug timing for measuing response rate
+auto freq_time = std::chrono::high_resolution_clock::now();
+int sample_count = 0;
+const bool VERBOSE = false;
 
 monodrive_msgs::StateSensor state_data;
 
@@ -76,6 +82,15 @@ void control_vehicle(){
 }
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
+    if(++sample_count >= 100 and VERBOSE) {
+        auto current_time = std::chrono::high_resolution_clock::now();
+        auto time_diff = 100.0 / 
+            (std::chrono::duration_cast<std::chrono::nanoseconds>(current_time - freq_time).count() / 1e9);
+        std::cout << "Sample frequency (Hz): " << time_diff << std::endl;
+        freq_time = current_time;
+        sample_count = 0;
+    }
+
     state_data = state_sensor_msg;
 }
 
@@ -91,7 +106,7 @@ int main(int argc, char** argv)
     // create vehicle controller publisher and sensor subscriber
     node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
     vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
-    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 0, &state_sensor_callback);
+    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 5, &state_sensor_callback);
 
     ros::Rate rate(100);
 

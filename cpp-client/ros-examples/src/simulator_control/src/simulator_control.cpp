@@ -20,6 +20,11 @@ namespace fs = std::experimental::filesystem;
 
 std::string vehicle_name;
 
+// Debug timing for measuing send rate
+auto freq_time = std::chrono::high_resolution_clock::now();
+int sample_count = 0;
+const bool VERBOSE = false;
+
 std::vector<Sensor> create_sensors_for(const std::string& ip)
 {
     std::vector<Sensor> sensors;
@@ -40,7 +45,7 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
     state_config.ros.advertise = true;
     state_config.ros.topic = "/monodrive/state_sensor";
     state_config.ros.message_type = "monodrive_msgs/StateSensor";
-    state_config.ros.queue_size = 0;
+    state_config.ros.queue_size = 2;
     sensors.emplace_back(state_config);
 
     std::cout<<"***********ALL SENSOR CONFIGS*******"<<std::endl;
@@ -55,6 +60,14 @@ void run_monodrive(float fps, Simulator& sim){
     ros::Rate rate(fps);
     // mono::precise_stopwatch stopwatch;
     while(ros::ok()){
+        if(++sample_count >= 100 and VERBOSE) {
+            auto current_time = std::chrono::high_resolution_clock::now();
+            auto time_diff = 100.0 / 
+                (std::chrono::duration_cast<std::chrono::nanoseconds>(current_time - freq_time).count() / 1e9);
+            std::cout << "Send frequency (Hz): " << time_diff << std::endl;
+            freq_time = current_time;
+            sample_count = 0;
+        }
         sim.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
         // ros::spinOnce();
         rate.sleep();
