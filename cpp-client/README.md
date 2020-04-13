@@ -23,15 +23,20 @@
     - CMake Tools
     - C/C++
 3. Select `File -> Open Folder` and navigate to this folder to build the cpp-examples or simulator-cpp-client to build just the client library.
-4. Click the CMake extension
-    1. Click the Configure All Projects.
+4. Use the CMake extension to configure and build
+    1. Click the Configure All Projects icon: 
+
+        <img src="../doc/cpp-client/setup/images/configure.png" width="250">
+
     2. If prompted to Scan for Kits select Yes.
     
-    *Windows* Choose: `Visual Studio Community 2019 Release - amd64`.
+        *Windows* Choose: `Visual Studio Community 2019 Release - amd64`.
     
-    *Linux* Choose: `Choose the compiler of your choice, tested with g++ 7.5.0`.
+        *Linux* Choose: `Choose the compiler of your choice, tested with g++ 7.5.0`.
     
-5. Build the client by clicking the `Build All Projects` icon.
+    3. Build the client by clicking the `Build All Projects` icon:
+    
+        <img src="../doc/cpp-client/setup/images/build.png" width="250">
 
 # monoDrive ROS Client
 
