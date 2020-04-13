@@ -20,18 +20,20 @@ namespace fs = std::experimental::filesystem;
 
 std::string vehicle_name;
 
-std::vector<Sensor> create_sensors_for(const std::string& ip)
+std::vector<Sensor> create_sensors_for(const std::string& ip, const int& port)
 {
     std::vector<Sensor> sensors;
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
     vp_config.location.z = 200;
+    vp_config.server_port = port;
     Sensor(vp_config).configure();
 
     StateConfig state_config;
     state_config.desired_tags = {"vehicle", "ego"};
     state_config.server_ip = ip;
+    state_config.server_port = port;
     state_config.listen_port = 8101;
     state_config.debug_drawing = false;
     state_config.undesired_tags = {""};
@@ -52,10 +54,8 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
 
 void run_monodrive(float fps, Simulator& sim){
     ros::Rate rate(fps);
-    // mono::precise_stopwatch stopwatch;
     while(ros::ok()){
         sim.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
-        // ros::spinOnce();
         rate.sleep();
     }
 }
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 
     //Setup and Connect Sensors
     std::cout << "Creating Sensors." << std::endl;
-    std::vector<Sensor> sensors = create_sensors_for(server0_ip);
+    std::vector<Sensor> sensors = create_sensors_for(server0_ip, server_port);
 
     /// initialize the vehicle
     std::cout << "Spawning vehicle." << std::endl;

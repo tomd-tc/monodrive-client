@@ -3,10 +3,10 @@
 #include <thread>         // std::thread
 #include <memory>
 #include <vector>
+#include <future>
 
 //monoDrive Includes
 #include "LaneSpline.h"
-#include <future>
 
 #include "ros/ros.h"
 #include "ros/package.h"
@@ -72,7 +72,6 @@ void control_vehicle(){
     msg.drive_mode = 1;
 
     vehicle_control_pub.publish(msg);
-    std::cout << "angle: " << angle << std::endl;
 }
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
