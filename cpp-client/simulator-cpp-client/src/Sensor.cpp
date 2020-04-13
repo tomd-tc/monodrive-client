@@ -11,14 +11,11 @@
 
 Sensor::Sensor(SensorBaseConfig& sensor_config) : config(&sensor_config)
 {
-
     //VieportCamera doesn't need a connection 
 	if(config->listen_port != 0){
 		listener = new Connection(config->server_ip, config->listen_port);
 	} 
 
-	// std::cout << this->config->dump_json() << std::endl;
-	
 	name = std::string(config->type) + std::string("_") + std::to_string(config->listen_port);
 }
 
@@ -36,7 +33,6 @@ bool Sensor::configure()
 {
 	bool success = send_configure();
 	if(!config->ros.publish_to_ros){
-		std::cout<<"start lisening"<<std::endl;
 		success = start_listening();
 	}
 	return success;
@@ -44,10 +40,8 @@ bool Sensor::configure()
 bool Sensor::send_configure()
 {
 	using namespace std;
-	Simulator& sim = Simulator::getInstance(config->server_ip, 8999);
+	Simulator& sim = Simulator::getInstance(config->server_ip, config->server_port);
 	json msg = json::parse(dump_json());
-	cout << "config:" << config->get().dump_json() << endl;
-	cout << "sending sensor config:   success = ";
 	return sim.send_command(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));	
 }
 
@@ -64,7 +58,6 @@ bool Sensor::start_listening()
 
 void Sensor::sample()
 {
-	// std::cout <<"Sample:" <<  name << std::endl;
 	recvBuffer.resize(header_length);
 	if(listener->socket.is_open()){
     	listener->read_sensor_packet(recvBuffer);

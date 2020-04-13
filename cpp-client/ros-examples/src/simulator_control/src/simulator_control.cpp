@@ -20,23 +20,20 @@ namespace fs = std::experimental::filesystem;
 
 std::string vehicle_name;
 
-// Debug timing for measuing send rate
-auto freq_time = std::chrono::high_resolution_clock::now();
-int sample_count = 0;
-const bool VERBOSE = false;
-
-std::vector<Sensor> create_sensors_for(const std::string& ip)
+std::vector<Sensor> create_sensors_for(const std::string& ip, const int& port)
 {
     std::vector<Sensor> sensors;
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
     vp_config.location.z = 200;
+    vp_config.server_port = port;
     Sensor(vp_config).configure();
 
     StateConfig state_config;
     state_config.desired_tags = {"vehicle", "ego"};
     state_config.server_ip = ip;
+    state_config.server_port = port;
     state_config.listen_port = 8101;
     state_config.debug_drawing = false;
     state_config.undesired_tags = {""};
@@ -45,7 +42,6 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
     state_config.ros.advertise = true;
     state_config.ros.topic = "/monodrive/state_sensor";
     state_config.ros.message_type = "monodrive_msgs/StateSensor";
-    state_config.ros.queue_size = 2;
     sensors.emplace_back(state_config);
 
     std::cout<<"***********ALL SENSOR CONFIGS*******"<<std::endl;
@@ -58,18 +54,8 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
 
 void run_monodrive(float fps, Simulator& sim){
     ros::Rate rate(fps);
-    // mono::precise_stopwatch stopwatch;
     while(ros::ok()){
-        if(++sample_count >= 100 and VERBOSE) {
-            auto current_time = std::chrono::high_resolution_clock::now();
-            auto time_diff = 100.0 / 
-                (std::chrono::duration_cast<std::chrono::nanoseconds>(current_time - freq_time).count() / 1e9);
-            std::cout << "Send frequency (Hz): " << time_diff << std::endl;
-            freq_time = current_time;
-            sample_count = 0;
-        }
         sim.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
-        // ros::spinOnce();
         rate.sleep();
     }
 }
@@ -97,14 +83,14 @@ int main(int argc, char** argv)
 
     //Setup and Connect Sensors
     std::cout << "Creating Sensors." << std::endl;
-    std::vector<Sensor> sensors = create_sensors_for(server0_ip);
+    std::vector<Sensor> sensors = create_sensors_for(server0_ip, server_port);
 
     /// initialize the vehicle
     std::cout << "Spawning vehicle." << std::endl;
     if(!sim0.send_command(ApiMessage(777, SpawnVehicleCommand_ID, true, config.vehicle)))
         return 0;
 
-    float fps = 100.f;
+    float fps = 60.f;
     run_monodrive(fps, sim0);
 
     return 0;

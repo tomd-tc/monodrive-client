@@ -19,6 +19,7 @@ class SensorBaseConfig
         SensorBaseConfig(){};
         virtual ~SensorBaseConfig(){};
         string server_ip = "127.0.0.1";
+        int server_port = 8999;
         std::string type = "None";
         std::string description;
         int listen_port = 0;
