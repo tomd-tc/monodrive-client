@@ -26,7 +26,7 @@
 4. Use the CMake extension to configure and build
     1. Click the Configure All Projects icon: 
 
-        <img src="/doc/cpp-client/setup/images/configure.png" width="250">
+        <img src="doc/cpp-client/setup/images/configure.png" width="250">
 
     2. If prompted to Scan for Kits select Yes.
     
@@ -36,7 +36,7 @@
     
     3. Build the client by clicking the `Build All Projects` icon:
     
-        <img src="/doc/cpp-client/setup/images/build.png" width="250">
+        <img src="doc/cpp-client/setup/images/build.png" width="250">
 
 # monoDrive ROS Client
 
