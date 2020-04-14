@@ -20,14 +20,14 @@ LaneSpline lanespline;
 std::vector<Sensor> create_sensors_for(const std::string& ip)
 {
     std::vector<Sensor> sensors;
-    // CameraConfig fc_config;// = *(new CameraConfig());
-    // fc_config.server_ip = ip;
-    // fc_config.listen_port = 8100;
-    // fc_config.location.z = 200;
-    // fc_config.rotation.pitch = -5;
-    // fc_config.resolution = CameraConfig::Resolution(1024,1024);
+    CameraConfig fc_config;// = *(new CameraConfig());
+    fc_config.server_ip = ip;
+    fc_config.listen_port = 8100;
+    fc_config.location.z = 200;
+    fc_config.rotation.pitch = -5;
+    fc_config.resolution = CameraConfig::Resolution(512,512);
 
-    // sensors.emplace_back(fc_config);
+    sensors.emplace_back(fc_config);
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
@@ -35,7 +35,7 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
     Sensor(vp_config).configure();
 
     StateConfig state_config;
-    state_config.desired_tags = {"vehicle", "ego", "R1-1"};
+    state_config.desired_tags = {"vehicle", "ego"};
     state_config.server_ip = ip;
     state_config.listen_port = 8101;
     state_config.debug_drawing = true;
@@ -51,13 +51,8 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
 }
 
 void control_vehicle(Simulator& simulator, Sensor &sensor){
-    // std::string json_string(reinterpret_cast<char*>(sensor.recvBuffer.data()), sensor.recvBuffer.size());
-    // std::cout << "recieved length, size: " << sensor.recvBuffer.length() << " " << sensor.recvBuffer.size() << std::endl;
     std::string json_string(reinterpret_cast<char*>(sensor.recvBuffer.data()), sensor.recvBuffer.size());
-    // std::cout << json_string << std::endl;
-    // json_string += "_json";
     nlohmann::json frames = json::parse(json_string);
-    // std::cout << frames.dump() << std::endl;
 
     nlohmann::json vehicle_frame;
     nlohmann::json stop_sign_frame;
@@ -65,10 +60,6 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
         for(auto& tag : f["tags"]){
             if(tag == "ego"){
                 vehicle_frame = f;
-                break;
-            }
-            else if(tag == "R1-1"){
-                stop_sign_frame = f;
                 break;
             }
         }
@@ -83,10 +74,6 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
         vehicle_frame["orientation"][0].get<float>(),
         vehicle_frame["orientation"][1].get<float>(),
         vehicle_frame["orientation"][2].get<float>());
-    Eigen::VectorXd stop_sign_position(3);
-    stop_sign_position << stop_sign_frame["position"][0].get<double>(),
-        stop_sign_frame["position"][1].get<double>(),
-        stop_sign_frame["position"][2].get<double>();
     auto nearestIndex = lanespline.GetNearestPoint("road_0", "lane_2", position);
     auto& lane_points = lanespline.spline_map["road_0"]["lane_2"];
     int nextPointIndex = nearestIndex;
@@ -104,21 +91,11 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
     dirToNextPoint.normalize();
 
     double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
-    // std::cout << angle << std::endl;
     
     nlohmann::json msg;
-    double distToStopSign = (stop_sign_position - position).norm();
-    std::cout << distToStopSign << std::endl;
-    if(distToStopSign <= 25000){
-        msg["forward_amount"] = 0.0f;
-        msg["brake_amount"] = 1.0f;
-    }
-    else{
-        msg["forward_amount"] = 1.0f;
-        msg["brake_amount"] = 0.0f;
-    }
+    msg["forward_amount"] = 0.75f;
+    msg["brake_amount"] = 0.0f;
     msg["drive_mode"] = 1;
-    
     msg["right_amount"] = angle;
 
     std::cout << "sending control" << std::endl;
@@ -133,22 +110,19 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "stop-sign/simulator.json",
+        "cpp-examples/lane_follower/simulator.json",
         "simulator-cpp-client/config/vehicle.json",
         "simulator-cpp-client/config/weather.json",
-        "stop-sign/scenario.json");
+        "cpp-examples/lane_follower/scenario.json");
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
     sim0.configure();
-    lanespline = LaneSpline("stop-sign/Straightaway5k.json");
+    lanespline = LaneSpline("cpp-examples/lane_follower/Straightaway5k.json");
 
     //Setup and Connect Sensors
     std::vector<Sensor> sensors = create_sensors_for(server0_ip);
     
     //Get number of steps in scenario and start timer
     int nSteps = config.scenario.size();
-    int idx = 0;
-    mono::precise_stopwatch stopwatch;
-
 
     /// initialize the vehicle, the first control command spawns the vehicle
     sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
@@ -157,10 +131,9 @@ int main(int argc, char** argv)
             {"brake_amount", 0.0},
             {"drive_mode", 1}
         }));
-    // sleep(5);
     //Step through scenario while reading sensor ouputs
     std::future<bool> task;
-    while(100){
+    while(true){
         task = std::async([&sim0](){
             return sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
         });
@@ -172,14 +145,9 @@ int main(int argc, char** argv)
             break;
         }
         else{
-            control_vehicle(sim0, sensors[0]);
+            control_vehicle(sim0, sensors[1]);
         }
     }
-
-    //Calculate FPS
-    auto scenario_time = stopwatch.elapsed_time<unsigned int, std::chrono::microseconds>();
-    auto fps = float(idx)/scenario_time*1000000.0;
-    std::cout<< "fps = " + std::to_string(fps) << std::endl;
     
     return 0;
 }
