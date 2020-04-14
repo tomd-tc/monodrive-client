@@ -94,6 +94,7 @@ public:
 	bool configure();
 	bool send_configure();
 	bool start_listening();
+	bool stop_listening();
 	
 	ByteBuffer recvBuffer;
 	SensorBaseConfig* config = nullptr;

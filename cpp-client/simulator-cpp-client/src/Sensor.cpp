@@ -21,7 +21,8 @@ Sensor::Sensor(SensorBaseConfig& sensor_config) : config(&sensor_config)
 
 Sensor::~Sensor()
 {
-	
+	stop_listening();
+	delete listener;
 }
 
 std::string Sensor::dump_json()
@@ -55,9 +56,20 @@ bool Sensor::start_listening()
 	return success;	
 }
 
+bool Sensor::stop_listening()
+{
+	if(listener==nullptr)
+		return true;
+	if(listener->socket.is_open()){
+		listener->socket.close();
+	}
+	return true;
+}
 
 void Sensor::sample()
 {
+	if(config->listen_port == 0)
+		return;
 	recvBuffer.resize(header_length);
 	if(listener->socket.is_open()){
     	listener->read_sensor_packet(recvBuffer);
