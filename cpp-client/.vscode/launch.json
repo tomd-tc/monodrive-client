@@ -1,0 +1,72 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "lane_follower linux",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-examples/lane_follower/lane_follower",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "lane_follower windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-examples/lane_follower/lane_follower",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "replay_example windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-examples/replay/replay_example",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "replay_example linux",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-examples/replay/replay_example",
+            "args": [
+                ""
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}

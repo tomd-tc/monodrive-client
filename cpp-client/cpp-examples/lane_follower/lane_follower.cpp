@@ -98,7 +98,6 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
     msg["drive_mode"] = 1;
     msg["right_amount"] = angle;
 
-    std::cout << "sending control" << std::endl;
     simulator.send_command(ApiMessage(777, EgoControl_ID, true, msg));
 }
 
