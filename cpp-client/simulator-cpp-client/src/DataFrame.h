@@ -90,3 +90,58 @@ class ImuFrame : DataFrame{
     uint16_t checksum;
     int time_of_week;
 };
+
+struct Quaternion{
+    float x, y, z, w;
+};
+struct Vec3{
+    float x, y, z;
+};
+
+struct Transform{
+    Vec3 position;
+    Quaternion orientation;
+};
+
+struct OOBB{
+    std::string name;
+    Quaternion orientation;
+    Vec3 center;
+    Vec3 scale;
+    Vec3 extents;
+};
+
+struct WheelState{
+    int32_t id;
+    float speed;
+    Transform transform;
+};
+
+struct Odometry{
+    Transform pose;
+    Vec3 linear_velocity;
+    Vec3 angular_velocity;
+};
+
+struct ObjectState{
+    std::string name;
+    Odometry odometry;
+    std::vector<std::string> tags;
+    std::vector<OOBB> oobbs;
+};
+
+struct VehicleState{
+    ObjectState state;
+    std::vector<WheelState> wheels;
+};
+
+class StateFrame : DataFrame{
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override {
+        // todo
+        return ByteBuffer();
+    }
+    std::vector<VehicleState> vehicles;
+    float game_time;
+    int time;
+};

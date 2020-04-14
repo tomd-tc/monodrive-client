@@ -2,23 +2,14 @@
 
 #include <string>    
 #include <iostream>
-#include "json.hpp" 
-
-
-using nlohmann::json;
-using string = std::string;
-
-void inline json_log(const string& error_message)
-{
-    std::cerr << error_message << std::endl;
-};
+#include "JsonHelpers.h"
 
 class SensorBaseConfig
 {
     public:
         SensorBaseConfig(){};
         virtual ~SensorBaseConfig(){};
-        string server_ip = "127.0.0.1";
+        std::string server_ip = "127.0.0.1";
         int server_port = 8999;
         std::string type = "None";
         std::string description;
@@ -44,7 +35,7 @@ class SensorBaseConfig
             int queue_size{1};
         }ros;
         friend void to_json(nlohmann::json& j,const SensorBaseConfig& config);
-        friend void from_json(const json& j, SensorBaseConfig& config);
+        friend void from_json(const nlohmann::json& j, SensorBaseConfig& config);
 
         virtual SensorBaseConfig& get()
         {
@@ -52,7 +43,7 @@ class SensorBaseConfig
         }
         virtual std::string dump_json()
         {
-            json j = *this;
+            nlohmann::json j = *this;
             return j.dump();
         }
 };
@@ -71,7 +62,7 @@ public:
         return *this;
     }
     std::string dump_json() override{
-        json j = *this;
+        nlohmann::json j = *this;
         return j.dump();
     }
 };
@@ -89,7 +80,7 @@ public:
     int n_lasers{16};
     float reset_angle{0.0f};
     std::string dump_json() override{
-        json j = *this;
+        nlohmann::json j = *this;
         return j.dump();
     }
 };
@@ -141,7 +132,7 @@ public:
         bool debug_draw{true};
     }sbr;   
     std::string dump_json() override{
-        json j = *this;
+        nlohmann::json j = *this;
         return j.dump();
     }
 };
@@ -175,7 +166,7 @@ public:
         return *this;
     }
     std::string dump_json() override{
-        json j = *this;
+        nlohmann::json j = *this;
         return j.dump();
     }      
 };
@@ -190,7 +181,7 @@ public:
     //friend void to_json(nlohmann::json& j,const GPSConfig& config);
     //friend void json_get(const json& j, GPSConfig& config);
     std::string dump_json() override{
-        json j = *this;
+        nlohmann::json j = *this;
         return j.dump();
     }
 };
@@ -203,7 +194,7 @@ public:
         type = "IMU";
     }
     std::string dump_json() override{
-        json j = *this;
+        nlohmann::json j = *this;
         return j.dump();
     }
 };
@@ -215,14 +206,14 @@ public:
     {
         type = "Collision";
     }
-    std::vector<string> desired_tags{"vt"};
-    std::vector<string> undesired_tags{"static"};
+    std::vector<std::string> desired_tags{"vt"};
+    std::vector<std::string> undesired_tags{"static"};
     CollisionConfig& get()
     {
         return *this;
     }
     std::string dump_json() override{
-        json j = *this;
+        nlohmann::json j = *this;
         return j.dump();
     }
 };
@@ -236,85 +227,36 @@ public:
     }
 };
 
-template <typename T>
-bool inline json_get(const json& data, const string& key, T& value) {
-    T temp;
-    try {
-        temp = data.at(key).get<T>();
-    }
-    catch (const nlohmann::detail::out_of_range& e) {
-        // key not found error
-        json_log(string(e.what()));
-        return false;
-    }
-    catch (const nlohmann::detail::type_error& e) {
-        // type error
-        json_log(string("key \"") + string(key.c_str()) + string("\" sent as wrong type ") + std::string(e.what()));
-        return false;
-    }
-    catch (const std::exception& e) {
-        // unknown error
-        json_log(string("json exception ") + string(e.what()));
-        return false;
-    }
-    value = temp;
-    return true;
-}
-
-template<typename T>
-bool inline json_vector(const json& data, const string& key, std::vector<T>& value){
-    std::vector<T> temp;
-    try{
-        for(auto& v : data[key]){
-            temp.push_back(v.get<T>());
-        }
-    }
-    catch (const nlohmann::detail::out_of_range& e) {
-        json_log(string(e.what()));
-        return false;
-    }
-    catch (const nlohmann::detail::type_error& e) {
-        json_log(string("key \"") + string(key.c_str()) + string("\" sent as wrong type ") + std::string(e.what()));
-        return false;
-    }
-    catch (const std::exception& e) {
-        json_log(string("json exception ") + string(e.what()));
-        return false;
-    }
-    value = temp;
-    return true;
-}
-
 /// SensorBaseConfig
-void inline to_json(json& j, const SensorBaseConfig::Location& location)
+void inline to_json(nlohmann::json& j, const SensorBaseConfig::Location& location)
 {
-    j = json{{"x", location.x},
+    j = nlohmann::json{{"x", location.x},
                 {"y", location.y},
                 {"z", location.z}
     };
 }
-void inline from_json(const json& j, SensorBaseConfig::Location& location)
+void inline from_json(const nlohmann::json& j, SensorBaseConfig::Location& location)
 {
     json_get(j, "x", location.x);
     json_get(j, "y", location.y);
     json_get(j, "z", location.z);
 }
-void inline to_json(json& j, const SensorBaseConfig::Rotation& rotation)
+void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
 {
-    j = json{{"yaw", rotation.yaw},
+    j = nlohmann::json{{"yaw", rotation.yaw},
                 {"pitch", rotation.pitch},
                 {"roll", rotation.roll}
                 };
 }
-void inline from_json(const json& j, SensorBaseConfig::Rotation& rotation)
+void inline from_json(const nlohmann::json& j, SensorBaseConfig::Rotation& rotation)
 {
     json_get(j,"yaw", rotation.yaw);
     json_get(j,"pitch", rotation.pitch);
     json_get(j, "roll", rotation.roll);
 }
-void inline to_json(json& j, const SensorBaseConfig::ROS& ros)
+void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 {
-    j = json{   
+    j = nlohmann::json{   
         {"publish_to_ros", ros.publish_to_ros},
         {"advertise", ros.advertise},
         {"topic", ros.topic},
@@ -323,7 +265,7 @@ void inline to_json(json& j, const SensorBaseConfig::ROS& ros)
         {"queue_size", ros.queue_size}
     };
 }
-void inline from_json(const json& j, SensorBaseConfig::ROS& ros)
+void inline from_json(const nlohmann::json& j, SensorBaseConfig::ROS& ros)
 {
     json_get(j,"publis_to_ross", ros.publish_to_ros);
     json_get(j,"advertise", ros.advertise);
@@ -332,9 +274,9 @@ void inline from_json(const json& j, SensorBaseConfig::ROS& ros)
     json_get(j,"send_tf", ros.send_tf);
     json_get(j, "queue_size", ros.queue_size);
 }
-void inline to_json(json& j, const SensorBaseConfig& config)
+void inline to_json(nlohmann::json& j, const SensorBaseConfig& config)
 {
-    j = json{
+    j = nlohmann::json{
         {"type", config.type},
         {"description", config.description},
         {"listen_port", config.listen_port},
@@ -343,7 +285,7 @@ void inline to_json(json& j, const SensorBaseConfig& config)
         {"ros", config.ros}
     };
 };
-void inline from_json(const json& j, SensorBaseConfig& config)
+void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
 {
     json_get(j, "type", config.type);
     json_get(j, "description", config.description);
@@ -355,20 +297,20 @@ void inline from_json(const json& j, SensorBaseConfig& config)
 /// End SensorBaseConfig JSON Parsing
 
 /// Camera Config JSON Parsing
-void inline to_json(json& j, const CameraConfig::Resolution& resolution)
+void inline to_json(nlohmann::json& j, const CameraConfig::Resolution& resolution)
 {
-    j = json{{"x", resolution.x},
+    j = nlohmann::json{{"x", resolution.x},
             {"y", resolution.y}
             };
 }
 
-void inline from_json(const json& j, CameraConfig::Resolution& resolution)
+void inline from_json(const nlohmann::json& j, CameraConfig::Resolution& resolution)
 {
     json_get(j, "x", resolution.x);
     json_get(j, "y", resolution.y);
 }
 
-void inline to_json(json& j, const StateConfig& config){
+void inline to_json(nlohmann::json& j, const StateConfig& config){
     j = static_cast<SensorBaseConfig>(config);
     j["desired_tags"] = config.desired_tags;
     j["undesired_tags"] = config.undesired_tags;
@@ -376,7 +318,7 @@ void inline to_json(json& j, const StateConfig& config){
     j["include_obb"] = config.include_obb;
 }
 
-void inline from_json(const json& j, StateConfig& config)
+void inline from_json(const nlohmann::json& j, StateConfig& config)
 {
     json_get(j, "include_obb", config.include_obb);
     json_get(j, "debug_drawing", config.debug_drawing);
@@ -384,7 +326,7 @@ void inline from_json(const json& j, StateConfig& config)
     json_vector(j, "undesired_tags", config.undesired_tags);
 }
 
-void inline to_json(json& j, const CameraConfig& config)
+void inline to_json(nlohmann::json& j, const CameraConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
     j["stream_dimensions"] = config.resolution;
@@ -399,7 +341,7 @@ void inline to_json(json& j, const CameraConfig& config)
     j["channels"] =config.channels;
 }
 
-void inline from_json(const json& j, CameraConfig& config)
+void inline from_json(const nlohmann::json& j, CameraConfig& config)
 {
     json_get(j, "stream_dimensions", config.resolution),
     json_get(j, "max_distance", config.max_distance);
@@ -416,7 +358,7 @@ void inline from_json(const json& j, CameraConfig& config)
 /// END Camera Config JSON Parsing
 
 /// Radar Config JSON Parsing
-void inline to_json(json& j, const RadarConfig& config)
+void inline to_json(nlohmann::json& j, const RadarConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
     j["paint_targets"] = config.paint_targets;
@@ -437,26 +379,26 @@ void inline to_json(json& j, const RadarConfig& config)
     j["sbr"] = config.sbr;
 }
 
-void inline to_json(json& j, const RadarConfig::Transmitter& config)
+void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
 {
-     j = json{{ "peak_power", config.peak_power},
+     j = nlohmann::json{{ "peak_power", config.peak_power},
               {"aperature", config.aperature},
               {"gain", config.gain}
      };
 }
 
-void inline to_json(json& j, const RadarConfig::Receiver& config)
+void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
 {
-    j = json{{"gain", config.gain},
+    j = nlohmann::json{{"gain", config.gain},
              {"aperature", config.aperature},
              {"nf", config.nf},
              {"noise_temp", config.noise_temp},
              {"nb", config.nb}    
     };
 }
-void inline to_json(json& j, const RadarConfig::SBR& config)
+void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
 {
-    j = json{{"minimum_radar_distance", config.minimum_radar_distance},
+    j = nlohmann::json{{"minimum_radar_distance", config.minimum_radar_distance},
              {"long_range_scan_distance", config.long_range_scan_distance},
              {"short_range_scan_distance", config.short_range_scan_distance},
              {"num_scans_azimuth", config.num_scans_elevation},
@@ -468,7 +410,7 @@ void inline to_json(json& j, const RadarConfig::SBR& config)
              {"debug_draw", config.debug_draw}
       };
 }
-void inline from_json(const json& j, RadarConfig& config)
+void inline from_json(const nlohmann::json& j, RadarConfig& config)
 {
     json_get(j, "paint_targets", config.paint_targets);
     json_get(j, "target_paint_lifetime", config.target_paint_lifetime);
@@ -484,14 +426,14 @@ void inline from_json(const json& j, RadarConfig& config)
     json_get(j, "sbr", config.sbr);
 }
 
-void inline from_json(const json& j, RadarConfig::Transmitter config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter config)
 {
     json_get(j, "peak_power", config.peak_power);
     json_get(j, "aperature", config.aperature);
     json_get(j, "gain", config.gain);
 }
 
-void inline from_json(const json& j, RadarConfig::Receiver config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
 {
     json_get(j, "gain", config.gain);
     json_get(j, "aperature", config.aperature);
@@ -500,7 +442,7 @@ void inline from_json(const json& j, RadarConfig::Receiver config)
     json_get(j, "nb", config.nb);
 }
 
-void inline from_json(const json& j, RadarConfig::SBR config)
+void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
 {
     json_get(j, "minimum_radar_distance",   config.minimum_radar_distance);
     json_get(j, "long_range_scan_distance", config.long_range_scan_distance);
@@ -517,7 +459,7 @@ void inline from_json(const json& j, RadarConfig::SBR config)
 /// END Radar Config JSON Parsing
 
 /// Lidar Config JSON Parsing
-void inline to_json(json& j, const LidarConfig& config)
+void inline to_json(nlohmann::json& j, const LidarConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
     j["max_distance"] =          config.max_distance;
@@ -527,7 +469,7 @@ void inline to_json(json& j, const LidarConfig& config)
     j["reset_angle"] =           config.reset_angle;
 }
 
-void inline from_json(const json& j, LidarConfig& config)
+void inline from_json(const nlohmann::json& j, LidarConfig& config)
 {
     json_get(j, "max_distance",         config.max_distance);
     json_get(j, "horizontal_resolution",config.horizontal_resolution);
@@ -540,7 +482,7 @@ void inline from_json(const json& j, LidarConfig& config)
 
 /// GPS Config JSON Parsing
 
-void inline to_json(json& j, const GPSConfig& config)
+void inline to_json(nlohmann::json& j, const GPSConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
 }
@@ -553,7 +495,7 @@ void inline to_json(json& j, const GPSConfig& config)
 /// END GPS Config JSON Parsing
 
 /// Collision Config JSON Parsing
-void inline to_json(json& j, const CollisionConfig& config)
+void inline to_json(nlohmann::json& j, const CollisionConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
     for (auto iter = config.desired_tags.begin(); iter != config.desired_tags.end(); ++iter)
@@ -566,7 +508,7 @@ void inline to_json(json& j, const CollisionConfig& config)
 	}
 }
 
-void inline from_json(const json& j, CollisionConfig& config)
+void inline from_json(const nlohmann::json& j, CollisionConfig& config)
 {
     json_get(j, "desired_tags", config.desired_tags);
     json_get(j, "undesired_tags", config.undesired_tags);   

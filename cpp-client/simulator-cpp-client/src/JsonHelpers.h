@@ -6,22 +6,10 @@
 #include "json.hpp"
 #pragma warning(pop)
 
-class JsonSerializable {
-	virtual void to_json(nlohmann::json& j) const = 0;
-	virtual void from_json(const nlohmann::json& j) = 0;
+void inline json_log(const std::string& error_message)
+{
+    std::cerr << error_message << std::endl;
 };
-
-template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
-void to_json(nlohmann::json& j, const T& bm) {
-	bm.to_json(j);
-};
-
-template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
-void from_json(const nlohmann::json& j, T& bm) {
-	bm.from_json(j);
-};
-
-
 
 template <typename T>
 T json_get_value(const nlohmann::json& j, std::string name, T defaultValue)
@@ -32,9 +20,6 @@ T json_get_value(const nlohmann::json& j, std::string name, T defaultValue)
 	}
 	return defaultValue;
 }
-
-
-
 
 inline bool json_contains_name(const nlohmann::json& j, const std::string &name) {
 	for (auto& obj : j) {
@@ -71,3 +56,52 @@ bool json_contains_one(const nlohmann::json& j, T key, Args... keys) {
 	return std::find(j.begin(), j.end(), key) != j.end() || json_contains_one(j, keys...);
 }
 
+
+template <typename T>
+bool inline json_get(const json& data, const string& key, T& value) {
+    T temp;
+    try {
+        temp = data.at(key).get<T>();
+    }
+    catch (const nlohmann::detail::out_of_range& e) {
+        // key not found error
+        json_log(string(e.what()));
+        return false;
+    }
+    catch (const nlohmann::detail::type_error& e) {
+        // type error
+        json_log(string("key \"") + string(key.c_str()) + string("\" sent as wrong type ") + std::string(e.what()));
+        return false;
+    }
+    catch (const std::exception& e) {
+        // unknown error
+        json_log(string("json exception ") + string(e.what()));
+        return false;
+    }
+    value = temp;
+    return true;
+}
+
+template<typename T>
+bool inline json_vector(const json& data, const string& key, std::vector<T>& value){
+    std::vector<T> temp;
+    try{
+        for(auto& v : data[key]){
+            temp.push_back(v.get<T>());
+        }
+    }
+    catch (const nlohmann::detail::out_of_range& e) {
+        json_log(string(e.what()));
+        return false;
+    }
+    catch (const nlohmann::detail::type_error& e) {
+        json_log(string("key \"") + string(key.c_str()) + string("\" sent as wrong type ") + std::string(e.what()));
+        return false;
+    }
+    catch (const std::exception& e) {
+        json_log(string("json exception ") + string(e.what()));
+        return false;
+    }
+    value = temp;
+    return true;
+}

@@ -116,3 +116,17 @@ void ImuFrame::parse(ByteBuffer& buffer){
     checksum = buffer.readShort();
     time_of_week = buffer.readLong();
 }
+
+void StateFrame::parse(ByteBuffer& buffer){
+    auto json = BufferToJson(buffer);
+    game_time = json["game_time"].get<float>();
+    time = json["time"].get<int>();
+    auto states = json["frame"];
+
+    vehicles.clear();
+    for(auto& frame : states){
+        VehicleState state;
+        json_get(frame, "name", state.state.name);
+        
+    }
+}
