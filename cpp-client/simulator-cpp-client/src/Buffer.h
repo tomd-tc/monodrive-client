@@ -68,8 +68,8 @@ public:
 		position_ = 0;
 	}
 
-	uint32_t size() { return available(); }
-	uint32_t length() { return length_; }
+	uint32_t size() const { return available(); }
+	uint32_t length() const { return length_; }
 
 	uint32_t skip(uint32_t count) {
 		position_ += count;
