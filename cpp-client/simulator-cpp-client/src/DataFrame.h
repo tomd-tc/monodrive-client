@@ -5,8 +5,8 @@
 
 class DataFrame{
 public:
-    virtual void parse(const ByteBuffer& buffer) = 0;
-    virtual ByteBuffer write() = 0;
+    virtual void parse(ByteBuffer& buffer) = 0;
+    virtual ByteBuffer write() const = 0;
     static ByteBuffer JsonToBuffer(const nlohmann::json& frame);
     static nlohmann::json BufferToJson(const ByteBuffer& buffer);
     // int read_header(ByteBuffer& buffer);
@@ -47,15 +47,20 @@ public:
     int size(){
         return resolution.x * resolution.y * channels;
     }
-    virtual void parse(const ByteBuffer& buffer){
+    virtual void parse(ByteBuffer& buffer){
         std::copy(buffer.data(), buffer.data() + buffer.size(), data);
+    }
+    virtual ByteBuffer write() const override{
+        // todo
+        return ByteBuffer();
     }
 };
 
 class RadarTargetListFrame : DataFrame{
 public:
-    virtual void parse(const ByteBuffer& buffer) override;
-    virtual ByteBuffer write() override;
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+public:
     struct Target{
         std::vector<std::string> target_ids;
         float range{-1}; // m
@@ -63,12 +68,25 @@ public:
         float velocity{0};
         float rcs{0}; 
     };
-public:
     std::vector<Target> targets;
     std::vector<Target> gt_targets;
 protected:
     void parse_target_list(const nlohmann::json& target_list);
     void parse_gt_target_list(const nlohmann::json& target_list);
-    nlohmann::json write_target_list();
-    nlohmann::json write_gt_target_list();
+    nlohmann::json write_target_list() const;
+    nlohmann::json write_gt_target_list() const;
+};
+
+class ImuFrame : DataFrame{
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override {
+        // todo
+        return ByteBuffer();
+    }
+
+    float acc_x, acc_y, acc_z;
+    float ang_x, ang_y, ang_z;
+    uint32_t timer;
+    uint16_t checksum;
+    int time_of_week;
 };

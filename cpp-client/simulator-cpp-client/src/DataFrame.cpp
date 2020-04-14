@@ -1,5 +1,7 @@
 #include "DataFrame.h"
 
+#define IMU_DATA_PACKET_SIZE 35
+
 // int DataFrame::read_header(ByteBuffer& buffer){
 //     // todo this probably wrong
 //     int length = buffer.readInt();
@@ -50,7 +52,7 @@ void RadarTargetListFrame::parse_gt_target_list(const nlohmann::json& target_lis
     }
 }
 
-void RadarTargetListFrame::parse(const ByteBuffer& buffer){
+void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = BufferToJson(buffer);
     // todo: make both target list and gt list same type to simplify
     // target list
@@ -59,7 +61,7 @@ void RadarTargetListFrame::parse(const ByteBuffer& buffer){
     parse_target_list(frame["gt_target_list"]);
 }
 
-nlohmann::json RadarTargetListFrame::write_target_list(){
+nlohmann::json RadarTargetListFrame::write_target_list() const{
     nlohmann::json target_list = nlohmann::json::array();
     for(int i = 0; i < targets.size(); ++i){
         auto& target = targets[i];
@@ -79,7 +81,7 @@ nlohmann::json RadarTargetListFrame::write_target_list(){
     return target_list;
 }
 
-nlohmann::json RadarTargetListFrame::write_gt_target_list(){
+nlohmann::json RadarTargetListFrame::write_gt_target_list() const{
     nlohmann::json target_list = nlohmann::json::array();
     for(int i = 0; i < gt_targets.size(); ++i){
         auto& target = gt_targets[i];
@@ -93,9 +95,24 @@ nlohmann::json RadarTargetListFrame::write_gt_target_list(){
     return target_list;
 }
 
-ByteBuffer RadarTargetListFrame::write(){
+ByteBuffer RadarTargetListFrame::write() const{
     nlohmann::json frame;
     frame["target_list"] = write_target_list();
     frame["gt_target_list"] = write_gt_target_list();
     return JsonToBuffer(frame);
+}
+
+void ImuFrame::parse(ByteBuffer& buffer){
+    // packet_size not needed, old artifact of some specific hardware
+    uint8_t packet_size = buffer.readByte();
+    acc_x = buffer.readFloat();
+    acc_y = buffer.readFloat();
+    acc_z = buffer.readFloat();
+    ang_x = buffer.readFloat();
+    ang_y = buffer.readFloat();
+    ang_z = buffer.readFloat();
+    // more hardware artifacts
+    timer = buffer.readInt();
+    checksum = buffer.readShort();
+    time_of_week = buffer.readLong();
 }

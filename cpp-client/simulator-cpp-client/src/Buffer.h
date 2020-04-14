@@ -110,6 +110,16 @@ public:
 		return (value << 32) | readInt();
 	}
 
+	float readFloat(){
+		uint32_t val = readInt();
+		union{
+			uint32_t input;
+			float output;
+		} data;
+		data.input = val;
+		return data.output;
+	}
+
 	void write(uint8_t value) {
 		if (position_ + 1 >= length_) {
 			grow((position_ + 1) - length_);
