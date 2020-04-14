@@ -128,6 +128,7 @@ struct ObjectState{
     Odometry odometry;
     std::vector<std::string> tags;
     std::vector<OOBB> oobbs;
+    static ObjectState extract(const nlohmann::json& frame);
 };
 
 struct VehicleState{
