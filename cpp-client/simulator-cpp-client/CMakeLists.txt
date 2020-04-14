@@ -10,8 +10,6 @@ add_library(${PROJECT_NAME} ${SOURCES})
 include_directories(src)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
-add_subdirectory(example)
-
 #include boost
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS OFF)

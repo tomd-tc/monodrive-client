@@ -2,6 +2,7 @@
   "id": "simulator_test",
   "server_ip": "127.0.0.1",
   "server_port": 8999,
+  "map": "Almono",
   "client_ip": "127.0.0.1",
   "simulation_mode": 2,
   "phys_materials": {

@@ -45,7 +45,12 @@ int main(int argc, char** argv)
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
     
     //Read JSON files in cpp_client/config directory
-    Configuration config;
+    Configuration config(
+        "simulator-cpp-client/config/simulator.json",
+        "simulator-cpp-client/config/vehicle.json",
+        "simulator-cpp-client/config/weather.json",
+        "simulator-cpp-client/config/scenario.json"
+    );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     if(!sim0.configure()){
