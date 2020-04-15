@@ -110,13 +110,13 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "cpp-examples/lane_follower/simulator.json",
-        "simulator-cpp-client/config/vehicle.json",
-        "simulator-cpp-client/config/weather.json",
-        "cpp-examples/lane_follower/scenario.json");
+        "cpp-client/lane_follower/simulator.json",
+        "config/vehicle.json",
+        "config/weather.json",
+        "cpp-client/lane_follower/scenario.json");
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
     sim0.configure();
-    lanespline = LaneSpline("cpp-examples/lane_follower/Straightaway5k.json");
+    lanespline = LaneSpline("cpp-client/lane_follower/Straightaway5k.json");
 
     //Setup and Connect Sensors
     std::vector<Sensor> sensors = create_sensors_for(server0_ip);
