@@ -77,6 +77,7 @@ int main(int argc, char** argv)
         for(auto& sensor : sensors)
         {
             sensor.sample();
+            sensor.parse();
         }
         if(!task.get()){
             break;

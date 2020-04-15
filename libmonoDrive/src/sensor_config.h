@@ -48,7 +48,9 @@ class SensorBaseConfig
             nlohmann::json j = *this;
             return j.dump();
         }
-        virtual DataFrame* DataFrameFactory() = 0;
+        virtual DataFrame* DataFrameFactory(){
+            throw std::runtime_error("SensorBaseConfig does not name a DataFrame type. Use a derived Sensor type.");
+        };
 };
 
 class StateConfig : public SensorBaseConfig{

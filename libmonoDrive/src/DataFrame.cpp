@@ -10,7 +10,7 @@
 //     return length;
 // }
 
-nlohmann::json BufferToJson(const ByteBuffer& buffer){
+nlohmann::json DataFrame::BufferToJson(const ByteBuffer& buffer){
     std::string json_string(reinterpret_cast<char*>(buffer.data()), buffer.size());
     return nlohmann::json::parse(json_string);
 }

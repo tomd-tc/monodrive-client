@@ -14,6 +14,7 @@ Sensor::Sensor(SensorBaseConfig& sensor_config) : config(&sensor_config)
 	if(config->listen_port != 0){
 		listener = new Connection(config->server_ip, config->listen_port);
 	} 
+	frame = config->DataFrameFactory();
 
 	name = std::string(config->type) + std::string("_") + std::to_string(config->listen_port);
 }
@@ -22,6 +23,8 @@ Sensor::~Sensor()
 {
 	stop_listening();
 	delete listener;
+	if(frame != nullptr)
+		delete frame;
 }
 
 std::string Sensor::dump_json()
