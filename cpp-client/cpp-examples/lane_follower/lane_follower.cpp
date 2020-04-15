@@ -53,7 +53,7 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
 
 void control_vehicle(Simulator& simulator, Sensor &sensor){
     std::string json_string(reinterpret_cast<char*>(sensor.recvBuffer.data()), sensor.recvBuffer.size());
-    nlohmann::json frames = json::parse(json_string);
+    nlohmann::json frames = nlohmann::json::parse(json_string);
 
     nlohmann::json vehicle_frame;
     nlohmann::json stop_sign_frame;
@@ -105,7 +105,7 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
 int main(int argc, char** argv)
 {
     //Single Simulator Example
-    string server0_ip = "127.0.0.1";
+    std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
     
     //Read JSON files in cpp_client/config directory

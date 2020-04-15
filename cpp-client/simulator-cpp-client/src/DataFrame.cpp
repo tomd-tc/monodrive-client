@@ -117,26 +117,16 @@ void ImuFrame::parse(ByteBuffer& buffer){
     time_of_week = buffer.readLong();
 }
 
-ObjectState ObjectState::extract(const nlohmann::json& frame){
-    ObjectState state;
-    // state.odometry.angular_velocity
-    // state.odometry.linear_velocity
-    // state.odometry.pose.orientation
-    // state.odometry.pose.position
-    // json_get(frame, ["angular_velocity"], ;
-}
-
 void StateFrame::parse(ByteBuffer& buffer){
     auto json = BufferToJson(buffer);
     game_time = json["game_time"].get<float>();
     time = json["time"].get<int>();
     auto states = json["frame"];
+    auto vehicleStates = states["vehicles"];
 
     vehicles.clear();
-    for(auto& frame : states){
-        VehicleState state;
-        json_get(frame, "name", state.state.name);
-        state.state.odometry.angular_velocity
-        json_get(frame, "")
+    for(auto& vehicle : vehicleStates){
+        VehicleState state = VehicleState::extract(vehicle);
+        vehicles.emplace_back(state);
     }
 }

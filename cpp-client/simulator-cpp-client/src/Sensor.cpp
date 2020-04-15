@@ -8,7 +8,6 @@
 #include "Simulator.h"
 
 
-
 Sensor::Sensor(SensorBaseConfig& sensor_config) : config(&sensor_config)
 {
     //VieportCamera doesn't need a connection 
@@ -42,7 +41,7 @@ bool Sensor::send_configure()
 {
 	using namespace std;
 	Simulator& sim = Simulator::getInstance(config->server_ip, config->server_port);
-	json msg = json::parse(dump_json());
+	nlohmann::json msg = nlohmann::json::parse(dump_json());
 	return sim.send_command(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));	
 }
 

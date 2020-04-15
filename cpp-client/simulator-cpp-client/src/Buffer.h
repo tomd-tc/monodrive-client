@@ -1,6 +1,9 @@
 #pragma once
 
 #include <stdint.h>
+#include <exception>
+#include <string>
+#include <cstring>
 
 
 class BufferOverrunException : public std::exception {
@@ -45,7 +48,7 @@ public:
 		position_ = 0;
 	}
 
-	ByteBuffer& operator+=(std::size_t n) {
+	ByteBuffer& operator+=(size_t n) {
 		skip(n);
 		return *this;
 	}
@@ -78,7 +81,7 @@ public:
 		return position_;
 	}
 
-	int32_t available() {
+	int32_t available() const {
 		return length_ - position_;
 	}
 

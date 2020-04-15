@@ -41,7 +41,7 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
 int main(int argc, char** argv)
 {
     //Single Simulator Example
-    string server0_ip = "127.0.0.1";
+    std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
     
     //Read JSON files in cpp_client/config directory

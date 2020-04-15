@@ -6,6 +6,8 @@
 #include "json.hpp"
 #pragma warning(pop)
 
+#include <string>
+
 void inline json_log(const std::string& error_message)
 {
     std::cerr << error_message << std::endl;
@@ -58,24 +60,24 @@ bool json_contains_one(const nlohmann::json& j, T key, Args... keys) {
 
 
 template <typename T>
-bool inline json_get(const json& data, const string& key, T& value) {
+bool inline json_get(const nlohmann::json& data, const std::string& key, T& value) {
     T temp;
     try {
         temp = data.at(key).get<T>();
     }
     catch (const nlohmann::detail::out_of_range& e) {
         // key not found error
-        json_log(string(e.what()));
+        json_log(std::string(e.what()));
         return false;
     }
     catch (const nlohmann::detail::type_error& e) {
         // type error
-        json_log(string("key \"") + string(key.c_str()) + string("\" sent as wrong type ") + std::string(e.what()));
+        json_log(std::string("key \"") + std::string(key.c_str()) + std::string("\" sent as wrong type ") + std::string(e.what()));
         return false;
     }
     catch (const std::exception& e) {
         // unknown error
-        json_log(string("json exception ") + string(e.what()));
+        json_log(std::string("json exception ") + std::string(e.what()));
         return false;
     }
     value = temp;
@@ -83,7 +85,7 @@ bool inline json_get(const json& data, const string& key, T& value) {
 }
 
 template<typename T>
-bool inline json_vector(const json& data, const string& key, std::vector<T>& value){
+bool inline json_vector(const nlohmann::json& data, const std::string& key, std::vector<T>& value){
     std::vector<T> temp;
     try{
         for(auto& v : data[key]){
@@ -91,15 +93,15 @@ bool inline json_vector(const json& data, const string& key, std::vector<T>& val
         }
     }
     catch (const nlohmann::detail::out_of_range& e) {
-        json_log(string(e.what()));
+        json_log(std::string(e.what()));
         return false;
     }
     catch (const nlohmann::detail::type_error& e) {
-        json_log(string("key \"") + string(key.c_str()) + string("\" sent as wrong type ") + std::string(e.what()));
+        json_log(std::string("key \"") + std::string(key.c_str()) + std::string("\" sent as wrong type ") + std::string(e.what()));
         return false;
     }
     catch (const std::exception& e) {
-        json_log(string("json exception ") + string(e.what()));
+        json_log(std::string("json exception ") + std::string(e.what()));
         return false;
     }
     value = temp;
