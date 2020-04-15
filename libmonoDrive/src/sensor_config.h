@@ -3,6 +3,7 @@
 #include <string>    
 #include <iostream>
 #include "JsonHelpers.h"
+#include "DataFrame.h"
 
 class SensorBaseConfig
 {
@@ -46,6 +47,7 @@ class SensorBaseConfig
             nlohmann::json j = *this;
             return j.dump();
         }
+        // virtual DataFrame* GetDataFrameType() = 0;
 };
 
 class StateConfig : public SensorBaseConfig{
@@ -65,6 +67,9 @@ public:
         nlohmann::json j = *this;
         return j.dump();
     }
+    // virtual DataFrame* GetDataFrameType() override{
+    //     return new StateFrame();
+    // }
 };
 
 class LidarConfig : public SensorBaseConfig

@@ -3,7 +3,6 @@
 #include "Buffer.h"
 #include "JsonHelpers.h"
 #include <algorithm>
-#include "Configuration.h"
 
 class DataFrame{
 public:
@@ -16,21 +15,8 @@ public:
     // float game_time;
 };
 
-nlohmann::json BufferToJson(const ByteBuffer& buffer){
-    std::string json_string(reinterpret_cast<char*>(buffer.data()), buffer.size());
-    return nlohmann::json::parse(json_string);
-}
-
-// todo need space for the header: length, wall time, game time
-ByteBuffer DataFrame::JsonToBuffer(const nlohmann::json& frame){
-    std::string raw = frame.dump();
-    ByteBuffer buffer;
-    buffer.write((uint8_t*)raw.c_str(), raw.size());
-    return buffer;
-}
-
 // for now 8 bit only, todo: add float higher bit rate etc enum
-class ImageFrame : DataFrame{
+class ImageFrame : public DataFrame{
 public:
     ImageFrame(int x_res, int y_res) : channels(channels){
         resolution.x = x_res;
@@ -59,7 +45,7 @@ public:
     }
 };
 
-class RadarTargetListFrame : DataFrame{
+class RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
@@ -203,7 +189,7 @@ struct VehicleState{
     }
 };
 
-class StateFrame : DataFrame{
+class StateFrame : public DataFrame{
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
         // todo

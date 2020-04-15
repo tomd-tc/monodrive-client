@@ -10,6 +10,19 @@
 //     return length;
 // }
 
+nlohmann::json BufferToJson(const ByteBuffer& buffer){
+    std::string json_string(reinterpret_cast<char*>(buffer.data()), buffer.size());
+    return nlohmann::json::parse(json_string);
+}
+
+// todo need space for the header: length, wall time, game time
+ByteBuffer DataFrame::JsonToBuffer(const nlohmann::json& frame){
+    std::string raw = frame.dump();
+    ByteBuffer buffer;
+    buffer.write((uint8_t*)raw.c_str(), raw.size());
+    return buffer;
+}
+
 void RadarTargetListFrame::parse_target_list(const nlohmann::json& target_list){
     targets.clear();
     int size = target_list["range"].size();

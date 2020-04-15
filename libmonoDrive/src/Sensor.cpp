@@ -65,16 +65,24 @@ bool Sensor::stop_listening()
 	return true;
 }
 
-void Sensor::sample()
+bool Sensor::sample()
 {
 	if(config->listen_port == 0)
-		return;
+		return false;
 	recvBuffer.resize(header_length);
 	if(listener->socket.is_open()){
     	listener->read_sensor_packet(recvBuffer);
 	}
-	else
-	{
+	else{
 		std::cout << "Sensor Channel is not open" << std::endl;
+		return false;
 	}
+	return true;
+}
+
+bool Sensor::parse(){
+	if(frame == nullptr)
+		return false;
+	frame->parse(recvBuffer);
+	return true;
 }

@@ -12,6 +12,7 @@
 #include "ApiMessage.h"
 #include "SimulatorCommands.h"
 #include "sensor_config.h"
+#include "DataFrame.h"
 
 #define CONTROL_HEADER			0x6d6f6e6f
 #define RESPONSE_HEADER			0x6f6e6f6d
@@ -89,15 +90,18 @@ public:
 	~Sensor();
 	Sensor(SensorBaseConfig& sensor_config);
 
-	void sample();
+	bool sample();
+	bool parse();
 	std::string dump_json();
 	bool configure();
 	bool send_configure();
 	bool start_listening();
 	bool stop_listening();
+
 	
 	ByteBuffer recvBuffer;
 	SensorBaseConfig* config = nullptr;
+	DataFrame* frame = nullptr;
 	
 private:
 	std::string name;
