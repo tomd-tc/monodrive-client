@@ -1,1 +1,0 @@
-/usr/bin/g++-7  -g   CMakeFiles/lane_follower.dir/lane_follower.cpp.o  -o lane_follower -lmonoDriveClient 

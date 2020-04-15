@@ -1,3 +1,0 @@
-/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/build/CMakeFiles/rebuild_cache.dir
-/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/build/CMakeFiles/lane_follower.dir
-/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/build/CMakeFiles/edit_cache.dir
