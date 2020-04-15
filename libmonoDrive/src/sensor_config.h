@@ -4,6 +4,7 @@
 #include <iostream>
 #include "JsonHelpers.h"
 #include "DataFrame.h"
+#include <exception>
 
 class SensorBaseConfig
 {
@@ -47,7 +48,7 @@ class SensorBaseConfig
             nlohmann::json j = *this;
             return j.dump();
         }
-        // virtual DataFrame* GetDataFrameType() = 0;
+        virtual DataFrame* DataFrameFactory() = 0;
 };
 
 class StateConfig : public SensorBaseConfig{
@@ -67,9 +68,9 @@ public:
         nlohmann::json j = *this;
         return j.dump();
     }
-    // virtual DataFrame* GetDataFrameType() override{
-    //     return new StateFrame();
-    // }
+    virtual DataFrame* DataFrameFactory() override{
+        return new StateFrame;
+    }
 };
 
 class LidarConfig : public SensorBaseConfig
@@ -87,6 +88,10 @@ public:
     std::string dump_json() override{
         nlohmann::json j = *this;
         return j.dump();
+    }
+    virtual DataFrame* DataFrameFactory() override{
+        throw std::runtime_error("not implemented");
+        return new StateFrame;
     }
 };
 
@@ -140,6 +145,9 @@ public:
         nlohmann::json j = *this;
         return j.dump();
     }
+    virtual DataFrame* DataFrameFactory() override{
+        return new RadarTargetListFrame;
+    }
 };
 
 
@@ -174,6 +182,16 @@ public:
         nlohmann::json j = *this;
         return j.dump();
     }      
+    virtual DataFrame* DataFrameFactory() override{
+        int nChannels = 4;
+        if(channels == "bgra")
+            nChannels = 4;
+        if(channels == "gray")
+            nChannels = 1;
+        else
+            throw std::runtime_error("only bgra and gray are supported channel types");
+        return new ImageFrame(resolution.x, resolution.y, nChannels);
+    }
 };
 
 class GPSConfig : public SensorBaseConfig
@@ -189,6 +207,10 @@ public:
         nlohmann::json j = *this;
         return j.dump();
     }
+    virtual DataFrame* DataFrameFactory() override{
+        throw std::runtime_error("not implemented");
+        return new StateFrame;
+    }
 };
 
 class IMUConfig : public SensorBaseConfig
@@ -201,6 +223,9 @@ public:
     std::string dump_json() override{
         nlohmann::json j = *this;
         return j.dump();
+    }
+    virtual DataFrame* DataFrameFactory() override{
+        return new ImuFrame;
     }
 };
 
@@ -221,6 +246,10 @@ public:
         nlohmann::json j = *this;
         return j.dump();
     }
+    virtual DataFrame* DataFrameFactory() override{
+        throw std::runtime_error("not implemented");
+        return new ImuFrame;
+    }
 };
 
 class ViewportCameraConfig : public CameraConfig
@@ -229,6 +258,9 @@ public:
     ViewportCameraConfig()
     {
         type = "ViewportCamera";
+    }
+    virtual DataFrame* DataFrameFactory() override{
+        return nullptr;
     }
 };
 
@@ -504,13 +536,13 @@ void inline to_json(nlohmann::json& j, const CollisionConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
     for (auto iter = config.desired_tags.begin(); iter != config.desired_tags.end(); ++iter)
-	{
-		j["desired_tags"].push_back(*iter);
-	}
+    {
+        j["desired_tags"].push_back(*iter);
+    }
     for (auto iter = config.undesired_tags.begin(); iter != config.undesired_tags.end(); ++iter)
-	{
-		j["undesired_tags"].push_back(*iter);
-	}
+    {
+        j["undesired_tags"].push_back(*iter);
+    }
 }
 
 void inline from_json(const nlohmann::json& j, CollisionConfig& config)

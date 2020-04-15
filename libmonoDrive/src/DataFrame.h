@@ -18,7 +18,7 @@ public:
 // for now 8 bit only, todo: add float higher bit rate etc enum
 class ImageFrame : public DataFrame{
 public:
-    ImageFrame(int x_res, int y_res) : channels(channels){
+    ImageFrame(int x_res, int y_res, int channels) : channels(channels){
         resolution.x = x_res;
         resolution.y = y_res;
         data = new uint8_t[channels * resolution.x * resolution.y];
@@ -66,7 +66,7 @@ protected:
     nlohmann::json write_gt_target_list() const;
 };
 
-class ImuFrame : DataFrame{
+class ImuFrame : public DataFrame{
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
         // todo
