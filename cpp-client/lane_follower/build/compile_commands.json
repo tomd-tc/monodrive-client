@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/build",
+  "command": "/usr/bin/g++-7   -isystem /usr/include/eigen3  -g   -o CMakeFiles/lane_follower.dir/lane_follower.cpp.o -c /home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/lane_follower.cpp",
+  "file": "/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/lane_follower.cpp"
+}
+]

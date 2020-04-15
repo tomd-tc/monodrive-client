@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/lane_follower.cpp
+iostream
+-
+chrono
+-
+thread
+-
+memory
+-
+vector
+-
+Simulator.h
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/Simulator.h
+Configuration.h
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/Configuration.h
+Sensor.h
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/Sensor.h
+sensor_config.h
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/sensor_config.h
+Stopwatch.h
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/Stopwatch.h
+LaneSpline.h
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/LaneSpline.h
+future
+-
+DataFrame.h
+/home/stephen/projects/monodrive-client/cpp-client/cpp-examples/lane_follower/DataFrame.h
+
