@@ -14,8 +14,9 @@
 
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
+    // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    CameraConfig fc_config;// = *(new CameraConfig());
+    CameraConfig fc_config;
     fc_config.server_ip = ip;
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
@@ -38,6 +39,14 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     gps_config.listen_port = 8102;
     sensors.push_back(std::make_shared<Sensor>(gps_config));
 
+    RadarConfig radar_config;
+    radar_config.location.x = 250;
+    radar_config.location.z = 50;
+    radar_config.server_ip = ip;
+    radar_config.listen_port = 8103;
+    sensors.push_back(std::make_shared<Sensor>(radar_config));
+
+    // Send configuraitons to the simulator
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {
@@ -47,11 +56,22 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 }
 
 void view_sensors(std::vector<std::shared_ptr<Sensor>>& sensors){
+    // cast the data frame of the sensor to the appropiate type
     auto camera = static_cast<ImageFrame*>(sensors[0]->frame);
     auto imu = static_cast<ImuFrame*>(sensors[1]->frame);
     auto gps = static_cast<GPSFrame*>(sensors[2]->frame);
-    std::cout << "accel: " << imu->acc_x << ", " << imu->acc_y << ", " << imu->acc_z << std::endl;
-    std::cout << "lat,long: " << gps->lattitude << ", " << gps->longitude << " yaw: " << gps->yaw << std::endl;
+    auto radar = static_cast<RadarTargetListFrame*>(sensors[3]->frame);
+    // now access the data frame's data
+    std::cout << "IMU    accel: " << imu->acc_x << ", " << imu->acc_y << ", " << imu->acc_z << std::endl;
+    std::cout << "GPS:   lat,long: " << gps->lattitude << ", " << gps->longitude << " yaw: " << gps->yaw << std::endl;
+    std::cout << "RADAR: num targets: " << radar->targets.size() << std::endl;
+    if(radar->targets.size() > 0){
+        auto& target = radar->targets[0];
+        std::cout << "RADAR: target 1 ~ ";
+        if(target.target_ids.size() > 0){
+            std::cout << "id1: " << target.target_ids[0] << " ";         }
+        std::cout << "range: " << target.range << " aoa: " << target.aoa << " velocity " << target.velocity << std::endl;
+    }
 }
 
 int main(int argc, char** argv)
@@ -94,9 +114,11 @@ int main(int argc, char** argv)
         //sample all sensors
         for(auto& sensor : sensors)
         {
-            sensor->sample();
+            if(!sensor->sample())
+                std::cout << "Failed to sample " << sensor->config->type << std::endl;
             sensor->parse();
         }
+        // review senors, see replay example for better parallelization
         view_sensors(sensors);
         if(!stepTask.get()){
             break;

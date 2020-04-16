@@ -97,6 +97,7 @@ public:
     }
 };
 
+// todo: make sure defaults are correct
 class RadarConfig : public SensorBaseConfig
 {
 public:
@@ -104,17 +105,18 @@ public:
     {
         type = "Radar";
     }
-    bool paint_targets{true};
+    bool paint_targets{false};
     float target_paint_lifetime{0.25f};
-    int num_samples_per_sweep{1100};
+    float nearest_target_label_radius{50.0f};
+    bool send_radar_cube{false};
+    int gpu_number{0};
     float fs{150000000.0f};
     float fc{77000000000.0f};
     int num_sweeps{32};
-    float range_max{150.0f};
-    float range_resolution{1.0f};
-    float max_velocity{100.0f};
-    float max_targets{100.0f};
-    float fps{1.0};
+    int num_samples_per_sweep{345};
+    float sweep_time{0.0000069};
+    int bandwidth{250000000};
+    int max_radar_returns{500};
     int elements{8};
     struct Transmitter
     {
@@ -124,7 +126,7 @@ public:
     }transmitter;
     struct Receiver
     {
-        float gain{20.0f};
+        float gain{10.0f};
         float aperature{0.000798f};
         float nf{10.0f};
         float noise_temp{290.0};
@@ -132,16 +134,16 @@ public:
     }receiver;
     struct SBR
     {
-        float minimum_radar_distance{1.0f};
-        float long_range_scan_distance{150.0f};
-        float short_range_scan_distance{60.0f};
-        float num_scans_azimuth{100.0f};
-        float long_range_fov{20.0f};
-        float short_range_fov{90.0f};
-        float num_scans_elevation{20.0f};
+        float long_range_scan_distance{60.0f};
+        float short_range_scan_distance{30.0f};
+        float long_range_fov{30.0f};
+        float short_range_fov{60.0f};
         float elevation_fov{5.0f};
-        float max_raycast_hits{5.f};
-        bool debug_draw{true};
+        float ray_division_y{10.0f};
+        float ray_division_z{10.0f};
+        bool debug_frustum{false};
+        bool debug_scan{false};
+        bool debug_rescan{false};
     }sbr;   
     std::string dump_json() override{
         nlohmann::json j = *this;
@@ -399,16 +401,16 @@ void inline to_json(nlohmann::json& j, const RadarConfig& config)
     j = static_cast<SensorBaseConfig>(config);
     j["paint_targets"] = config.paint_targets;
     j["target_paint_lifetime"] = config.target_paint_lifetime;
-    j["num_samples_per_sweep"] = config.num_samples_per_sweep;
+    j["nearest_target_label_radius"] = config.nearest_target_label_radius;
+    j["send_radar_cube"] = config.send_radar_cube;
+    j["gpu_number"] = config.gpu_number;
     j["fs"] = config.fs;
     j["fc"] = config.fc;
     j["num_sweeps"] = config.num_sweeps;
-    j["range_max"] = config.range_max;
-    j["sweep_num_for_range_max"] = config.num_samples_per_sweep;
-    j["range_resolution"]  = config.range_resolution;
-    j["max_velocity"] = config.max_velocity;
-    j["max_targets"] = config.max_targets;
-    j["fps"] = config.fps;
+    j["num_samples_per_sweep"] = config.num_samples_per_sweep;
+    j["sweep_time"] = config.sweep_time;
+    j["bandwidth"] = config.bandwidth;
+    j["max_radar_returns"] = config.max_radar_returns;
     j["elements"] = config.elements;
     j["transmitter"] = config.transmitter;
     j["receiver"] = config.receiver;
@@ -434,28 +436,32 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
 }
 void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
 {
-    j = nlohmann::json{{"minimum_radar_distance", config.minimum_radar_distance},
-             {"long_range_scan_distance", config.long_range_scan_distance},
-             {"short_range_scan_distance", config.short_range_scan_distance},
-             {"num_scans_azimuth", config.num_scans_elevation},
-             {"long_range_fov", config.long_range_fov},
-             {"short_range_fov", config.short_range_scan_distance},
-             {"num_scans_elevation", config.num_scans_elevation},
-             {"elevation_fov", config.elevation_fov},
-             {"max_raycast_hits", config.max_raycast_hits},
-             {"debug_draw", config.debug_draw}
+    j = nlohmann::json{
+        {"long_range_scan_distance", config.long_range_scan_distance},
+        {"short_range_scan_distance", config.short_range_scan_distance},
+        {"long_range_fov", config.long_range_fov},
+        {"short_range_fov", config.short_range_scan_distance},
+        {"elevation_fov", config.elevation_fov},
+        {"ray_division_z", config.ray_division_z},
+        {"ray_division_y", config.ray_division_y},
+        {"debug_frustum", config.debug_frustum},
+        {"debug_scan", config.debug_scan},
+        {"debug_rescan", config.debug_rescan}
       };
 }
 void inline from_json(const nlohmann::json& j, RadarConfig& config)
 {
     json_get(j, "paint_targets", config.paint_targets);
     json_get(j, "target_paint_lifetime", config.target_paint_lifetime);
+    json_get(j, "nearest_target_label_radius", config.nearest_target_label_radius);
+    json_get(j, "send_radar_cube", config.send_radar_cube);
+    json_get(j, "gpu_number", config.gpu_number);
+    json_get(j, "fs", config.fs);
+    json_get(j, "fc", config.fc);
+    json_get(j, "num_sweeps", config.num_sweeps);
     json_get(j, "num_samples_per_sweep", config.num_samples_per_sweep);
-    json_get(j, "range_max", config.range_max);
-    json_get(j, "range_resolution", config.range_resolution);
-    json_get(j, "max_velocity", config.max_velocity);
-    json_get(j, "max_targets", config.max_targets);
-    json_get(j, "fps", config.fps);
+    json_get(j, "sweep_time", config.sweep_time);
+    json_get(j, "max_radar_returns", config.max_radar_returns);
     json_get(j, "elements", config.elements);
     json_get(j, "transmitter", config.transmitter);
     json_get(j, "receiver", config.receiver);
@@ -480,16 +486,16 @@ void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
 
 void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
 {
-    json_get(j, "minimum_radar_distance",   config.minimum_radar_distance);
     json_get(j, "long_range_scan_distance", config.long_range_scan_distance);
     json_get(j, "short_range_scan_distance",config.short_range_scan_distance);
-    json_get(j, "num_scans_azimuth",        config.num_scans_azimuth);
     json_get(j, "long_range_fov",           config.long_range_fov);
     json_get(j, "short_range_fov",          config.short_range_fov);
-    json_get(j, "num_scans_elevation",      config.num_scans_elevation);
     json_get(j, "elevation_fov",            config.elevation_fov);
-    json_get(j, "max_raycast_hits",         config.max_raycast_hits);
-    json_get(j, "debug_draw",               config.debug_draw);
+    json_get(j, "ray_division_y",           config.ray_division_y);
+    json_get(j, "ray_division_z",           config.ray_division_z);
+    json_get(j, "debug_frustum",           config.debug_frustum);
+    json_get(j, "debug_scan",           config.debug_scan);
+    json_get(j, "debug_rescan",           config.debug_rescan);
 }
 
 /// END Radar Config JSON Parsing
