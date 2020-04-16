@@ -81,6 +81,37 @@ public:
     int time_of_week;
 };
 
+class GPSFrame : public DataFrame{
+public:
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override {
+        // todo
+        return ByteBuffer();
+    }
+    // uint8_t preamble;
+    // uint16_t MSG_POS_LLH;
+    uint16_t id_hash;
+    // uint8_t payload_size;
+
+    double lattitude;
+    double longitude;
+    double elevation;
+
+    float world_x;
+    float world_y;
+    float forward_x;
+    float forward_y;
+    float forward_z;
+    float yaw;
+    float speed;
+
+    uint16_t horizontal_accuracy;
+    uint16_t vertical_accuracy;
+    uint8_t num_sats_signal;
+    uint8_t fixed_mode_status;
+    uint16_t crc;
+};
+
 struct Quaternion{
     float x, y, z, w;
     static Quaternion extract(const nlohmann::json& frame){

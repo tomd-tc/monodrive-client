@@ -25,7 +25,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 
     IMUConfig im_config;
     im_config.server_ip = ip;
-    im_config.listen_port = 8105;
+    im_config.listen_port = 8101;
     sensors.push_back(std::make_shared<Sensor>(im_config));
 
     ViewportCameraConfig vp_config;
@@ -33,6 +33,10 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     vp_config.location.z = 200;
     Sensor(vp_config).configure();
 
+    GPSConfig gps_config;
+    gps_config.server_ip = ip;
+    gps_config.listen_port = 8102;
+    sensors.push_back(std::make_shared<Sensor>(gps_config));
 
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
@@ -45,7 +49,9 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 void view_sensors(std::vector<std::shared_ptr<Sensor>>& sensors){
     auto camera = static_cast<ImageFrame*>(sensors[0]->frame);
     auto imu = static_cast<ImuFrame*>(sensors[1]->frame);
-    std::cout << imu->acc_x << ", " << imu->acc_y << ", " << imu->acc_z << std::endl;
+    auto gps = static_cast<GPSFrame*>(sensors[2]->frame);
+    std::cout << "accel: " << imu->acc_x << ", " << imu->acc_y << ", " << imu->acc_z << std::endl;
+    std::cout << "lat,long: " << gps->lattitude << ", " << gps->longitude << " yaw: " << gps->yaw << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -89,8 +95,9 @@ int main(int argc, char** argv)
         for(auto& sensor : sensors)
         {
             sensor->sample();
-            return sensor->parse();
+            sensor->parse();
         }
+        view_sensors(sensors);
         if(!stepTask.get()){
             break;
         }

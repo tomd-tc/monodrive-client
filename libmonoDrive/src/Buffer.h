@@ -113,6 +113,16 @@ public:
 		return (value << 32) | readInt();
 	}
 
+	double readDouble(){
+		uint64_t val = readLong();
+		union{
+			uint64_t input;
+			double output;
+		} data;
+		data.input = val;
+		return data.output;
+	}
+
 	float readFloat(){
 		uint32_t val = readInt();
 		union{

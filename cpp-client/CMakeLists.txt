@@ -8,3 +8,4 @@ else()
 endif()
 
 add_subdirectory(replay)
+add_subdirectory(parser_dev)

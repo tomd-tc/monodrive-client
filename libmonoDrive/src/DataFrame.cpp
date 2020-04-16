@@ -113,6 +113,20 @@ ByteBuffer RadarTargetListFrame::write() const{
     return JsonToBuffer(frame);
 }
 
+void StateFrame::parse(ByteBuffer& buffer){
+    auto json = BufferToJson(buffer);
+    game_time = json["game_time"].get<float>();
+    time = json["time"].get<int>();
+    auto states = json["frame"];
+    auto vehicleStates = states["vehicles"];
+
+    vehicles.clear();
+    for(auto& vehicle : vehicleStates){
+        VehicleState state = VehicleState::extract(vehicle);
+        vehicles.emplace_back(state);
+    }
+}
+
 void ImuFrame::parse(ByteBuffer& buffer){
     // packet_size not needed, old artifact of some specific hardware
     uint8_t packet_size = buffer.readByte();
@@ -128,16 +142,24 @@ void ImuFrame::parse(ByteBuffer& buffer){
     time_of_week = buffer.readInt();
 }
 
-void StateFrame::parse(ByteBuffer& buffer){
-    auto json = BufferToJson(buffer);
-    game_time = json["game_time"].get<float>();
-    time = json["time"].get<int>();
-    auto states = json["frame"];
-    auto vehicleStates = states["vehicles"];
-
-    vehicles.clear();
-    for(auto& vehicle : vehicleStates){
-        VehicleState state = VehicleState::extract(vehicle);
-        vehicles.emplace_back(state);
-    }
+void GPSFrame::parse(ByteBuffer& buffer){
+    uint8_t preamble = buffer.readByte();
+    uint16_t MSG_POS_LLH = buffer.readShort();
+    id_hash = buffer.readShort();
+    uint8_t payload_size = buffer.readByte();
+    lattitude = buffer.readDouble();
+    longitude = buffer.readDouble();
+    elevation = buffer.readDouble();
+    world_x = buffer.readFloat();
+    world_y = buffer.readFloat();
+    forward_x = buffer.readFloat();
+    forward_y = buffer.readFloat();
+    forward_z = buffer.readFloat();
+    yaw = buffer.readFloat();
+    speed = buffer.readFloat();
+    horizontal_accuracy = buffer.readShort();
+    vertical_accuracy = buffer.readShort();
+    num_sats_signal = buffer.readByte();
+    fixed_mode_status = buffer.readByte();
+    crc = buffer.readShort();
 }

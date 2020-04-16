@@ -92,6 +92,7 @@ public:
         return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
+        std::cout << "Error, no parser for Lidar Sensor yet, you will need to parse the buffer yourself." << std::endl;
         return nullptr;
     }
 };
@@ -202,14 +203,12 @@ public:
     {
         type = "GPS";
     }
-    //friend void to_json(nlohmann::json& j,const GPSConfig& config);
-    //friend void json_get(const json& j, GPSConfig& config);
     std::string dump_json() override{
         nlohmann::json j = *this;
         return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
-        return nullptr;
+        return new GPSFrame;
     }
 };
 
@@ -247,6 +246,7 @@ public:
         return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
+        std::cout << "Error, no parser for Collision Sensor yet, you will need to parse the buffer yourself." << std::endl;
         return nullptr;
     }
 };
