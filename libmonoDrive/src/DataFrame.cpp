@@ -21,15 +21,24 @@ ByteBuffer DataFrame::JsonToBuffer(const nlohmann::json& frame){
     return buffer;
 }
 
+void RadarTargetListFrame::parse(ByteBuffer& buffer){
+    auto frame = BufferToJson(buffer)["message"];
+    // todo: make both target list and gt list same type to simplify
+    // target list
+    parse_target_list(frame["target_list"]);
+    // gt target list
+    parse_gt_target_list(frame["gt_target_list"]);
+}
+
 void RadarTargetListFrame::parse_target_list(const nlohmann::json& target_list){
     targets.clear();
-    int size = target_list["range"].size();
+    int size = target_list["ranges"].size();
     if(size == 0)
         return;
-    auto ranges = target_list["range"].get<std::vector<float>>();
-    auto aoas = target_list["aoa"].get<std::vector<float>>();
+    auto ranges = target_list["ranges"].get<std::vector<float>>();
+    auto aoas = target_list["aoas"].get<std::vector<float>>();
     auto rcs = target_list["rcs"].get<std::vector<float>>();
-    auto velocites = target_list["velocites"].get<std::vector<float>>();
+    auto velocites = target_list["velocities"].get<std::vector<float>>();
     auto target_ids = target_list["target_ids"];
     for(int i = 0; i < size; ++i){
         Target target;
@@ -45,12 +54,12 @@ void RadarTargetListFrame::parse_target_list(const nlohmann::json& target_list){
 
 void RadarTargetListFrame::parse_gt_target_list(const nlohmann::json& target_list){
     gt_targets.clear();
-    int size = target_list["range"].size();
+    int size = target_list["ranges"].size();
     if(size == 0)
         return;
-    auto ranges = target_list["range"].get<std::vector<float>>();
-    auto aoas = target_list["aoa"].get<std::vector<float>>();
-    auto velocites = target_list["velocites"].get<std::vector<float>>();
+    auto ranges = target_list["ranges"].get<std::vector<float>>();
+    auto aoas = target_list["aoas"].get<std::vector<float>>();
+    auto velocites = target_list["velocities"].get<std::vector<float>>();
     auto target_ids = target_list["target_ids"].get<std::vector<std::string>>();
     for(int i = 0; i < size; ++i){
         Target target;
@@ -61,15 +70,6 @@ void RadarTargetListFrame::parse_gt_target_list(const nlohmann::json& target_lis
         target.velocity = velocites[i];
         gt_targets.emplace_back(target);
     }
-}
-
-void RadarTargetListFrame::parse(ByteBuffer& buffer){
-    auto frame = BufferToJson(buffer);
-    // todo: make both target list and gt list same type to simplify
-    // target list
-    parse_target_list(frame["target_list"]);
-    // gt target list
-    parse_target_list(frame["gt_target_list"]);
 }
 
 nlohmann::json RadarTargetListFrame::write_target_list() const{
@@ -114,7 +114,7 @@ ByteBuffer RadarTargetListFrame::write() const{
 }
 
 void StateFrame::parse(ByteBuffer& buffer){
-    auto json = BufferToJson(buffer);
+    auto json = BufferToJson(buffer)["message"];
     game_time = json["game_time"].get<float>();
     time = json["time"].get<int>();
     auto states = json["frame"];
