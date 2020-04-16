@@ -18,9 +18,9 @@ using namespace lane_spline;
 
 LaneSpline lanespline;
 
-std::vector<Sensor> create_sensors_for(const std::string& ip)
+std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
-    std::vector<Sensor> sensors;
+    std::vector<std::shared_ptr<Sensor>> sensors;
     CameraConfig fc_config;// = *(new CameraConfig());
     fc_config.server_ip = ip;
     fc_config.listen_port = 8100;
@@ -28,7 +28,7 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
     fc_config.rotation.pitch = -5;
     fc_config.resolution = CameraConfig::Resolution(512,512);
 
-    sensors.emplace_back(fc_config);
+    sensors.push_back(std::make_shared<Sensor>(fc_config));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
@@ -41,12 +41,12 @@ std::vector<Sensor> create_sensors_for(const std::string& ip)
     state_config.listen_port = 8101;
     state_config.debug_drawing = true;
     state_config.undesired_tags = {""};
-    sensors.emplace_back(state_config);
+    sensors.push_back(std::make_shared<Sensor>(state_config));
 
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {
-        sensor.configure();
+        sensor->configure();
     }
     return sensors;
 }
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
     lanespline = LaneSpline("cpp-client/lane_follower/Straightaway5k.json");
 
     //Setup and Connect Sensors
-    std::vector<Sensor> sensors = create_sensors_for(server0_ip);
+    std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
     
     //Get number of steps in scenario and start timer
     int nSteps = config.scenario.size();
@@ -139,13 +139,13 @@ int main(int argc, char** argv)
         });
         //sample all sensors
         for(auto& sensor : sensors){
-            sensor.sample();
+            sensor->sample();
         }
         if(!task.get()){
             break;
         }
         else{
-            control_vehicle(sim0, sensors[1]);
+            control_vehicle(sim0, *sensors[1]);
         }
     }
     

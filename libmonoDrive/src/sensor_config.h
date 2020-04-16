@@ -92,8 +92,7 @@ public:
         return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
-        throw std::runtime_error("not implemented");
-        return new StateFrame;
+        return nullptr;
     }
 };
 
@@ -186,9 +185,9 @@ public:
     }      
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
-        if(channels == "bgra")
+        if(channels.compare("bgra") == 0)
             nChannels = 4;
-        if(channels == "gray")
+        else if(channels.compare("gray") == 0)
             nChannels = 1;
         else
             throw std::runtime_error("only bgra and gray are supported channel types");
@@ -210,8 +209,7 @@ public:
         return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
-        throw std::runtime_error("not implemented");
-        return new StateFrame;
+        return nullptr;
     }
 };
 
@@ -249,8 +247,7 @@ public:
         return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
-        throw std::runtime_error("not implemented");
-        return new ImuFrame;
+        return nullptr;
     }
 };
 

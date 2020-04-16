@@ -17,8 +17,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     std::vector<std::shared_ptr<Sensor>> sensors;
     CameraConfig fc_config;// = *(new CameraConfig());
     fc_config.server_ip = ip;
-    fc_config.listen_port = 8103;
-    fc_config.location.z = 200;
+    fc_config.listen_port = 8100;
+    fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
     fc_config.resolution = CameraConfig::Resolution(512,512);
     sensors.push_back(std::make_shared<Sensor>(fc_config));
@@ -40,6 +40,12 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
         sensor->configure();
     }
     return sensors;
+}
+
+void view_sensors(std::vector<std::shared_ptr<Sensor>>& sensors){
+    auto camera = static_cast<ImageFrame*>(sensors[0]->frame);
+    auto imu = static_cast<ImuFrame*>(sensors[1]->frame);
+    std::cout << imu->acc_x << ", " << imu->acc_y << ", " << imu->acc_z << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -82,14 +88,9 @@ int main(int argc, char** argv)
         //sample all sensors
         for(auto& sensor : sensors)
         {
-            sampleTasks.push_back(
-                std::async([&sensor](){
-                    sensor->sample();
-                    return sensor->parse();
-                }));
+            sensor->sample();
+            return sensor->parse();
         }
-        for(auto& sampleTask : sampleTasks)
-            sampleTask.get();
         if(!stepTask.get()){
             break;
         }

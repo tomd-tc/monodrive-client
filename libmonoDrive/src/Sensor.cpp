@@ -10,13 +10,12 @@
 
 Sensor::Sensor(SensorBaseConfig& sensor_config) : config(&sensor_config)
 {
+	name = std::string(config->type) + std::string("_") + std::to_string(config->listen_port);
     //VieportCamera doesn't need a connection 
 	if(config->listen_port != 0){
 		listener = new Connection(config->server_ip, config->listen_port);
 	} 
 	frame = config->DataFrameFactory();
-
-	name = std::string(config->type) + std::string("_") + std::to_string(config->listen_port);
 }
 
 Sensor::~Sensor()
@@ -34,6 +33,7 @@ std::string Sensor::dump_json()
 
 bool Sensor::configure()
 {
+	std::cout << "Configure " << name << std::endl;
 	bool success = send_configure();
 	if(!config->ros.publish_to_ros){
 		success = start_listening();

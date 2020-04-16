@@ -1,7 +1,5 @@
 #include "DataFrame.h"
 
-#define IMU_DATA_PACKET_SIZE 35
-
 // int DataFrame::read_header(ByteBuffer& buffer){
 //     // todo this probably wrong
 //     int length = buffer.readInt();
@@ -127,7 +125,7 @@ void ImuFrame::parse(ByteBuffer& buffer){
     // more hardware artifacts
     timer = buffer.readInt();
     checksum = buffer.readShort();
-    time_of_week = buffer.readLong();
+    time_of_week = buffer.readInt();
 }
 
 void StateFrame::parse(ByteBuffer& buffer){

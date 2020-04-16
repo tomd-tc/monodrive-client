@@ -67,6 +67,7 @@ protected:
 };
 
 class ImuFrame : public DataFrame{
+public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
         // todo
@@ -190,6 +191,7 @@ struct VehicleState{
 };
 
 class StateFrame : public DataFrame{
+public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
         // todo

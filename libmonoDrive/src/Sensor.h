@@ -56,7 +56,7 @@ public:
 
 	bool open_connection()
 	{
-		std::cout << "Connectiong sensor to: " << server_endpoint << std::endl;
+		std::cout << "Connecting sensor to: " << server_endpoint << std::endl;
 		try
 		{
 			socket.connect(server_endpoint);
@@ -86,9 +86,10 @@ class Sensor
 {
 public:
 	//Constructors
-	Sensor(){};
 	~Sensor();
 	Sensor(SensorBaseConfig& sensor_config);
+	Sensor(const Sensor& ) = delete;
+	Sensor& operator=(const Sensor& ) = delete;
 
 	bool sample();
 	bool parse();
