@@ -8,7 +8,7 @@
 #include "Simulator.h"
 
 
-Sensor::Sensor(SensorBaseConfig& sensor_config) : config(&sensor_config)
+Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensor_config) : config(std::move(sensor_config))
 {
 	name = std::string(config->type) + std::string("_") + std::to_string(config->listen_port);
     //VieportCamera doesn't need a connection 

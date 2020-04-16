@@ -87,7 +87,7 @@ class Sensor
 public:
 	//Constructors
 	~Sensor();
-	Sensor(SensorBaseConfig& sensor_config);
+	Sensor(std::unique_ptr<SensorBaseConfig> sensor_config);
 	Sensor(const Sensor& ) = delete;
 	Sensor& operator=(const Sensor& ) = delete;
 
@@ -101,7 +101,7 @@ public:
 
 	
 	ByteBuffer recvBuffer;
-	SensorBaseConfig* config = nullptr;
+	std::unique_ptr<SensorBaseConfig> config = nullptr;
 	DataFrame* frame = nullptr;
 	
 private:

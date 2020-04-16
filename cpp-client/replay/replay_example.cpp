@@ -31,7 +31,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
     vp_config.location.z = 200;
-    Sensor(vp_config).configure();
+    Sensor(std::make_unique<ViewportCameraConfig>(vp_config).configure();
 
 
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;

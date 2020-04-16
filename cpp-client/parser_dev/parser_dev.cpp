@@ -21,30 +21,30 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = CameraConfig::Resolution(512,512);
-    sensors.push_back(std::make_shared<Sensor>(fc_config));
+    fc_config.resolution = CameraConfig::Resolution(1024,1024);
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
     IMUConfig im_config;
     im_config.server_ip = ip;
     im_config.listen_port = 8101;
-    sensors.push_back(std::make_shared<Sensor>(im_config));
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(im_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
     vp_config.location.z = 200;
-    Sensor(vp_config).configure();
+    Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     GPSConfig gps_config;
     gps_config.server_ip = ip;
     gps_config.listen_port = 8102;
-    sensors.push_back(std::make_shared<Sensor>(gps_config));
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(gps_config)));
 
     RadarConfig radar_config;
     radar_config.location.x = 250;
     radar_config.location.z = 50;
     radar_config.server_ip = ip;
     radar_config.listen_port = 8103;
-    sensors.push_back(std::make_shared<Sensor>(radar_config));
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(radar_config)));
 
     // Send configuraitons to the simulator
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;

@@ -152,7 +152,7 @@ add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catk
 
 target_link_libraries(${PROJECT_NAME}_node -lstdc++fs)
 
-add_subdirectory(../../../simulator-cpp-client build)
+add_subdirectory(../../../libmonoDrive build)
 target_link_libraries(${PROJECT_NAME}_node monoDriveClient)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
