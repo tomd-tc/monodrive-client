@@ -40,8 +40,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(gps_config)));
 
     RadarConfig radar_config;
-    radar_config.location.x = 250;
-    radar_config.location.z = 50;
+    radar_config.location.x = 245;
+    radar_config.location.z = 60;
     radar_config.server_ip = ip;
     radar_config.listen_port = 8103;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(radar_config)));

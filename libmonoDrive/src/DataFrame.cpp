@@ -23,6 +23,7 @@ ByteBuffer DataFrame::JsonToBuffer(const nlohmann::json& frame){
 
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = BufferToJson(buffer)["message"];
+    std::cout << frame << std::endl;
     // todo: make both target list and gt list same type to simplify
     // target list
     parse_target_list(frame["target_list"]);

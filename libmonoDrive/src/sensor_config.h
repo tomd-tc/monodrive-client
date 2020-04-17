@@ -122,7 +122,7 @@ public:
     {
         float peak_power{5.0f};
         float aperature{.000859f};
-        float gain{13.5f};   
+        float gain{13.5f};
     }transmitter;
     struct Receiver
     {
@@ -138,7 +138,7 @@ public:
         float short_range_scan_distance{30.0f};
         float long_range_fov{30.0f};
         float short_range_fov{60.0f};
-        float elevation_fov{5.0f};
+        float elevation_fov{10.0f};
         float ray_division_y{10.0f};
         float ray_division_z{10.0f};
         bool debug_frustum{false};
