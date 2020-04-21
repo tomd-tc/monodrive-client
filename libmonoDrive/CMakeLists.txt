@@ -17,6 +17,9 @@ find_package(Boost 1.65 REQUIRED COMPONENTS system)
 if(MSVC)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_ALL_NO_LIB)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_PROGRAM_OPTIONS_DYN_LINK)
+else()
+	# not required for msvc
+	target_link_libraries(${PROJECT_NAME} -lstdc++fs)
 endif()
 
 
@@ -27,8 +30,6 @@ target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
 find_library(LIBRT rt)
 find_package(Threads)
-
-target_link_libraries(${PROJECT_NAME} -lstdc++fs)
 
 if(LIBRT)
 	target_link_libraries(${PROJECT_NAME} ${LIBRT})

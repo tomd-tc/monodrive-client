@@ -24,27 +24,27 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.resolution = CameraConfig::Resolution(1024,1024);
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
-    IMUConfig im_config;
-    im_config.server_ip = ip;
-    im_config.listen_port = 8101;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(im_config)));
+    // IMUConfig im_config;
+    // im_config.server_ip = ip;
+    // im_config.listen_port = 8101;
+    // sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(im_config)));
 
-    ViewportCameraConfig vp_config;
-    vp_config.server_ip = ip;
-    vp_config.location.z = 200;
-    Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
+    // ViewportCameraConfig vp_config;
+    // vp_config.server_ip = ip;
+    // vp_config.location.z = 200;
+    // Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
-    GPSConfig gps_config;
-    gps_config.server_ip = ip;
-    gps_config.listen_port = 8102;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(gps_config)));
+    // GPSConfig gps_config;
+    // gps_config.server_ip = ip;
+    // gps_config.listen_port = 8102;
+    // sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(gps_config)));
 
-    RadarConfig radar_config;
-    radar_config.location.x = 245;
-    radar_config.location.z = 60;
-    radar_config.server_ip = ip;
-    radar_config.listen_port = 8103;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(radar_config)));
+    // RadarConfig radar_config;
+    // radar_config.location.x = 245;
+    // radar_config.location.z = 60;
+    // radar_config.server_ip = ip;
+    // radar_config.listen_port = 8103;
+    // sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(radar_config)));
 
     // Send configuraitons to the simulator
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
@@ -82,10 +82,10 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "config/simulator.json",
+        "cpp-client/parser_dev/simulator.json",
         "config/vehicle.json",
         "config/weather.json",
-        "config/scenario.json"
+        "cpp-client/parser_dev/scenario.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
@@ -103,26 +103,34 @@ int main(int argc, char** argv)
 
     //Step through scenario while reading sensor ouputs
     std::future<bool> stepTask;
-    std::cout << "Running scenario" << std::endl;
-    for(; idx < nSteps; idx++)
+    // std::cout << "Running scenario" << std::endl;
+    /// initialize the vehicle, the first control command spawns the vehicle
+    sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
+        {   {"forward_amount", 0.0}, 
+            {"right_amount", 0.0},
+            {"brake_amount", 0.0},
+            {"drive_mode", 1}
+        }));
+    // for(; idx < nSteps; idx++)
+    while(true)
     {	
-        std::vector<std::future<bool>> sampleTasks;
-        //step simulator
-        stepTask = std::async([&sim0, &idx](){
-            return sim0.step(idx, 1);
-        });
-        //sample all sensors
-        for(auto& sensor : sensors)
-        {
-            if(!sensor->sample())
-                std::cout << "Failed to sample " << sensor->config->type << std::endl;
-            sensor->parse();
-        }
-        // review senors, see replay example for better parallelization
-        view_sensors(sensors);
-        if(!stepTask.get()){
-            break;
-        }
+        // std::vector<std::future<bool>> sampleTasks;
+        // //step simulator
+        // stepTask = std::async([&sim0, &idx](){
+        //     return sim0.step(idx, 1);
+        // });
+        // //sample all sensors
+        // for(auto& sensor : sensors)
+        // {
+        //     if(!sensor->sample())
+        //         std::cout << "Failed to sample " << sensor->config->type << std::endl;
+        //     sensor->parse();
+        // }
+        // // review senors, see replay example for better parallelization
+        // view_sensors(sensors);
+        // if(!stepTask.get()){
+        //     break;
+        // }
     }
     //Calculate FPS
     auto scenario_time = stopwatch.elapsed_time<unsigned int, std::chrono::microseconds>();

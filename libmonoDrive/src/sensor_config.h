@@ -374,7 +374,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["focal_length"] = config.focal_length;
     j["fstop"] = config.fstop;
     j["min_shutter"] = config.min_shutter;
-    j["max_shutter"] = config.max_distance;
+    j["max_shutter"] = config.max_shutter;
     j["sensor_size"] = config.sensor_size;
     j["channels"] =config.channels;
 }
@@ -388,7 +388,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "focal_length", config.focal_length);
     json_get(j, "fstop", config.fstop);
     json_get(j, "min_shutter", config.min_shutter); 
-    json_get(j, "max_shutter", config.max_distance); 
+    json_get(j, "max_shutter", config.max_shutter); 
     json_get(j, "sensor_size", config.sensor_size); 
     json_get(j, "channels", config.channels);         
 }
