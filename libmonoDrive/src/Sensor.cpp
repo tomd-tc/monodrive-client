@@ -60,26 +60,36 @@ bool Sensor::start_listening()
 
 bool Sensor::stop_listening()
 {
+	bContinue = false;
 	if(listener==nullptr)
 		return true;
 	if(listener->socket.is_open()){
 		listener->socket.close();
 	}
+	SampleThread.join();
 	return true;
 }
 
 bool Sensor::sample()
 {
-	if(config->listen_port == 0)
-		return false;
-	recvBuffer.resize(header_length);
-	if(listener->socket.is_open()){
-    	listener->read_sensor_packet(recvBuffer);
-	}
-	else{
-		std::cout << "Sensor Channel is not open" << std::endl;
-		return false;
-	}
+	SampleThread = std::thread([this](){
+		while(bContinue){
+			if(config->listen_port == 0)
+				return false;
+			recvBuffer.resize(header_length);
+			if(listener->socket.is_open()){
+				auto start = sysNow;
+				listener->read_sensor_packet(recvBuffer);
+				std::cout << ticToc(start) << std::endl;
+				parse();
+			}
+			else{
+				std::cout << "Sensor Channel is not open" << std::endl;
+				return false;
+			}
+		}
+		return true;
+	});
 	return true;
 }
 

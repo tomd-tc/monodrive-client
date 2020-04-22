@@ -25,26 +25,6 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "parser_dev linux",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/cpp-client/parser_dev/parser_dev",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
-            "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
             "name": "replay_example linux",
             "type": "cppdbg",
             "request": "launch",
@@ -82,6 +62,17 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/cpp-client/replay/replay_example",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "parser_dev windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/parser_dev/parser_dev",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

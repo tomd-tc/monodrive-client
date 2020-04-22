@@ -12,6 +12,15 @@
 #include "sensor_config.h"
 #include "Stopwatch.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/highgui.hpp"
+
+// #define IMG_WIDTH 4096
+// #define IMG_HEIGHT 2160
+
+#define IMG_WIDTH 1920
+#define IMG_HEIGHT 1080
+
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
     // Configure the sensors we wish to use
@@ -21,7 +30,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = CameraConfig::Resolution(1024,1024);
+    fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH,IMG_HEIGHT);
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
     // IMUConfig im_config;
@@ -29,10 +38,11 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     // im_config.listen_port = 8101;
     // sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(im_config)));
 
-    // ViewportCameraConfig vp_config;
-    // vp_config.server_ip = ip;
-    // vp_config.location.z = 200;
-    // Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
+    ViewportCameraConfig vp_config;
+    vp_config.server_ip = ip;
+    vp_config.location.z = 200;
+    vp_config.resolution = ViewportCameraConfig::Resolution(256,256);
+    Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     // GPSConfig gps_config;
     // gps_config.server_ip = ip;
@@ -112,8 +122,38 @@ int main(int argc, char** argv)
             {"drive_mode", 1}
         }));
     // for(; idx < nSteps; idx++)
+    for(auto& sensor : sensors){
+        sensor->sample();
+    }
+    bool bContinue = true;
+    // std::thread t1([&sim0, &bContinue](){
+    //     while(bContinue){
+    //         // std::cout << "Control" << std::endl;
+    //         // sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
+    //         //     {   {"forward_amount", 0.0}, 
+    //         //         {"right_amount", 0.0},
+    //         //         {"brake_amount", 0.0},
+    //         //         {"drive_mode", 1}
+    //         //     }));
+    //         sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
+    //     }
+    // });
+    std::thread t1([&sensors, &bContinue](){
+        while(bContinue){
+            ImageFrame* frame = static_cast<ImageFrame*>(sensors[0]->frame);
+            // std::cout << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << std::endl;
+            cv::Mat img(IMG_HEIGHT, IMG_WIDTH, CV_8UC4, frame->data);
+            cv::imshow("win", img);
+            cv::waitKey(1);
+        }
+    });
+    std::cout << "Sampling sensor loop" << std::endl;
     while(true)
     {	
+        // auto start = sysNow;
+        sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
+        // std::cout << "Time: " << ticToc(start) << std::endl;
+
         // std::vector<std::future<bool>> sampleTasks;
         // //step simulator
         // stepTask = std::async([&sim0, &idx](){
@@ -132,6 +172,8 @@ int main(int argc, char** argv)
         //     break;
         // }
     }
+    bContinue = false;
+    t1.join();
     //Calculate FPS
     auto scenario_time = stopwatch.elapsed_time<unsigned int, std::chrono::microseconds>();
     auto fps = float(idx+1)/scenario_time*1000000.0;

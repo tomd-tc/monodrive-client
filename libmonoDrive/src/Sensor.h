@@ -13,10 +13,22 @@
 #include "SimulatorCommands.h"
 #include "sensor_config.h"
 #include "DataFrame.h"
+#include <chrono>
 
 #define CONTROL_HEADER			0x6d6f6e6f
 #define RESPONSE_HEADER			0x6f6e6f6d
 
+#ifndef sysNow
+#define sysNow std::chrono::system_clock::now()
+#endif
+inline std::string ticToc(const std::chrono::system_clock::time_point &start) {
+	auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(sysNow - start);
+	return std::to_string(elapsed.count()) + " (ms)";
+}
+inline std::string ticTocU(const std::chrono::system_clock::time_point &start) {
+	auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(sysNow - start);
+	return std::to_string(elapsed.count()) + " (us)";
+}
 //enum class SensorType {Lidar, Radar, Camera, IMU, GPS, Collision};
 
 //template<typename SensorT>
@@ -92,6 +104,8 @@ public:
 	Sensor& operator=(const Sensor& ) = delete;
 
 	bool sample();
+	bool bContinue = true;
+	std::thread SampleThread;
 	bool parse();
 	std::string dump_json();
 	bool configure();

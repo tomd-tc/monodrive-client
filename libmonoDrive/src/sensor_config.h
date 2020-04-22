@@ -165,9 +165,9 @@ public:
     struct Resolution
     {
         Resolution(){}
-        Resolution(float x, float y) : x(x), y(y) {}
-        float x{512.0f};
-        float y{512.0f};
+        Resolution(int x, int y) : x(x), y(y) {}
+        int x{512};
+        int y{512};
     } resolution;
     float max_distance{50000.0f};
     float dynamic_range{50.0f};
@@ -188,7 +188,7 @@ public:
     }      
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
-        if(channels.compare("bgra") == 0)
+        if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
             nChannels = 4;
         else if(channels.compare("gray") == 0)
             nChannels = 1;
@@ -337,9 +337,10 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
 /// Camera Config JSON Parsing
 void inline to_json(nlohmann::json& j, const CameraConfig::Resolution& resolution)
 {
-    j = nlohmann::json{{"x", resolution.x},
-            {"y", resolution.y}
-            };
+    j = nlohmann::json{
+        {"x", resolution.x},
+        {"y", resolution.y}
+    };
 }
 
 void inline from_json(const nlohmann::json& j, CameraConfig::Resolution& resolution)
