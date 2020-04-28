@@ -129,5 +129,5 @@ class CameraAnnotationFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
-	std::vector<AnnotationFrame2D> annotations;
+	std::map<std::string, AnnotationFrame2D> annotations;
 };

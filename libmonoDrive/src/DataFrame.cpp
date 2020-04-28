@@ -122,10 +122,7 @@ void StateFrame::parse(ByteBuffer& buffer){
     auto vehicleStates = states["vehicles"];
 
     vehicles.clear();
-    for(auto& vehicle : vehicleStates){
-        VehicleState state = VehicleState::extract(vehicle);
-        vehicles.emplace_back(state);
-    }
+	json_get(vehicleStates, vehicles);
 }
 
 void ImuFrame::parse(ByteBuffer& buffer){
@@ -167,18 +164,19 @@ void GPSFrame::parse(ByteBuffer& buffer){
 
 void CameraAnnotationFrame::parse(ByteBuffer& buffer) {
 	auto frames = BufferToJson(buffer);
-	json_get(frames, annotations);
+	for (auto& frame : frames) {
+		AnnotationFrame2D annotationFrame;
+		if (json_get(frame, annotationFrame)) {
+			annotations.insert(std::make_pair(annotationFrame.name, annotationFrame));
+		}
+	}
 }
 
 ByteBuffer CameraAnnotationFrame::write() const {
 	nlohmann::json j;
-	for (auto& frame : annotations) {
-
+	for (auto& annotation : annotations) {
+		j.push_back(annotation.second);
 	}
-	
-}
 
-//std::string name;
-//std::vector<BoundingBox2D> bounding_boxes_2d;
-//std::vector<OOBB> oriented_bounding_boxes;
-//std::vector<std::string> tags;
+	return JsonToBuffer(j);
+}
