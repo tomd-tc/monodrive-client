@@ -9,6 +9,7 @@ class DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) = 0;
     virtual ByteBuffer write() const = 0;
+	virtual ~DataFrame() {}
     static ByteBuffer JsonToBuffer(const nlohmann::json& frame);
     static nlohmann::json BufferToJson(const ByteBuffer& buffer);
     // int read_header(ByteBuffer& buffer);
@@ -37,7 +38,6 @@ public:
         return resolution.x * resolution.y * channels;
     }
     virtual void parse(ByteBuffer& buffer){
-        // std::copy((uint8_t)buffer.data(), (uint8_t*)buffer.data() + buffer.size(), data);
         memcpy(pixels, buffer.data(), buffer.size());
     }
     virtual ByteBuffer write() const override{
