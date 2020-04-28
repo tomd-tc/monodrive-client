@@ -70,6 +70,7 @@
 #define REPLAY_ConfigureTrajectoryCommand_ID	"REPLAY_ConfigureTrajectoryCommand_ID"
 #define REPLAY_StepSimulationCommand_ID			"REPLAY_StepSimulationCommand_ID"
 #define REPLAY_StateStepSimulationCommand_ID	"REPLAY_StateStepSimulationCommand_ID"
+#define GetStartPoints_ID           "GetStartPoints"
 
 #define GetVersion_ID				"GetVersion"
 #define GetMapCommand_ID			"GetMap"

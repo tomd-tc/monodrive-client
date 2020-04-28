@@ -6,12 +6,7 @@
 #include <cstring>
 #include <stdint.h>
 
-
-
-
-
-
-void to_json(nlohmann::json& j, ApiMessage& m) {
+void to_json(nlohmann::json& j, const ApiMessage& m) {
 	j = nlohmann::json{
 		{ "reference", m.get_reference() },
 		{ "type", m.get_message_type() },

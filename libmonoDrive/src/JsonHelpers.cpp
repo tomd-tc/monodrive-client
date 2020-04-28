@@ -3,11 +3,11 @@
 
 #if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
 
-void to_json(nlohmann::json& j, const FRotator& r) {
+void to_json(nlohmann::json& j, const FRotator& v) {
 	j = nlohmann::json{ 
-		{ "roll", r.Roll },
-		{ "pitch", r.Pitch },
-		{ "yaw", r.Yaw } 
+		{ "pitch", v.Pitch },
+		{ "yaw", v.Yaw },
+		{ "roll", v.Roll }
 	};
 }
 
@@ -92,20 +92,29 @@ void from_json(const nlohmann::json& j, FQuat& v) {
 	}
 }
 
-void to_json(nlohmann::json& j, const FLinearColor& c) {
+void to_json(nlohmann::json& j, const FLinearColor& v) {
 	j = nlohmann::json{ 
-		{ "R", c.R },
-		{ "G", c.G }, 
-		{ "B", c.B }, 
-		{ "A", c.A } 
+		{ "R", v.R },
+		{ "G", v.G }, 
+		{ "B", v.B }, 
+		{ "A", v.A } 
 	};
 }
 
-void from_json(const nlohmann::json& j, FLinearColor& c) {
-	c.R = j.at("R").get<float>();
-	c.G = j.at("G").get<float>();
-	c.B = j.at("B").get<float>();
-	c.A = j.at("A").get<float>();
+void from_json(const nlohmann::json& j, FLinearColor& v) {
+	v.R = j.at("R").get<float>();
+	v.G = j.at("G").get<float>();
+	v.B = j.at("B").get<float>();
+	v.A = j.at("A").get<float>();
 }
+
+void to_json(nlohmann::json& j, const FString& v) {
+	j = TCHAR_TO_UTF8(*v);
+}
+
+void from_json(const nlohmann::json& j, FString& v) {
+	v = FString(UTF8_TO_TCHAR(j.get<std::string>().c_str()));
+}
+
 
 #endif

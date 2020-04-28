@@ -35,30 +35,18 @@ void from_json(const nlohmann::json& j, T& bm) {
 	bm.from_json(j);
 };
 
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const FRotator& r);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, FRotator& v);
-
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const FQuat& r);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, FQuat& v);
-
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const FVector& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, FVector& v);
-
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const FVector2D& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, FVector2D& v);
-
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const FLinearColor& c);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, FLinearColor& c);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FString& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FString& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FRotator& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FRotator& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FQuat& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FQuat& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FVector& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FVector& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FVector2D& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FVector2D& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FLinearColor& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FLinearColor& v);
 
 #else
 void inline json_log(const std::string& error_message)
@@ -106,7 +94,7 @@ bool inline json_get(const nlohmann::json& data, T& value) {
     }
     catch (const nlohmann::detail::type_error& e) {
         // type error
-        json_log((key.c_str()) + std::string("\" sent as wrong type ") + std::string(e.what()));
+        json_log(std::string("Wrong type ") + std::string(e.what()));
         return false;
     }
     catch (const std::exception& e) {

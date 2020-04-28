@@ -61,46 +61,26 @@ struct AnnotationFrame2D {
 	std::vector<std::string> tags;
 };
 
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const Quat& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, Quat& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const Vec3f& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, Vec3f& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const Transform& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, Transform& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const OOBB& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, OOBB& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const WheelState& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, WheelState& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const Odometry& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, Odometry& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const ObjectState& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, ObjectState& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const VehicleState& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, VehicleState& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const BoundingBox2D& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, BoundingBox2D& v);
-MONODRIVECORE_API
-void to_json(nlohmann::json& j, const AnnotationFrame2D& v);
-MONODRIVECORE_API
-void from_json(const nlohmann::json& j, AnnotationFrame2D& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, Quat& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const Vec3f& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, Vec3f& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const Transform& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, Transform& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const OOBB& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, OOBB& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const WheelState& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, WheelState& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const Odometry& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, Odometry& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const ObjectState& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, ObjectState& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const VehicleState& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, VehicleState& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const BoundingBox2D& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, BoundingBox2D& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const AnnotationFrame2D& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, AnnotationFrame2D& v);
 
 
 

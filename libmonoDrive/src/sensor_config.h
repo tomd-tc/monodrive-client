@@ -361,8 +361,8 @@ void inline from_json(const nlohmann::json& j, StateConfig& config)
 {
     json_get(j, "include_obb", config.include_obb);
     json_get(j, "debug_drawing", config.debug_drawing);
-    json_vector(j, "desired_tags", config.desired_tags);
-    json_vector(j, "undesired_tags", config.undesired_tags);
+    json_get(j, "desired_tags", config.desired_tags);
+    json_get(j, "undesired_tags", config.undesired_tags);
 }
 
 void inline to_json(nlohmann::json& j, const CameraConfig& config)

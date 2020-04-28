@@ -1,3 +1,4 @@
+// Copyright 2017-2020 monoDrive, LLC. All Rights Reserved.
 #pragma once
 #include <string>
 #include <cstring>
@@ -7,18 +8,30 @@
 
 #include "Buffer.h"
 #include "JsonHelpers.h"
+#include "UECompatability.h"
 
 
 #define CONTROL_HEADER			0x6d6f6e6f
 #define RESPONSE_HEADER			0x6f6e6f6d
 
+#pragma push_macro("TEXT")
+#undef TEXT
+#pragma warning( push )
+#pragma warning( disable: 4668 4191) 
 
 #include <boost/asio.hpp>
+#undef UpdateResource
+#undef DeleteFile
+#undef MoveFile
+#undef CreateDirectory
+#undef CopyFile
+#pragma warning( pop)
+#pragma pop_macro("TEXT")
 
 using boost::asio::ip::tcp;
 
 
-class ApiMessage
+class MONODRIVECORE_API ApiMessage
 {
 public:
 	enum { header_length = 8 };
@@ -29,14 +42,12 @@ public:
 	{
 	}
 
-	ApiMessage(long in_reference, std::string in_type, bool in_success = false, nlohmann::json msg = NULL)
+	ApiMessage(long in_reference, std::string in_type, bool in_success = false)
 		: reference(in_reference),
 		type(in_type),
-		success(in_success),
-		message(msg)
+		success(in_success)
 	{
 	}
-
 
 	ApiMessage(const ApiMessage& other)
 		: reference(other.reference),
@@ -46,27 +57,10 @@ public:
 	{
 	}
 
-	std::string uint32_to_string(std::uint32_t value) {
+	std::string uint32_to_string(uint32 value) {
 		std::ostringstream os;
 		os << value;
 		return os.str();
-	}
-	 
-	void read(tcp::socket& socket )
-	{
-		recvBuffer.resize(header_length);
-		boost::asio::read(socket, boost::asio::buffer(recvBuffer.data(), recvBuffer.available()));
-		int32_t magic = recvBuffer.readInt();
-		int32_t size = recvBuffer.readInt();
-		int32_t payloadSize = size - header_length;
-		//std::cout<< "payloadSize = " << payloadSize << std::endl;
-		if (magic == RESPONSE_HEADER)
-		{
-			recvBuffer.grow(payloadSize);
-			boost::asio::read(socket, boost::asio::buffer(recvBuffer.data(), recvBuffer.available()));
-			nlohmann::json j = nlohmann::json::parse(recvBuffer.as_string());
-			success = deserialize(j);
-		}
 	}
 
 	template<typename ReadHandler>
@@ -88,7 +82,7 @@ public:
 					int32_t size = recvBuffer.readInt();
 					int32_t payloadSize = size - header_length;
 
-					if (magic == RESPONSE_HEADER)
+					if (magic == CONTROL_HEADER)
 					{
 						recvBuffer.grow(payloadSize);
 						boost::asio::async_read(socket,
@@ -118,7 +112,7 @@ public:
 					}
 					else
 					{
-						ApiMessage error = make_error("Incorrect CONTROL_HEADER sent from server");
+						ApiMessage error = make_error("Incorrect CONTROL_HEADER sent from client");
 						handler(std::make_error_code(std::errc::bad_message), error);
 					}
 				}
@@ -130,11 +124,11 @@ public:
 	{
 		try {
 			std::string data = serialize().dump();
-			//std::cout << "ApiMessage::asyncWrite: " << data << std::endl;
+			// std::cout << "ApiMessage::asyncWrite: " << data << std::endl;
 
 			uint32_t length = header_length + data.size();
 			sendBuffer.resize(length);
-			sendBuffer.writeInt(CONTROL_HEADER);
+			sendBuffer.writeInt(RESPONSE_HEADER);
 			sendBuffer.writeInt(length);
 			sendBuffer.write((uint8_t*)data.c_str(), data.size());
 			sendBuffer.reset();
@@ -150,48 +144,27 @@ public:
 		}
 	}
 
-	void write(tcp::socket& socket)
-	{
-		try {
-			//std::cout << "write tcp socket" << std::endl;
-			std::string data = serialize().dump();
-			//std::cout << "ApiMessage::asyncWrite: " << data << std::endl;
-
-			uint32_t length = header_length + data.size();
-			sendBuffer.resize(length);
-			sendBuffer.writeInt(CONTROL_HEADER);
-			sendBuffer.writeInt(length);
-			sendBuffer.write((uint8_t*)data.c_str(), data.size());
-			sendBuffer.reset();
-			boost::asio::write(socket,
-				boost::asio::buffer(sendBuffer.data(), sendBuffer.available()));
-		}
-		catch (std::exception& e) {
-			std::cout << "exception during send: " << e.what() << std::endl;
-		}
-	}
-	
 	ApiMessage make_error(std::string error);
 
 	//==================  NetworkMessage Class ====================
 	//NetworkMessage Type refers to class that handles message
-	const std::string& get_message_type() { return type; }
+	const std::string& get_message_type() const { return type; }
 	void set_message_type(const std::string cls) { type = cls; }
 
-	const bool get_success() { return success; }
-	void set_success(const bool val) { success = val; }
+	bool get_success() const { return success; }
+	void set_success(bool val) { success = val; }
 
 	//NetworkMessage Payload
-	const nlohmann::json& get_message() { return message; }
+	const nlohmann::json& get_message() const { return message; }
 	void set_message(const nlohmann::json& in_message) { message = in_message; }
 
-	const long get_reference() { return reference; }
+	long get_reference() const { return reference; }
 	void set_reference(long in_reference) { reference = in_reference; }
 
 	bool is_valid() { return type.length() > 0; }
-	std::string str();
+	//std::string str();
 
-	static std::string from_class(std::string messageClass);
+	//static std::string from_class(std::string messageClass);
 
 	ApiMessage& operator=(const ApiMessage m) {
 		this->reference = m.reference;
@@ -226,10 +199,6 @@ public:
 	bool operator==(const char* rhs) {
 		return type.compare(rhs) == 0;
 	}
-	//friend bool operator==(const ApiMessage& lhs, const std::string& rhs);
-	//friend bool operator==(const std::string& lhs, const ApiMessage& rhs);
-	//friend bool operator==(const ApiMessage& lhs, const char* rhs);
-	//friend bool operator==(const char* lhs, const ApiMessage& rhs);
 
 private:
 	long reference;
@@ -257,3 +226,5 @@ public:
 		set_message(newError);
 	}
 };
+
+
