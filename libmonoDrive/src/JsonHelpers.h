@@ -1,4 +1,4 @@
-// Copyright 2017-2018 monoDrive, LLC. All Rights Reserved.
+// Copyright 2017-2020 monoDrive, LLC. All Rights Reserved.
 #pragma once
 
 #pragma warning(push)
@@ -8,10 +8,115 @@
 
 #include <string>
 
+
+#if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
+#include "monoDriveCore.h"
+
+void inline json_log(const FString& error_message) {
+	EGO_LOG(LogMD_Core, Warning, "%s", *error_message);
+}
+
+void inline json_log(const std::string& error_message) {
+	EGO_LOG(LogMD_Core, Warning, "%s", UTF8_TO_TCHAR(error_message.c_str()));
+}
+
+class JsonSerializable {
+	virtual void to_json(nlohmann::json& j) const = 0;
+	virtual void from_json(const nlohmann::json& j) = 0;
+};
+
+template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
+void to_json(nlohmann::json& j, const T& bm) {
+	bm.to_json(j);
+};
+
+template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
+void from_json(const nlohmann::json& j, T& bm) {
+	bm.from_json(j);
+};
+
+MONODRIVECORE_API
+void to_json(nlohmann::json& j, const FRotator& r);
+MONODRIVECORE_API
+void from_json(const nlohmann::json& j, FRotator& v);
+
+MONODRIVECORE_API
+void to_json(nlohmann::json& j, const FQuat& r);
+MONODRIVECORE_API
+void from_json(const nlohmann::json& j, FQuat& v);
+
+MONODRIVECORE_API
+void to_json(nlohmann::json& j, const FVector& v);
+MONODRIVECORE_API
+void from_json(const nlohmann::json& j, FVector& v);
+
+MONODRIVECORE_API
+void to_json(nlohmann::json& j, const FVector2D& v);
+MONODRIVECORE_API
+void from_json(const nlohmann::json& j, FVector2D& v);
+
+MONODRIVECORE_API
+void to_json(nlohmann::json& j, const FLinearColor& c);
+MONODRIVECORE_API
+void from_json(const nlohmann::json& j, FLinearColor& c);
+
+#else
 void inline json_log(const std::string& error_message)
 {
     std::cerr << error_message << std::endl;
 };
+
+#endif
+
+template <typename T>
+bool inline json_get(const nlohmann::json& data, const std::string& key, T& value) {
+    T temp;
+    try {
+        temp = data.at(key).get<T>();
+    }
+    catch (const nlohmann::detail::out_of_range& e) {
+        // key not found error
+        json_log(std::string(e.what()));
+        return false;
+    }
+    catch (const nlohmann::detail::type_error& e) {
+        // type error
+        json_log(std::string("key \"") + std::string(key.c_str()) + std::string("\" sent as wrong type ") + std::string(e.what()));
+        return false;
+    }
+    catch (const std::exception& e) {
+        // unknown error
+        json_log(std::string("json exception ") + std::string(e.what()));
+        return false;
+    }
+    value = temp;
+    return true;
+}
+
+template <typename T>
+bool inline json_get(const nlohmann::json& data, T& value) {
+    T temp;
+    try {
+        temp = data.get<T>();
+    }
+    catch (const nlohmann::detail::out_of_range& e) {
+        // key not found error
+        json_log(std::string(e.what()));
+        return false;
+    }
+    catch (const nlohmann::detail::type_error& e) {
+        // type error
+        json_log((key.c_str()) + std::string("\" sent as wrong type ") + std::string(e.what()));
+        return false;
+    }
+    catch (const std::exception& e) {
+        // unknown error
+        json_log(std::string("json exception ") + std::string(e.what()));
+        return false;
+    }
+    value = temp;
+    return true;
+}
 
 template <typename T>
 T json_get_value(const nlohmann::json& j, std::string name, T defaultValue)
@@ -58,52 +163,3 @@ bool json_contains_one(const nlohmann::json& j, T key, Args... keys) {
 	return std::find(j.begin(), j.end(), key) != j.end() || json_contains_one(j, keys...);
 }
 
-
-template <typename T>
-bool inline json_get(const nlohmann::json& data, const std::string& key, T& value) {
-    T temp;
-    try {
-        temp = data.at(key).get<T>();
-    }
-    catch (const nlohmann::detail::out_of_range& e) {
-        // key not found error
-        json_log(std::string(e.what()));
-        return false;
-    }
-    catch (const nlohmann::detail::type_error& e) {
-        // type error
-        json_log(std::string("key \"") + std::string(key.c_str()) + std::string("\" sent as wrong type ") + std::string(e.what()));
-        return false;
-    }
-    catch (const std::exception& e) {
-        // unknown error
-        json_log(std::string("json exception ") + std::string(e.what()));
-        return false;
-    }
-    value = temp;
-    return true;
-}
-
-template<typename T>
-bool inline json_vector(const nlohmann::json& data, const std::string& key, std::vector<T>& value){
-    std::vector<T> temp;
-    try{
-        for(auto& v : data[key]){
-            temp.push_back(v.get<T>());
-        }
-    }
-    catch (const nlohmann::detail::out_of_range& e) {
-        json_log(std::string(e.what()));
-        return false;
-    }
-    catch (const nlohmann::detail::type_error& e) {
-        json_log(std::string("key \"") + std::string(key.c_str()) + std::string("\" sent as wrong type ") + std::string(e.what()));
-        return false;
-    }
-    catch (const std::exception& e) {
-        json_log(std::string("json exception ") + std::string(e.what()));
-        return false;
-    }
-    value = temp;
-    return true;
-}

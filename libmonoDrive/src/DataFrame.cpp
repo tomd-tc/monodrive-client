@@ -164,3 +164,21 @@ void GPSFrame::parse(ByteBuffer& buffer){
     fixed_mode_status = buffer.readByte();
     crc = buffer.readShort();
 }
+
+void CameraAnnotationFrame::parse(ByteBuffer& buffer) {
+	auto frames = BufferToJson(buffer);
+	json_get(frames, annotations);
+}
+
+ByteBuffer CameraAnnotationFrame::write() const {
+	nlohmann::json j;
+	for (auto& frame : annotations) {
+
+	}
+	
+}
+
+//std::string name;
+//std::vector<BoundingBox2D> bounding_boxes_2d;
+//std::vector<OOBB> oriented_bounding_boxes;
+//std::vector<std::string> tags;
