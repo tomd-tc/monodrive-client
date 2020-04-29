@@ -4,6 +4,7 @@
 #include "JsonHelpers.h"
 #include "DataFramePrimitives.h"
 #include <algorithm>
+#include "UECompatability.h"
 
 class DataFrame{
 public:
@@ -18,7 +19,7 @@ public:
 };
 
 // for now 8 bit only, todo: add float higher bit rate etc enum
-class ImageFrame : public DataFrame{
+class MONODRIVECORE_API ImageFrame : public DataFrame{
 public:
     ImageFrame(int x_res, int y_res, int channels) : channels(channels){
         resolution.x = x_res;
@@ -46,7 +47,7 @@ public:
     }
 };
 
-class RadarTargetListFrame : public DataFrame{
+class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
@@ -67,7 +68,7 @@ protected:
     nlohmann::json write_gt_target_list() const;
 };
 
-class ImuFrame : public DataFrame{
+class MONODRIVECORE_API ImuFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
@@ -82,7 +83,7 @@ public:
     int time_of_week;
 };
 
-class GPSFrame : public DataFrame{
+class MONODRIVECORE_API GPSFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
@@ -113,7 +114,7 @@ public:
     uint16_t crc;
 };
 
-class StateFrame : public DataFrame{
+class MONODRIVECORE_API StateFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
@@ -125,7 +126,7 @@ public:
     int time;
 };
 
-class CameraAnnotationFrame : public DataFrame{
+class MONODRIVECORE_API CameraAnnotationFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;

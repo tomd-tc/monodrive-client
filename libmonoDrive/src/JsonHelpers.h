@@ -11,6 +11,7 @@
 
 #if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
 #include "monoDriveCore.h"
+#include "LogHelper.h"
 
 void inline json_log(const FString& error_message) {
 	EGO_LOG(LogMD_Core, Warning, "%s", *error_message);
