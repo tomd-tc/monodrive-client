@@ -10,32 +10,27 @@
 
 
 #if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
-#include "monoDriveCore.h"
 #include "LogHelper.h"
 
-void inline json_log(const FString& error_message) {
-	EGO_LOG(LogMD_Core, Warning, "%s", *error_message);
-}
+void MONODRIVECORE_API json_log(const FString& error_message);
 
-void inline json_log(const std::string& error_message) {
-	EGO_LOG(LogMD_Core, Warning, "%s", UTF8_TO_TCHAR(error_message.c_str()));
-}
+void MONODRIVECORE_API json_log(const std::string& error_message);
 
-class JsonSerializable {
-	virtual void to_json(nlohmann::json& j) const = 0;
-	virtual void from_json(const nlohmann::json& j) = 0;
-};
-
-template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
-void to_json(nlohmann::json& j, const T& bm) {
-	bm.to_json(j);
-};
-
-template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
-void from_json(const nlohmann::json& j, T& bm) {
-	bm.from_json(j);
-};
-
+//class JsonSerializable {
+//	virtual void to_json(nlohmann::json& j) const = 0;
+//	virtual void from_json(const nlohmann::json& j) = 0;
+//};
+//
+//template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
+//void to_json(nlohmann::json& j, const T& bm) {
+//	bm.to_json(j);
+//};
+//
+//template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
+//void from_json(const nlohmann::json& j, T& bm) {
+//	bm.from_json(j);
+//};
+//
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FString& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FString& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FRotator& v);

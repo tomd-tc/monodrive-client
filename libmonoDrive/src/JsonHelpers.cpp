@@ -2,6 +2,15 @@
 #include "JsonHelpers.h"
 
 #if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
+#include "monoDriveCore.h"
+
+void json_log(const FString& error_message) {
+	EGO_LOG(LogMD_Core, Warning, "%s", *error_message);
+}
+
+void json_log(const std::string& error_message) {
+	EGO_LOG(LogMD_Core, Warning, "%s", UTF8_TO_TCHAR(error_message.c_str()));
+}
 
 void to_json(nlohmann::json& j, const FRotator& v) {
 	j = nlohmann::json{ 
