@@ -187,11 +187,11 @@ ByteBuffer CameraFrame::write() const{
 }
 
 void CameraFrame::parse(ByteBuffer& buffer){
-    if(currentFrameIndex % 2 == 0){
-        imageFrame.parse(buffer);
+    if(!bHasAnnotation or currentFrameIndex % 2 == 0){
+        imageFrame->parse(buffer);
     }
     else{
-        annotationFrame.parse(buffer);
+        annotationFrame->parse(buffer);
     }
     currentFrameIndex++;
 }

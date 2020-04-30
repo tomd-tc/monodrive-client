@@ -135,16 +135,16 @@ int main(int argc, char** argv)
     //         sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
     //     }
     // });
-    std::thread t1([&sensors, &bContinue](){
-        while(bContinue){
-            // ImageFrame* frame = static_cast<ImageFrame*>(sensors[0]->frame);
-            CameraFrame* frame = static_cast<CameraFrame*>(sensors[0]->frame);
-            // std::cout << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << std::endl;
-            // cv::Mat img(IMG_HEIGHT, IMG_WIDTH, CV_8UC4, frame->imageFrame.pixels);
-            // cv::imshow("win", img);
-            // cv::waitKey(1);
-        }
-    });
+    // std::thread t1([&sensors, &bContinue](){
+    //     while(bContinue){
+    //         // ImageFrame* frame = static_cast<ImageFrame*>(sensors[0]->frame);
+    //         CameraFrame* frame = static_cast<CameraFrame*>(sensors[0]->frame);
+    //         // std::cout << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << std::endl;
+    //         // cv::Mat img(IMG_HEIGHT, IMG_WIDTH, CV_8UC4, frame->imageFrame->pixels);
+    //         // cv::imshow("win", img);
+    //         // cv::waitKey(1);
+    //     }
+    // });
     std::cout << "Sampling sensor loop" << std::endl;
     int count = 0;
     while(true)
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
         // }
     }
     bContinue = false;
-    t1.join();
+    // t1.join();
     //Calculate FPS
     // auto scenario_time = stopwatch.elapsed_time<unsigned int, std::chrono::microseconds>();
     // std::cout<< "fps = " + std::to_string(fps) << std::endl;

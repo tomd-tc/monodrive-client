@@ -203,7 +203,7 @@ public:
             nChannels = 1;
         else
             throw std::runtime_error("only bgra and gray are supported channel types");
-        return new CameraFrame(resolution.x, resolution.y, nChannels);
+        return new CameraFrame(resolution.x, resolution.y, nChannels, annotation.include_annotation);
     }
 };
 

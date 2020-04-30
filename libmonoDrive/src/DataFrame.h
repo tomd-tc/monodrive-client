@@ -137,12 +137,19 @@ class MONODRIVECORE_API CameraFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
-    CameraFrame(int x_res, int y_res, int channels) : 
-        imageFrame(ImageFrame(x_res, y_res, channels)),
+    CameraFrame(int x_res, int y_res, int channels, bool hasAnnotation) : 
+        bHasAnnotation(hasAnnotation),
         currentFrameIndex(0)
     {
+        imageFrame = new ImageFrame(x_res, y_res, channels);
+        annotationFrame = new CameraAnnotationFrame;
     }
-    ImageFrame imageFrame;
-    CameraAnnotationFrame annotationFrame;
+    ~CameraFrame(){
+        delete imageFrame;
+        delete annotationFrame;
+    }
+    ImageFrame* imageFrame;
+    bool bHasAnnotation;
+    CameraAnnotationFrame* annotationFrame;
     int currentFrameIndex;
 };
