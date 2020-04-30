@@ -170,7 +170,7 @@ public:
 		try {
 			//std::cout << "write tcp socket" << std::endl;
 			std::string data = serialize().dump();
-			//std::cout << "ApiMessage::asyncWrite: " << data << std::endl;
+			std::cout << "ApiMessage::write: " << data << std::endl;
 
 			uint32_t length = header_length + data.size();
 			sendBuffer.resize(length);

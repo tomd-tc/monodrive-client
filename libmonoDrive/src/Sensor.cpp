@@ -80,7 +80,9 @@ bool Sensor::sample()
 			recvBuffer.resize(header_length);
 			if(listener->socket.is_open()){
 				mono::precise_stopwatch watch;
+				std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
+				std::cout << "read success..." << std::endl;
 				std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 				parse();
 			}

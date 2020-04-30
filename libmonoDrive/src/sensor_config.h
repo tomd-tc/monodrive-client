@@ -178,6 +178,15 @@ public:
     float max_shutter{.0014f};
     float sensor_size{9.07f};
     std::string channels{"bgra"};
+    struct Annotation{
+        Annotation(){}
+        bool include_annotation{false};
+        float far_plane{10000.f};
+        std::vector<std::string> desired_tags{};
+        bool include_tags{false};
+        bool include_oob{false};
+        bool cull_partial_frame{false};
+    } annotation;
     SensorBaseConfig& get() override
     {
         return *this;
@@ -334,6 +343,28 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
 }
 /// End SensorBaseConfig JSON Parsing
 
+void inline to_json(nlohmann::json& j, const CameraConfig::Annotation& annotation){
+    j = nlohmann::json{
+        {"include_annotation", annotation.include_annotation},
+        {"far_plane", annotation.far_plane},
+        {"cull_partial_frame", annotation.cull_partial_frame},
+        {"desired_tags", annotation.desired_tags},
+        {"include_obb", annotation.include_oob},
+        {"include_tags", annotation.include_tags}
+    };
+}
+
+void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotation)
+{
+    json_get(j, "include_annotation", annotation.include_annotation);
+    json_get(j, "far_plane", annotation.far_plane);
+    json_get(j, "cull_partial_frame", annotation.cull_partial_frame);
+    json_get(j, "desired_tags", annotation.desired_tags);
+    json_get(j, "include_obb", annotation.include_oob);
+    json_get(j, "include_tags", annotation.include_tags);
+}
+
+
 /// Camera Config JSON Parsing
 void inline to_json(nlohmann::json& j, const CameraConfig::Resolution& resolution)
 {
@@ -377,7 +408,8 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["min_shutter"] = config.min_shutter;
     j["max_shutter"] = config.max_shutter;
     j["sensor_size"] = config.sensor_size;
-    j["channels"] =config.channels;
+    j["channels"] = config.channels;
+    j["annotation"] = config.annotation;
 }
 
 void inline from_json(const nlohmann::json& j, CameraConfig& config)
@@ -392,6 +424,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "max_shutter", config.max_shutter); 
     json_get(j, "sensor_size", config.sensor_size); 
     json_get(j, "channels", config.channels);         
+    json_get(j, "annotation", config.annotation);
 }
 
 /// END Camera Config JSON Parsing
@@ -529,11 +562,6 @@ void inline to_json(nlohmann::json& j, const GPSConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
 }
-
-/*void inline from_json(const json& j, GPSConfig& config)
-{
-    use SensorBaseClass from_json method
-}*/
 
 /// END GPS Config JSON Parsing
 
