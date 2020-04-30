@@ -12,7 +12,6 @@
 
 
 #define CONTROL_HEADER			0x6d6f6e6f
-#define RESPONSE_HEADER			0x6f6e6f6d
 
 #pragma push_macro("TEXT")
 #undef TEXT
@@ -42,10 +41,11 @@ public:
 	{
 	}
 
-	ApiMessage(long in_reference, std::string in_type, bool in_success = false)
+	ApiMessage(long in_reference, std::string in_type, bool in_success = false, nlohmann::json msg = NULL)
 		: reference(in_reference),
 		type(in_type),
-		success(in_success)
+		success(in_success),
+		message(msg)
 	{
 	}
 
@@ -57,10 +57,31 @@ public:
 	{
 	}
 
-	std::string uint32_to_string(uint32 value) {
+	std::string uint32_to_string(uint32_t value) {
 		std::ostringstream os;
 		os << value;
 		return os.str();
+	}
+
+	void read(tcp::socket& socket )
+	{
+		recvBuffer.resize(header_length);
+		boost::asio::read(socket, boost::asio::buffer(recvBuffer.data(), recvBuffer.available()));
+		int32_t magic = recvBuffer.readInt();
+		int32_t size = recvBuffer.readInt();
+		int32_t payloadSize = size - header_length;
+		//std::cout<< "payloadSize = " << payloadSize << std::endl;
+		if (magic == CONTROL_HEADER)
+		{
+			recvBuffer.grow(payloadSize);
+			boost::asio::read(socket, boost::asio::buffer(recvBuffer.data(), recvBuffer.available()));
+			nlohmann::json j = nlohmann::json::parse(recvBuffer.as_string());
+			success = deserialize(j);
+		}
+		else {
+			//ApiMessage error = make_error("Incorrect CONTROL_HEADER");
+			std::cout << "Incorrect CONTROL_HEADER" << std::endl;
+		}
 	}
 
 	template<typename ReadHandler>
@@ -112,7 +133,7 @@ public:
 					}
 					else
 					{
-						ApiMessage error = make_error("Incorrect CONTROL_HEADER sent from client");
+						ApiMessage error = make_error("Incorrect CONTROL_HEADER");
 						handler(std::make_error_code(std::errc::bad_message), error);
 					}
 				}
@@ -128,7 +149,7 @@ public:
 
 			uint32_t length = header_length + data.size();
 			sendBuffer.resize(length);
-			sendBuffer.writeInt(RESPONSE_HEADER);
+			sendBuffer.writeInt(CONTROL_HEADER);
 			sendBuffer.writeInt(length);
 			sendBuffer.write((uint8_t*)data.c_str(), data.size());
 			sendBuffer.reset();
@@ -138,6 +159,27 @@ public:
 				{
 					handler(ec, *this);
 				});
+		}
+		catch (std::exception& e) {
+			std::cout << "exception during send: " << e.what() << std::endl;
+		}
+	}
+
+	void write(tcp::socket& socket)
+	{
+		try {
+			//std::cout << "write tcp socket" << std::endl;
+			std::string data = serialize().dump();
+			//std::cout << "ApiMessage::asyncWrite: " << data << std::endl;
+
+			uint32_t length = header_length + data.size();
+			sendBuffer.resize(length);
+			sendBuffer.writeInt(CONTROL_HEADER);
+			sendBuffer.writeInt(length);
+			sendBuffer.write((uint8_t*)data.c_str(), data.size());
+			sendBuffer.reset();
+			boost::asio::write(socket,
+				boost::asio::buffer(sendBuffer.data(), sendBuffer.available()));
 		}
 		catch (std::exception& e) {
 			std::cout << "exception during send: " << e.what() << std::endl;

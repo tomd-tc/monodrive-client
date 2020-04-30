@@ -10,6 +10,7 @@
 #include "ApiMessage.h"
 #include "SimulatorCommands.h"
 
+static std::mutex _mutex;
 
 std::map<const std::string, Simulator*> Simulator::sim_map;
 
@@ -87,17 +88,17 @@ bool Simulator::configure()
 		}
 	}
 
-	cout << "Send Simulator Config:   success = ";
-	cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << endl;
+	std::cout << "Send Simulator Config:   success = ";
+	std::cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
 	// cout << "Send Ego Vehicle Config: success = ";
 	// cout << send_command(ApiMessage(1001, EgoVehicleConfig_ID, true, config.vehicle)) << endl;
 
-	cout << "Send Scenario Config:    success = ";
-	cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << endl;
+	std::cout << "Send Scenario Config:    success = ";
+	std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
 
-	cout << "Send Weather Config:     success = ";
-	cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << endl;	
+	std::cout << "Send Weather Config:     success = ";
+	std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;	
 	return true;
 }
 

@@ -6,6 +6,7 @@
 
 #include "Sensor.h"
 #include "Simulator.h"
+#include "Stopwatch.h"
 
 
 Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensor_config) : config(std::move(sensor_config))
@@ -78,9 +79,9 @@ bool Sensor::sample()
 				return false;
 			recvBuffer.resize(header_length);
 			if(listener->socket.is_open()){
-				auto start = sysNow;
+				mono::precise_stopwatch watch;
 				listener->read_sensor_packet(recvBuffer);
-				std::cout << ticToc(start) << std::endl;
+				std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 				parse();
 			}
 			else{

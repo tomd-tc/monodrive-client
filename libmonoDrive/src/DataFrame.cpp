@@ -163,6 +163,7 @@ void GPSFrame::parse(ByteBuffer& buffer){
 }
 
 void CameraAnnotationFrame::parse(ByteBuffer& buffer) {
+    annotations.clear();
 	auto frames = BufferToJson(buffer);
 	for (auto& frame : frames) {
 		AnnotationFrame2D annotationFrame;
@@ -179,4 +180,18 @@ ByteBuffer CameraAnnotationFrame::write() const {
 	}
 
 	return JsonToBuffer(j);
+}
+
+ByteBuffer CameraFrame::write() const{
+    throw std::runtime_error("Not implemented");
+}
+
+void CameraFrame::parse(ByteBuffer& buffer){
+    if(currentFrameIndex % 2 == 0){
+        imageFrame.parse(buffer);
+    }
+    else{
+        annotationFrame.parse(buffer);
+    }
+    currentFrameIndex++;
 }

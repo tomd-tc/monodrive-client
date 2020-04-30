@@ -78,6 +78,17 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false
+        },
+        {
+            "name": "buffer_dev windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/buffer_dev",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
         }
     ]
 }

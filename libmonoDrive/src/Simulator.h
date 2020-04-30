@@ -13,8 +13,6 @@
 #include "ApiMessage.h"
 
 
-static std::mutex _mutex;
-
 class Simulator 
 {
 	

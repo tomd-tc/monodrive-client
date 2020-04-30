@@ -48,7 +48,7 @@ public:
 		position_ = 0;
 	}
 
-	ByteBuffer& operator+=(size_t n) {
+	ByteBuffer& operator+=(uint32_t n) {
 		skip(n);
 		return *this;
 	}

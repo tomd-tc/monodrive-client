@@ -8,4 +8,5 @@ cmake_minimum_required(VERSION 3.10)
 # endif()
 
 # add_subdirectory(replay)
-add_subdirectory(parser_dev)
+# add_subdirectory(parser_dev)
+add_subdirectory(buffer_dev)

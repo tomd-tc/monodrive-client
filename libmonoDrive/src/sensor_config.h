@@ -114,7 +114,7 @@ public:
     float fc{77000000000.0f};
     int num_sweeps{32};
     int num_samples_per_sweep{345};
-    float sweep_time{0.0000069};
+    float sweep_time{0.0000069f};
     int bandwidth{250000000};
     int max_radar_returns{500};
     int elements{8};
@@ -194,7 +194,7 @@ public:
             nChannels = 1;
         else
             throw std::runtime_error("only bgra and gray are supported channel types");
-        return new ImageFrame(resolution.x, resolution.y, nChannels);
+        return new CameraFrame(resolution.x, resolution.y, nChannels);
     }
 };
 

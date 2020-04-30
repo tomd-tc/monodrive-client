@@ -132,3 +132,17 @@ public:
 	virtual ByteBuffer write() const override;
 	std::map<std::string, AnnotationFrame2D> annotations;
 };
+
+class MONODRIVECORE_API CameraFrame : public DataFrame{
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+    CameraFrame(int x_res, int y_res, int channels) : 
+        imageFrame(ImageFrame(x_res, y_res, channels)),
+        currentFrameIndex(0)
+    {
+    }
+    ImageFrame imageFrame;
+    CameraAnnotationFrame annotationFrame;
+    int currentFrameIndex;
+};
