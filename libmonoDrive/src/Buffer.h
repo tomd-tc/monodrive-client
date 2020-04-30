@@ -27,6 +27,13 @@ public:
 		data_ = new uint8_t[size];
 	}
 
+	ByteBuffer(uint32_t size, uint32_t header_offset)
+		: length_(size+header_offset),
+		position_(header_offset)
+	{
+		data_ = new uint8_t[length_];
+	}
+
 	ByteBuffer(const ByteBuffer& other)
 	{
 		length_ = other.length_;

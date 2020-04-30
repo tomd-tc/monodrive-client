@@ -27,10 +27,10 @@ Sensor::~Sensor()
 		delete frame;
 }
 
-std::string Sensor::dump_json()
-{
-	return config->dump_json();
-}
+// std::string Sensor::dump_json()
+// {
+// 	return config->dump_json();
+// }
 
 bool Sensor::configure()
 {
@@ -45,7 +45,9 @@ bool Sensor::send_configure()
 {
 	using namespace std;
 	Simulator& sim = Simulator::getInstance(config->server_ip, config->server_port);
-	nlohmann::json msg = nlohmann::json::parse(dump_json());
+	nlohmann::json msg = config->dump();
+	std::cout << msg << std::endl;
+	// nlohmann::json::parse(dump_json());
 	return sim.send_command(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));	
 }
 
@@ -80,9 +82,9 @@ bool Sensor::sample()
 			recvBuffer.resize(header_length);
 			if(listener->socket.is_open()){
 				mono::precise_stopwatch watch;
-				std::cout << "reading data frame..." << std::endl;
+				// std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
-				std::cout << "read success..." << std::endl;
+				// std::cout << "read success..." << std::endl;
 				std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 				parse();
 			}

@@ -18,35 +18,6 @@ public:
     // float game_time;
 };
 
-// for now 8 bit only, todo: add float higher bit rate etc enum
-class MONODRIVECORE_API ImageFrame : public DataFrame{
-public:
-    ImageFrame(int x_res, int y_res, int channels) : channels(channels){
-        resolution.x = x_res;
-        resolution.y = y_res;
-        pixels = new uint8_t[channels * resolution.x * resolution.y];
-    }
-    ~ImageFrame(){
-        delete pixels;
-    }
-    uint8_t* pixels;
-    int channels;
-    struct Resolution{
-        int x;
-        int y;
-    } resolution;
-    int size(){
-        return resolution.x * resolution.y * channels;
-    }
-    virtual void parse(ByteBuffer& buffer){
-        memcpy(pixels, buffer.data(), buffer.size());
-    }
-    virtual ByteBuffer write() const override{
-        // todo
-        return ByteBuffer();
-    }
-};
-
 class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
@@ -71,10 +42,7 @@ protected:
 class MONODRIVECORE_API ImuFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
-    virtual ByteBuffer write() const override {
-        // todo
-        return ByteBuffer();
-    }
+    virtual ByteBuffer write() const override;
 
     float acc_x, acc_y, acc_z;
     float ang_x, ang_y, ang_z;
@@ -88,6 +56,7 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
         // todo
+        throw std::runtime_error("Not implemented");
         return ByteBuffer();
     }
     // uint8_t preamble;
@@ -119,12 +88,38 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override {
         // todo
+        throw std::runtime_error("Not implemented");
         return ByteBuffer();
     }
     std::vector<VehicleState> vehicles;
     float game_time;
     int time;
 };
+
+// for now 8 bit only, todo: add float higher bit rate etc enum
+class MONODRIVECORE_API ImageFrame : public DataFrame{
+public:
+    ImageFrame(int x_res, int y_res, int channels) : channels(channels){
+        resolution.x = x_res;
+        resolution.y = y_res;
+        pixels = new uint8_t[channels * resolution.x * resolution.y];
+    }
+    ~ImageFrame(){
+        delete pixels;
+    }
+    uint8_t* pixels;
+    int channels;
+    struct Resolution{
+        int x;
+        int y;
+    } resolution;
+    int size() const{
+        return resolution.x * resolution.y * channels;
+    }
+    virtual void parse(ByteBuffer& buffer);
+    virtual ByteBuffer write() const override;
+};
+
 
 class MONODRIVECORE_API CameraAnnotationFrame : public DataFrame{
 public:

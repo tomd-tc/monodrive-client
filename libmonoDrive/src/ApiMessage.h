@@ -41,7 +41,7 @@ public:
 	{
 	}
 
-	ApiMessage(long in_reference, std::string in_type, bool in_success = false, nlohmann::json msg = NULL)
+	ApiMessage(long in_reference, std::string in_type, bool in_success = false, nlohmann::json msg = nlohmann::json())
 		: reference(in_reference),
 		type(in_type),
 		success(in_success),
@@ -170,13 +170,13 @@ public:
 		try {
 			//std::cout << "write tcp socket" << std::endl;
 			std::string data = serialize().dump();
-			std::cout << "ApiMessage::write: " << data << std::endl;
+			// std::cout << "ApiMessage::write: " << data << std::endl;
 
-			uint32_t length = header_length + data.size();
+			uint32_t length = header_length + (uint32_t)data.size();
 			sendBuffer.resize(length);
 			sendBuffer.writeInt(CONTROL_HEADER);
 			sendBuffer.writeInt(length);
-			sendBuffer.write((uint8_t*)data.c_str(), data.size());
+			sendBuffer.write((uint8_t*)data.c_str(), (uint32_t)data.size());
 			sendBuffer.reset();
 			boost::asio::write(socket,
 				boost::asio::buffer(sendBuffer.data(), sendBuffer.available()));

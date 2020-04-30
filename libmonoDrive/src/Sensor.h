@@ -92,7 +92,7 @@ public:
 	bool bContinue = true;
 	std::thread SampleThread;
 	bool parse();
-	std::string dump_json();
+	// std::string dump_json();
 	bool configure();
 	bool send_configure();
 	bool start_listening();

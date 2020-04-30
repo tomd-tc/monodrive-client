@@ -123,61 +123,32 @@ int main(int argc, char** argv)
         sensor->sample();
     }
     bool bContinue = true;
-    // std::thread t1([&sim0, &bContinue](){
-    //     while(bContinue){
-    //         // std::cout << "Control" << std::endl;
-    //         // sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
-    //         //     {   {"forward_amount", 0.0}, 
-    //         //         {"right_amount", 0.0},
-    //         //         {"brake_amount", 0.0},
-    //         //         {"drive_mode", 1}
-    //         //     }));
-    //         sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
-    //     }
-    // });
-    // std::thread t1([&sensors, &bContinue](){
-    //     while(bContinue){
-    //         // ImageFrame* frame = static_cast<ImageFrame*>(sensors[0]->frame);
-    //         CameraFrame* frame = static_cast<CameraFrame*>(sensors[0]->frame);
-    //         // std::cout << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << std::endl;
-    //         // cv::Mat img(IMG_HEIGHT, IMG_WIDTH, CV_8UC4, frame->imageFrame->pixels);
-    //         // cv::imshow("win", img);
-    //         // cv::waitKey(1);
-    //     }
-    // });
+    std::thread t1([&sensors, &bContinue](){
+        while(bContinue){
+            // ImageFrame* frame = static_cast<ImageFrame*>(sensors[0]->frame);
+            CameraFrame* frame = static_cast<CameraFrame*>(sensors[0]->frame);
+            // std::cout << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << std::endl;
+            cv::Mat img(frame->imageFrame->resolution.y, frame->imageFrame->resolution.x, CV_8UC4, frame->imageFrame->pixels);
+            cv::imshow("win", img);
+            cv::waitKey(1);
+        }
+    });
     std::cout << "Sampling sensor loop" << std::endl;
     int count = 0;
     while(true)
     {	
         // auto start = sysNow;
-        std::cout << "sampling... " << count++ << std::endl;
-        if(sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {})))
-            std::cout << "sample success" << std::endl;
-        // std::cout << "Time: " << ticToc(start) << std::endl;
-
-        // std::vector<std::future<bool>> sampleTasks;
-        // //step simulator
-        // stepTask = std::async([&sim0, &idx](){
-        //     return sim0.step(idx, 1);
-        // });
-        // //sample all sensors
-        // for(auto& sensor : sensors)
-        // {
-        //     if(!sensor->sample())
-        //         std::cout << "Failed to sample " << sensor->config->type << std::endl;
-        //     sensor->parse();
-        // }
-        // // review senors, see replay example for better parallelization
-        // view_sensors(sensors);
-        // if(!stepTask.get()){
-        //     break;
+        // std::cout << "sampling... " << count++ << std::endl;
+        sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
+        // if(sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {})))
+            // std::cout << "sample success" << std::endl;
+        // else{
+            // std::cout << "sample failed" << std::endl;
         // }
     }
     bContinue = false;
     // t1.join();
     //Calculate FPS
-    // auto scenario_time = stopwatch.elapsed_time<unsigned int, std::chrono::microseconds>();
-    // std::cout<< "fps = " + std::to_string(fps) << std::endl;
     
     return 0;
 }

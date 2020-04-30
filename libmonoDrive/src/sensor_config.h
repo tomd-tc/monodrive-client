@@ -38,15 +38,8 @@ class SensorBaseConfig
         }ros;
         friend void to_json(nlohmann::json& j,const SensorBaseConfig& config);
         friend void from_json(const nlohmann::json& j, SensorBaseConfig& config);
-
-        virtual SensorBaseConfig& get()
-        {
+        virtual nlohmann::json dump(){
             return *this;
-        }
-        virtual std::string dump_json()
-        {
-            nlohmann::json j = *this;
-            return j.dump();
         }
         virtual DataFrame* DataFrameFactory(){
             throw std::runtime_error("SensorBaseConfig does not name a DataFrame type. Use a derived Sensor type.");
@@ -62,16 +55,11 @@ public:
     std::vector<std::string> undesired_tags{"static"};
     bool debug_drawing{false};
     bool include_obb{false};
-    StateConfig& get()
-    {
-        return *this;
-    }
-    std::string dump_json() override{
-        nlohmann::json j = *this;
-        return j.dump();
-    }
     virtual DataFrame* DataFrameFactory() override{
         return new StateFrame;
+    }
+    virtual nlohmann::json dump(){
+        return *this;
     }
 };
 
@@ -87,13 +75,12 @@ public:
     float rpms{300.0f};
     int n_lasers{16};
     float reset_angle{0.0f};
-    std::string dump_json() override{
-        nlohmann::json j = *this;
-        return j.dump();
-    }
     virtual DataFrame* DataFrameFactory() override{
         std::cout << "Error, no parser for Lidar Sensor yet, you will need to parse the buffer yourself." << std::endl;
         return nullptr;
+    }
+    virtual nlohmann::json dump(){
+        return *this;
     }
 };
 
@@ -145,12 +132,11 @@ public:
         bool debug_scan{false};
         bool debug_rescan{false};
     }sbr;   
-    std::string dump_json() override{
-        nlohmann::json j = *this;
-        return j.dump();
-    }
     virtual DataFrame* DataFrameFactory() override{
         return new RadarTargetListFrame;
+    }
+    virtual nlohmann::json dump(){
+        return *this;
     }
 };
 
@@ -187,14 +173,6 @@ public:
         bool include_oob{false};
         bool cull_partial_frame{false};
     } annotation;
-    SensorBaseConfig& get() override
-    {
-        return *this;
-    }
-    std::string dump_json() override{
-        nlohmann::json j = *this;
-        return j.dump();
-    }      
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
         if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
@@ -205,6 +183,9 @@ public:
             throw std::runtime_error("only bgra and gray are supported channel types");
         return new CameraFrame(resolution.x, resolution.y, nChannels, annotation.include_annotation);
     }
+    virtual nlohmann::json dump(){
+        return *this;
+    }
 };
 
 class GPSConfig : public SensorBaseConfig
@@ -213,10 +194,6 @@ public:
     GPSConfig()
     {
         type = "GPS";
-    }
-    std::string dump_json() override{
-        nlohmann::json j = *this;
-        return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
         return new GPSFrame;
@@ -229,10 +206,6 @@ public:
     IMUConfig()
     {
         type = "IMU";
-    }
-    std::string dump_json() override{
-        nlohmann::json j = *this;
-        return j.dump();
     }
     virtual DataFrame* DataFrameFactory() override{
         return new ImuFrame;
@@ -248,14 +221,6 @@ public:
     }
     std::vector<std::string> desired_tags{"vt"};
     std::vector<std::string> undesired_tags{"static"};
-    CollisionConfig& get()
-    {
-        return *this;
-    }
-    std::string dump_json() override{
-        nlohmann::json j = *this;
-        return j.dump();
-    }
     virtual DataFrame* DataFrameFactory() override{
         std::cout << "Error, no parser for Collision Sensor yet, you will need to parse the buffer yourself." << std::endl;
         return nullptr;

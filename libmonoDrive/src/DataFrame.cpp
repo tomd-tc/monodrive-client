@@ -1,22 +1,13 @@
 #include "DataFrame.h"
 
-// int DataFrame::read_header(ByteBuffer& buffer){
-//     // todo this probably wrong
-//     int length = buffer.readInt();
-//     time = buffer.readInt();
-//     game_time = buffer.readInt();
-//     return length;
-// }
-
 nlohmann::json DataFrame::BufferToJson(const ByteBuffer& buffer){
     std::string json_string(reinterpret_cast<char*>(buffer.data()), buffer.size());
     return nlohmann::json::parse(json_string);
 }
 
-// todo need space for the header: length, wall time, game time
 ByteBuffer DataFrame::JsonToBuffer(const nlohmann::json& frame){
     std::string raw = frame.dump();
-    ByteBuffer buffer;
+    ByteBuffer buffer(raw.size(),12);
     buffer.write((uint8_t*)raw.c_str(), raw.size());
     return buffer;
 }
@@ -114,6 +105,12 @@ ByteBuffer RadarTargetListFrame::write() const{
     return JsonToBuffer(frame);
 }
 
+ByteBuffer ImuFrame::write() const{
+    // todo
+    throw std::runtime_error("no implemented");
+    return ByteBuffer();
+}
+
 void StateFrame::parse(ByteBuffer& buffer){
     auto json = BufferToJson(buffer)["message"];
     game_time = json["game_time"].get<float>();
@@ -162,6 +159,16 @@ void GPSFrame::parse(ByteBuffer& buffer){
     crc = buffer.readShort();
 }
 
+void ImageFrame::parse(ByteBuffer& buffer){
+    memcpy(pixels, buffer.data(), buffer.size());
+}
+
+ByteBuffer ImageFrame::write() const {
+    ByteBuffer buffer(size(), 12); 
+    buffer.write(pixels, size());
+    return buffer;
+}
+
 void CameraAnnotationFrame::parse(ByteBuffer& buffer) {
     annotations.clear();
 	auto frames = BufferToJson(buffer);
@@ -184,6 +191,7 @@ ByteBuffer CameraAnnotationFrame::write() const {
 
 ByteBuffer CameraFrame::write() const{
     throw std::runtime_error("Not implemented");
+    return ByteBuffer();
 }
 
 void CameraFrame::parse(ByteBuffer& buffer){
