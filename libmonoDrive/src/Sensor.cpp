@@ -84,7 +84,7 @@ bool Sensor::sample()
 				mono::precise_stopwatch watch;
 				// std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
-				readyToRead.store(true, std::memory_order::memory_order_relaxed);
+				sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
 				// std::cout << "read success..." << std::endl;
 				std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 				parse();

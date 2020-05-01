@@ -123,18 +123,18 @@ bool Simulator::step(int step_idx, int nsteps)
 void Simulator::sample_all()
 {
 	ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
-	bool allSensorsReadyToRead = false;
+	for(auto& sensor : sensors){
+		sensor.sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+	}
+	send_command(sampleMessage);
+	bool samplingInProgress = true;
 	do{
-		allSensorsReadyToRead = true;
+		samplingInProgress = false;
 		for(auto& sensor : sensors){
-			if(!sensor.readyToRead.load(std::memory_order::memory_order_relaxed)){
-				allSensorsReadyToRead = false;
+			if(sensor.sampleInProgress.load(std::memory_order::memory_order_relaxed)){
+				samplingInProgress = true;
 				break;
 			}
-			// else if(sensor.listener->socket.){
-
-			// }
 		}
-	} while(!allSensorsReadyToRead);
-	send_command(sampleMessage);
+	} while(!samplingInProgress);
 }
