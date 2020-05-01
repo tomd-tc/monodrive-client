@@ -4,5 +4,5 @@ Collection of monoDrive client software for different languages. To build a give
 
 - [C++](https://github.com/monoDriveIO/monodrive-client/tree/master/cpp-client#monoDrive-c++-client)
 - [ROS](https://github.com/monoDriveIO/monodrive-client/tree/master/cpp-client#monoDrive-ROS-client)
-- [MATLAB](https://github.com/monoDriveIO/monodrive-client/tree/master/matlab#monoDrive-MATLAB-client)
-- [Simulink](https://github.com/monoDriveIO/monodrive-client/tree/master/matlab#monoDrive-MATLAB-client)
+- [MATLAB](https://github.com/monoDriveIO/monodrive-client/tree/master/matlab)
+- [Simulink](https://github.com/monoDriveIO/monodrive-client/tree/master/matlab)
