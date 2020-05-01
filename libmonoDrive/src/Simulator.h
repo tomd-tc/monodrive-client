@@ -38,7 +38,7 @@ public:
           return std::thread(&Simulator::step, this, step_idx, nsteps);
       }
 	void connect_sensors();
-	void sample();
+	void sample_all();
 	//static Simulator* s_pInstance;
 	static std::map<const std::string, Simulator*> sim_map;
 

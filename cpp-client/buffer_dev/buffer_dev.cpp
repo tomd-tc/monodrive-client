@@ -119,9 +119,9 @@ int main(int argc, char** argv)
             {"brake_amount", 0.0},
             {"drive_mode", 1}
         }));
-    for(auto& sensor : sensors){
-        sensor->sample();
-    }
+    // for(auto& sensor : sensors){
+    //     sensor->sample();
+    // }
     bool bContinue = true;
     std::thread t1([&sensors, &bContinue](){
         while(bContinue){
@@ -139,7 +139,21 @@ int main(int argc, char** argv)
     {	
         // auto start = sysNow;
         // std::cout << "sampling... " << count++ << std::endl;
-        sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
+        // sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
+        sim0.sample_all();
+        bool sensorsReading = true;
+        while(sensorsReading){
+            sensorsReading = false;
+            for(auto& sensor : sensors){
+                if(!sensor->readyToRead.load()){
+                    sensorsReading = true;
+                    break;
+                }
+            }
+        }
+        for(auto& sensor : sensors){
+            sensor->readyToRead.store(false);
+        }
         // if(sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {})))
             // std::cout << "sample success" << std::endl;
         // else{

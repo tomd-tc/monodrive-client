@@ -73,10 +73,10 @@ public:
 		return true;
 	}
 	friend class Sensor;
-private:
 	boost::asio::ip::tcp::endpoint server_endpoint;
 	boost::asio::io_service io_service;
     boost::asio::ip::tcp::socket socket{io_service};
+private:
 };
 
 class Sensor  
@@ -102,10 +102,12 @@ public:
 	ByteBuffer recvBuffer;
 	std::unique_ptr<SensorBaseConfig> config = nullptr;
 	DataFrame* frame = nullptr;
+	std::atomic<bool> readyToRead{false};
 	
+	// move back to private
+	Connection* listener = nullptr;
 private:
 	std::string name;
 	enum { header_length = 12 };
-	Connection* listener = nullptr;
 };
 

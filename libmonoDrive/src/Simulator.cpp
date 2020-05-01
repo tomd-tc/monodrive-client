@@ -120,10 +120,21 @@ bool Simulator::step(int step_idx, int nsteps)
 	return send_command(step_message);
 }
 
-void Simulator::sample()
+void Simulator::sample_all()
 {
-	for(auto& sensor : sensors)
-	{
-		sensor.sample();
-	}
+	ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
+	bool allSensorsReadyToRead = false;
+	do{
+		allSensorsReadyToRead = true;
+		for(auto& sensor : sensors){
+			if(!sensor.readyToRead.load(std::memory_order::memory_order_relaxed)){
+				allSensorsReadyToRead = false;
+				break;
+			}
+			// else if(sensor.listener->socket.){
+
+			// }
+		}
+	} while(!allSensorsReadyToRead);
+	send_command(sampleMessage);
 }
