@@ -103,6 +103,7 @@ public:
 	std::unique_ptr<SensorBaseConfig> config = nullptr;
 	DataFrame* frame = nullptr;
 	std::atomic<bool> sampleInProgress{false};
+	std::function<void(DataFrame*)> sample_callback;
 	
 private:
 	Connection* listener = nullptr;

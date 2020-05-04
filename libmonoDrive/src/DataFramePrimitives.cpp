@@ -57,7 +57,7 @@ void from_json(const nlohmann::json& j, Transform& v) {
 void to_json(nlohmann::json& j, const OOBB& v) {
 	j = {
 		{"name", v.name},
-		{"orientaiton", v.orientation},
+		{"orientation", v.orientation},
 		{"center", v.center},
 		{"scale", v.scale},
 		{"extents", v.extents}
@@ -65,7 +65,7 @@ void to_json(nlohmann::json& j, const OOBB& v) {
 }
 void from_json(const nlohmann::json& j, OOBB& v) {
 	json_get(j, "name", v.name);
-	json_get(j, "orientaiton", v.orientation);
+	json_get(j, "orientation", v.orientation);
 	json_get(j, "center", v.center);
 	json_get(j, "scale", v.scale);
 	json_get(j, "extents", v.extents);

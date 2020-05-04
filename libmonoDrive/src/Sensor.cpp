@@ -82,12 +82,16 @@ bool Sensor::sample()
 			recvBuffer.resize(header_length);
 			if(listener->socket.is_open()){
 				mono::precise_stopwatch watch;
-				// std::cout << "reading data frame..." << std::endl;
+				std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
-				sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
-				// std::cout << "read success..." << std::endl;
-				std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
+				std::cout << "read success..." << std::endl;
 				parse();
+				if(frame->parse_complete()){
+					std::cout << "PARSE COMPLETE" << std::endl;
+					sample_callback(frame);
+					sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
+				}
+				std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 			}
 			else{
 				std::cout << "Sensor Channel is not open" << std::endl;

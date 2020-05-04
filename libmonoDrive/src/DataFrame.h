@@ -10,6 +10,9 @@ class DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) = 0;
     virtual ByteBuffer write() const = 0;
+    virtual bool parse_complete(){
+        return true;
+    } 
 	virtual ~DataFrame() {}
     static ByteBuffer JsonToBuffer(const nlohmann::json& frame);
     static nlohmann::json BufferToJson(const ByteBuffer& buffer);
@@ -142,6 +145,15 @@ public:
     ~CameraFrame(){
         delete imageFrame;
         delete annotationFrame;
+    }
+    // for the double send on image then annotation
+    virtual bool parse_complete(){
+        if(!bHasAnnotation or currentFrameIndex % 2 == 0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     ImageFrame* imageFrame;
     bool bHasAnnotation;

@@ -31,6 +31,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
     fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH,IMG_HEIGHT);
+    fc_config.annotation.include_annotation = false;
+    fc_config.annotation.desired_tags = {"traffic_sign"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
     // IMUConfig im_config;
@@ -123,14 +125,28 @@ int main(int argc, char** argv)
         sensor->sample();
     }
     bool bContinue = true;
+
+    sensors[0]->sample_callback = [](DataFrame* frame){
+        auto imframe = static_cast<CameraFrame*>(frame);
+        std::cout << "callback " << imframe->annotationFrame->annotations.size() << std::endl;
+        for(auto& annotation : imframe->annotationFrame->annotations){
+            std::cout << annotation.first << ": " << std::endl << nlohmann::json(annotation.second).dump(1) << std::endl;
+        }
+    };
+
     std::thread t1([&sensors, &bContinue](){
         while(bContinue){
+            // mono::precise_stopwatch watch;
             // ImageFrame* frame = static_cast<ImageFrame*>(sensors[0]->frame);
             CameraFrame* frame = static_cast<CameraFrame*>(sensors[0]->frame);
             // std::cout << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << std::endl;
             cv::Mat img(frame->imageFrame->resolution.y, frame->imageFrame->resolution.x, CV_8UC4, frame->imageFrame->pixels);
+            // for(auto& annotation : frame->annotationFrame->annotations){
+            //     std::cout << annotation.first << std::endl;
+            // }
             cv::imshow("win", img);
             cv::waitKey(1);
+            // std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
         }
     });
     std::cout << "Sampling sensor loop" << std::endl;
