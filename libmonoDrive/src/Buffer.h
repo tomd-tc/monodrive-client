@@ -174,7 +174,7 @@ public:
 	}
 
 	void write(uint8_t* buffer, uint32_t length) {
-		if (position_ + length >= length_) {
+		if (position_ + length > length_) {
 			grow((position_ + length) - length_);
 		}
 		memcpy(&data_[position_], buffer, length);
