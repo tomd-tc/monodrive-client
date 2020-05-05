@@ -21,14 +21,14 @@ public:
 		position_(0)
 	{}
 
-	ByteBuffer(uint32_t size)
+	ByteBuffer(size_t size)
 		: length_(size),
 		position_(0)
 	{
 		data_ = new uint8_t[size];
 	}
 
-	ByteBuffer(uint32_t size, uint32_t header_offset)
+	ByteBuffer(size_t size, size_t header_offset)
 		: length_(size+header_offset),
 		position_(header_offset)
 	{
@@ -49,14 +49,14 @@ public:
 		delete[] data_;
 	}
 	
-	void resize(uint32_t size) {
+	void resize(size_t size) {
 		delete[] data_;
 		data_ = new uint8_t[size];
 		length_ = size;
 		position_ = 0;
 	}
 
-	ByteBuffer& operator+=(uint32_t n) {
+	ByteBuffer& operator+=(size_t n) {
 		skip(n);
 		return *this;
 	}
@@ -65,7 +65,7 @@ public:
 		return &data_[position_];
 	}
 
-	void grow(uint32_t size) {
+	void grow(size_t size) {
 		uint8_t* newdata = new uint8_t[length_ + size];
 		if (length_ > 0) {
 			memcpy(newdata, data_, length_);
@@ -75,14 +75,14 @@ public:
 		data_ = newdata;
 	}
 
-	void reset(uint32_t offset = 0) {
+	void reset(size_t offset = 0) {
 		position_ = offset;
 	}
 
-	uint32_t size() const { return available(); }
-	uint32_t length() const { return length_; }
+	size_t size() const { return available(); }
+	size_t length() const { return length_; }
 
-	uint32_t skip(uint32_t count) {
+	size_t skip(size_t count) {
 		position_ += count;
 		if (position_ > length_)
 			position_ = length_;
@@ -173,7 +173,7 @@ public:
 		writeInt(value & 0xffffffff);
 	}
 
-	void write(uint8_t* buffer, uint32_t length) {
+	void write(uint8_t* buffer, size_t length) {
 		if (position_ + length > length_) {
 			grow((position_ + length) - length_);
 		}
@@ -192,8 +192,8 @@ public:
 	}
     inline static ByteBuffer JsonToBuffer(const nlohmann::json& frame){
 		std::string raw = frame.dump();
-		ByteBuffer buffer((uint32_t)raw.size(), 12);
-		buffer.write((uint8_t*)raw.c_str(), (uint32_t)raw.size());
+		ByteBuffer buffer(raw.size(), 12);
+		buffer.write((uint8_t*)raw.c_str(), raw.size());
 		buffer.reset(12);
 		std::cout << "buffer dump: |" << buffer.as_string() << "|" << std::endl;
 		return buffer;
@@ -202,6 +202,6 @@ public:
 
 private:
 	uint8_t* data_;
-	uint32_t length_;
-	uint32_t position_;
+	size_t length_;
+	size_t position_;
 };
