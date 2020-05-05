@@ -172,6 +172,7 @@ public:
         bool include_tags{false};
         bool include_oob{false};
         bool cull_partial_frame{false};
+        bool debug_draw{false};
     } annotation;
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
@@ -315,7 +316,8 @@ void inline to_json(nlohmann::json& j, const CameraConfig::Annotation& annotatio
         {"cull_partial_frame", annotation.cull_partial_frame},
         {"desired_tags", annotation.desired_tags},
         {"include_obb", annotation.include_oob},
-        {"include_tags", annotation.include_tags}
+        {"include_tags", annotation.include_tags},
+        {"debug_draw", annotation.debug_draw}
     };
 }
 
@@ -327,6 +329,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
     json_get(j, "desired_tags", annotation.desired_tags);
     json_get(j, "include_obb", annotation.include_oob);
     json_get(j, "include_tags", annotation.include_tags);
+    json_get(j, "debug_draw", annotation.debug_draw);
 }
 
 

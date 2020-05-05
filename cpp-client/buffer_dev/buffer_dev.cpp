@@ -31,7 +31,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
     fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH,IMG_HEIGHT);
-    fc_config.annotation.include_annotation = false;
+    fc_config.annotation.include_annotation = true;
     fc_config.annotation.desired_tags = {"traffic_sign"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
@@ -86,8 +86,28 @@ void view_sensors(std::vector<std::shared_ptr<Sensor>>& sensors){
     }
 }
 
+ByteBuffer test(){
+    AnnotationFrame2D fake;
+    fake.name = "stuff";
+    BoundingBox2D box;
+    box.name = "hi";
+    fake.bounding_boxes_2d.push_back(box);
+    fake.bounding_boxes_2d.push_back(box);
+    std::cout << nlohmann::json(fake).dump() << std::endl;
+    DataFrame* front;
+    CameraAnnotationFrame* annoteFrame = new CameraAnnotationFrame;
+    front = annoteFrame;
+    annoteFrame->annotations[fake.name] = fake;
+    return front->write();
+}
+
 int main(int argc, char** argv)
 {
+    // ByteBuffer annoteFrameBuffer = test();
+    // std::cout << annoteFrameBuffer.length() << std::endl;
+    // std::cout << "success" << std::endl;
+    // return 0;
+
     //Single Simulator Example
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
