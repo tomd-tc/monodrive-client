@@ -101,13 +101,18 @@ ByteBuffer test(){
     return front->write();
 }
 
+void test2(){
+	CameraAnnotationFrame framey;
+	ByteBuffer buffy = framey.write();
+	auto jj = buffy.BufferToJson();
+    std::cout << jj.dump() << std::endl;
+    for(auto& x : jj){
+        std::cout << x.dump() << std::endl;
+    }
+}
+
 int main(int argc, char** argv)
 {
-    // ByteBuffer annoteFrameBuffer = test();
-    // std::cout << annoteFrameBuffer.length() << std::endl;
-    // std::cout << "success" << std::endl;
-    // return 0;
-
     //Single Simulator Example
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;

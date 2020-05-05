@@ -4,6 +4,7 @@
 #include <exception>
 #include <string>
 #include <cstring>
+#include "JsonHelpers.h"
 
 
 class BufferOverrunException : public std::exception {
@@ -74,8 +75,8 @@ public:
 		data_ = newdata;
 	}
 
-	void reset() {
-		position_ = 0;
+	void reset(uint32_t offset = 0) {
+		position_ = offset;
 	}
 
 	uint32_t size() const { return available(); }
@@ -180,11 +181,24 @@ public:
 		position_ += length;
 	}
 
-	std::string as_string() {
+	std::string as_string() const {
 		std::string str;
 		str.assign((char*)&data_[position_], (std::size_t)(length_ - position_));
 		return str;
 	}
+
+    inline nlohmann::json BufferToJson() const{
+		return nlohmann::json::parse(as_string());
+	}
+    inline static ByteBuffer JsonToBuffer(const nlohmann::json& frame){
+		std::string raw = frame.dump();
+		ByteBuffer buffer((uint32_t)raw.size(), 12);
+		buffer.write((uint8_t*)raw.c_str(), (uint32_t)raw.size());
+		buffer.reset(12);
+		std::cout << "buffer dump: |" << buffer.as_string() << "|" << std::endl;
+		return buffer;
+	}
+
 
 private:
 	uint8_t* data_;

@@ -14,11 +14,6 @@ public:
         return true;
     } 
 	virtual ~DataFrame() {}
-    static ByteBuffer JsonToBuffer(const nlohmann::json& frame);
-    static nlohmann::json BufferToJson(const ByteBuffer& buffer);
-    // int read_header(ByteBuffer& buffer);
-    // uint32_t time;
-    // float game_time;
 };
 
 class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
@@ -156,7 +151,7 @@ public:
         }
     }
     ImageFrame* imageFrame;
-    bool bHasAnnotation;
     CameraAnnotationFrame* annotationFrame;
+    bool bHasAnnotation;
     int currentFrameIndex;
 };
