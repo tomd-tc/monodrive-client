@@ -103,7 +103,7 @@ public:
         pixels = new uint8_t[channels * resolution.x * resolution.y];
     }
     ~ImageFrame(){
-        delete pixels;
+        delete[] pixels;
     }
     uint8_t* pixels;
     int channels;
@@ -135,7 +135,7 @@ public:
         currentFrameIndex(0)
     {
         imageFrame = new ImageFrame(x_res, y_res, channels);
-        annotationFrame = new CameraAnnotationFrame;
+        annotationFrame = new CameraAnnotationFrame();
     }
     ~CameraFrame(){
         delete imageFrame;

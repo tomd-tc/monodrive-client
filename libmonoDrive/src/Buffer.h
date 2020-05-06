@@ -4,6 +4,7 @@
 #include <exception>
 #include <string>
 #include <cstring>
+#include <algorithm>
 #include "JsonHelpers.h"
 
 
@@ -15,38 +16,52 @@ public:
 
 class ByteBuffer {
 public:
-	ByteBuffer()
-		: data_(nullptr),
-		length_(0),
-		position_(0)
-	{}
-
-	ByteBuffer(size_t size)
+	ByteBuffer(size_t size = 0)
 		: length_(size),
-		position_(0)
+		position_(0),
+		data_(size ? new uint8_t[length_]() : nullptr)
 	{
-		data_ = new uint8_t[size];
 	}
 
-	ByteBuffer(size_t size, size_t header_offset)
-		: length_(size+header_offset),
-		position_(header_offset)
+	ByteBuffer(size_t size, size_t offset)
+		: length_(size+offset),
+		position_(offset),
+		data_(size ? new uint8_t[length_]() : nullptr)
 	{
-		data_ = new uint8_t[length_];
 	}
 
 	ByteBuffer(const ByteBuffer& other)
+		: length_(other.length_),
+		position_(other.position_),
+		data_(length_ ? new uint8_t[length_]() : nullptr)
 	{
-		length_ = other.length_;
-		position_ = other.position_;
-		data_ = new uint8_t[length_];
-		if (length_ > 0) {
-			memcpy(data_, other.data_, length_);
-		}
+		std::copy(other.data_, other.data_+length_, data_);
+	}
+
+	friend void swap(ByteBuffer& lhs, ByteBuffer& rhs){
+		using std::swap;
+		swap(lhs.data_, rhs.data_);
+		swap(lhs.length_, rhs.length_);
+		swap(lhs.position_, rhs.position_);
+	}
+
+	ByteBuffer& operator=(ByteBuffer other){
+		swap(*this, other);
+		return *this;
+	}
+
+	ByteBuffer(ByteBuffer&& other) noexcept
+		: ByteBuffer()
+	{
+		swap(*this, other);
 	}
 
 	virtual ~ByteBuffer() {
 		delete[] data_;
+	}
+
+	size_t position() const {
+		return position_;
 	}
 	
 	void resize(size_t size) {
@@ -89,7 +104,7 @@ public:
 		return position_;
 	}
 
-	int32_t available() const {
+	size_t available() const {
 		return length_ - position_;
 	}
 
@@ -182,8 +197,12 @@ public:
 	}
 
 	std::string as_string() const {
-		std::string str;
-		str.assign((char*)&data_[position_], (std::size_t)(length_ - position_));
+		if (size() == 0)
+			return std::string("");
+		//std::string str;
+		//str.assign((char*)data(), size());
+		//str.assign(data(), size());
+		std::string str((char*)data(), size());
 		return str;
 	}
 
@@ -195,7 +214,19 @@ public:
 		ByteBuffer buffer(raw.size(), 12);
 		buffer.write((uint8_t*)raw.c_str(), raw.size());
 		buffer.reset(12);
-		std::cout << "buffer dump: |" << buffer.as_string() << "|" << std::endl;
+		//std::cout << "buffer dump: |" << buffer.as_string() << "|" << std::endl;
+		//UE_LOG(LogTemp, Warning, TEXT("%d %d"), UTF8_TO_TCHAR(buffer.as_string().c_str()));
+		//UE_LOG(LogTemp, Warning, TEXT("JSONTOBUFFER %s"), UTF8_TO_TCHAR(frame.dump().c_str()));
+		//UE_LOG(LogTemp, Warning, TEXT("JSONTOBUFFER %d %d %d"), buffer.size(), buffer.length(), buffer.position());
+		//char* c = new char[1000];
+		//memcpy(c, buffer.data(), buffer.size());
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), UTF8_TO_TCHAR(c));
+		//std::string str = buffer.as_string();
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), UTF8_TO_TCHAR(str.c_str()));
+		//delete[] c;
+
+		//delete[] c;
+		
 		return buffer;
 	}
 
