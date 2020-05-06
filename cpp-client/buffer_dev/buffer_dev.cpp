@@ -13,7 +13,9 @@
 #include "Stopwatch.h"
 
 #include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
 #include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 // #define IMG_WIDTH 4096
 // #define IMG_HEIGHT 2160
@@ -122,7 +124,7 @@ int main(int argc, char** argv)
         "cpp-client/parser_dev/simulator.json",
         "config/vehicle.json",
         "config/weather.json",
-        "cpp-client/parser_dev/scenario.json"
+        "cpp-client/buffer_dev/scenario.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
@@ -152,25 +154,31 @@ int main(int argc, char** argv)
     bool bContinue = true;
 
     sensors[0]->sample_callback = [](DataFrame* frame){
-        auto imframe = static_cast<CameraFrame*>(frame);
-        std::cout << "callback " << imframe->annotationFrame->annotations.size() << std::endl;
-        for(auto& annotation : imframe->annotationFrame->annotations){
-            std::cout << annotation.first << ": " << std::endl << nlohmann::json(annotation.second).dump(1) << std::endl;
+        auto camFrame = static_cast<CameraFrame*>(frame);
+        // std::cout << "callback " << camFrame->annotationFrame->annotations.size() << std::endl;
+        auto imFrame = camFrame->imageFrame;
+        cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4, imFrame->pixels);
+        for(auto& annotation : camFrame->annotationFrame->annotations){
+            // std::cout << annotation.first << ": " << std::endl << nlohmann::json(annotation.second).dump(1) << std::endl;
+            for(auto& bbox : annotation.second.bounding_boxes_2d)
+            cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)), cv::Point(int(bbox.xmax), int(bbox.ymax)), cv::Scalar(0,0,255));
         }
+        cv::imshow("win", img);
+        cv::waitKey(1);
     };
 
     std::thread t1([&sensors, &bContinue](){
         while(bContinue){
             // mono::precise_stopwatch watch;
             // ImageFrame* frame = static_cast<ImageFrame*>(sensors[0]->frame);
-            CameraFrame* frame = static_cast<CameraFrame*>(sensors[0]->frame);
+            // CameraFrame* frame = static_cast<CameraFrame*>(sensors[0]->frame);
             // std::cout << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << " " << (int)frame->data[int(IMG_HEIGHT*IMG_WIDTH*0.5)] << std::endl;
-            cv::Mat img(frame->imageFrame->resolution.y, frame->imageFrame->resolution.x, CV_8UC4, frame->imageFrame->pixels);
+            // cv::Mat img(frame->imageFrame->resolution.y, frame->imageFrame->resolution.x, CV_8UC4, frame->imageFrame->pixels);
             // for(auto& annotation : frame->annotationFrame->annotations){
             //     std::cout << annotation.first << std::endl;
             // }
-            cv::imshow("win", img);
-            cv::waitKey(1);
+            // cv::imshow("win", img);
+            // cv::waitKey(1);
             // std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
         }
     });
