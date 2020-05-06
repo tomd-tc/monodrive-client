@@ -3,7 +3,6 @@
 #include <string>
 #include <memory>
 
-
 #include "Sensor.h"
 #include "Simulator.h"
 #include "Stopwatch.h"
@@ -26,11 +25,6 @@ Sensor::~Sensor()
 	if(frame != nullptr)
 		delete frame;
 }
-
-// std::string Sensor::dump_json()
-// {
-// 	return config->dump_json();
-// }
 
 bool Sensor::configure()
 {
@@ -73,7 +67,7 @@ bool Sensor::stop_listening()
 	return true;
 }
 
-bool Sensor::sample()
+bool Sensor::StartSampleLoop()
 {
 	SampleThread = std::thread([this](){
 		while(bContinue){
@@ -81,17 +75,19 @@ bool Sensor::sample()
 				return false;
 			recvBuffer.resize(header_length);
 			if(listener->socket.is_open()){
-				mono::precise_stopwatch watch;
+				mono::precise_stopwatch watch0;
 				// std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
 				// std::cout << "read success..." << std::endl;
+				std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
+				mono::precise_stopwatch watch1;
 				parse();
-				std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
+				std::cout << name << " parse: " <<  watch1.elapsed_time<unsigned int, std::chrono::microseconds>() << " (us)" << std::endl;
 				if(frame->parse_complete()){
 					// std::cout << "PARSE COMPLETE" << std::endl;
-					mono::precise_stopwatch watch1;
+					mono::precise_stopwatch watch2;
 					sample_callback(frame);
-					std::cout << "callback: " << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
+					std::cout << name << " callback: " << watch2.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 					sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
 				}
 			}

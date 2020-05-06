@@ -51,8 +51,8 @@ public:
     StateConfig(){
         type = "State";
     }
-    std::vector<std::string> desired_tags{"vehicle", "dynamic"};
-    std::vector<std::string> undesired_tags{"static"};
+    std::vector<std::string> desired_tags{};
+    std::vector<std::string> undesired_tags{};
     bool debug_drawing{false};
     bool include_obb{false};
     virtual DataFrame* DataFrameFactory() override{

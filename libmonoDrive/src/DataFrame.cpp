@@ -1,4 +1,5 @@
 #include "DataFrame.h"
+#include "Stopwatch.h"
 
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = buffer.BufferToJson()["message"];
@@ -100,11 +101,11 @@ ByteBuffer ImuFrame::write() const{
 }
 
 void StateFrame::parse(ByteBuffer& buffer){
-    auto j = buffer.BufferToJson()["message"];
+    auto j = buffer.BufferToJson();
 	json_get(j, "game_time", game_time);
 	json_get(j, "time", time);
 	json_get(j, "sample_count", sample_count);
-    auto states = j["frame"];
+    const auto& states = j["frame"];
 
     vehicles.clear();
     objects.clear();
@@ -114,12 +115,13 @@ void StateFrame::parse(ByteBuffer& buffer){
 
 ByteBuffer StateFrame::write() const {
 	nlohmann::json j = {
-		{"frame",
-			{"time", time},
-			{"game_time", game_time},
-			{"sample_count", sample_count},
-            {"vehicles", vehicles},
-            {"objects", objects}
+        {"time", time},
+        {"game_time", game_time},
+        {"sample_count", sample_count},
+		{"frame", {
+                {"vehicles", vehicles},
+                {"objects", objects}
+            }
 		}
 	};
 	return ByteBuffer::JsonToBuffer(j);

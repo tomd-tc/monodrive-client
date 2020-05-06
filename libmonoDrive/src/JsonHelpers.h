@@ -16,21 +16,6 @@ void MONODRIVECORE_API json_log(const FString& error_message);
 
 void MONODRIVECORE_API json_log(const std::string& error_message);
 
-//class JsonSerializable {
-//	virtual void to_json(nlohmann::json& j) const = 0;
-//	virtual void from_json(const nlohmann::json& j) = 0;
-//};
-//
-//template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
-//void to_json(nlohmann::json& j, const T& bm) {
-//	bm.to_json(j);
-//};
-//
-//template <typename T, typename std::enable_if<std::is_base_of<JsonSerializable, T>::value>::type* = nullptr>
-//void from_json(const nlohmann::json& j, T& bm) {
-//	bm.from_json(j);
-//};
-//
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FString& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FString& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FRotator& v);

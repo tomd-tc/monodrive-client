@@ -37,11 +37,12 @@ public:
 	std::thread stepThread(int step_idx, int nsteps) {
           return std::thread(&Simulator::step, this, step_idx, nsteps);
       }
-	void connect_sensors();
-	void sample_all();
+	void sample_all(std::vector<std::shared_ptr<Sensor>>& sensors);
 	//static Simulator* s_pInstance;
 	static std::map<const std::string, Simulator*> sim_map;
 
+	const std::string& getServerIp() const{return server_ip;}
+	const short& getServerPort() const{return server_port;}
 private:
 	Simulator(const Configuration& inConfig);
 	Simulator(const Configuration& inConfig, const std::string& inServer_ip, const short& inServer_port);
@@ -51,7 +52,6 @@ private:
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::socket controlSocket{io_service};
 	Configuration config;
-	std::vector<Sensor> sensors;
 	std::string server_ip;
 	short server_port;
 };
