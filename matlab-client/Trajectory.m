@@ -35,8 +35,7 @@ classdef Trajectory < matlab.System
 
         function response = send_trajectory(obj)
             command = obj.sim.ID_REPLAY_CONFIGURE_TRAJECTORY_COMMAND;
-            fid = fopen(obj.file_path,'r','n','UTF-8');
-            config = struct(jsondecode(fscanf(fid, '%s')));
+            config = json_read(obj.file_path);
             response = obj.sim.send_message(command, config);
             fclose(fid);
         end

@@ -1,4 +1,4 @@
-classdef Camera < Sensor 
+classdef CameraSensor < Sensor 
     % Camera Sensor
     %
     % This template includes the minimum set of functions required
@@ -6,8 +6,7 @@ classdef Camera < Sensor
 
     % Public, tunable properties
     properties
-        config_path = 'configurations/camera.json'
-          
+        config_path = '../configurations/camera.json'
     end
 
     % Pre-computed constants
@@ -17,7 +16,10 @@ classdef Camera < Sensor
         height
     end
 
-    methods(Access = protected)
+    
+       methods(Access = protected)
+
+        
         function setupImpl(obj)
             % Setup super class then             
             setupImpl@Sensor(obj);

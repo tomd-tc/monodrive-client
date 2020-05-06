@@ -20,7 +20,7 @@ classdef Viewport_Camera < Sensor
     methods(Access = protected)
         function setupImpl(obj)
             % Setup super class then             
-            setupImpl@Sensor(obj);
+            setupImpl@CameraSensor(obj);
             %obj.width = obj.config.stream_dimensions.x;
             %obj.height = obj.config.stream_dimensions.y;
         end

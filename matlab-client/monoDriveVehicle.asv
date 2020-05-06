@@ -10,7 +10,7 @@ classdef monoDriveVehicle < matlab.System & matlab.system.mixin.Propagates ...
     properties
       server_ip = "127.0.0.1"
       server_port = 8999
-      
+      connection = tcpip(obj.server_ip, obj.server_port, 'Timeout', 2);
       ID_EGO_CONTROL = "EgoControl_ID"
       HEADER_CONTROL = uint32(hex2dec('6d6f6e6f'))
       HEADER_RESPONSE = uint32(hex2dec('6f6e6f6d'))
@@ -32,7 +32,7 @@ classdef monoDriveVehicle < matlab.System & matlab.system.mixin.Propagates ...
 
     % Pre-computed constants
     properties(Access = private)
-        connection = libpointer;
+        sim= libpointer
         
     end
 

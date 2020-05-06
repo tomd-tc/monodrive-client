@@ -3,8 +3,9 @@ classdef Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system
 
     % Public, tunable properties
     properties
-      server_ip = "127.0.0.1"
-      server_port = 8999
+      
+
+
     end
 
     properties(Nontunable)
@@ -22,7 +23,8 @@ classdef Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system
     
     % Pre-computed constants
     properties(Access = protected)
-
+              server_ip = "127.0.0.1"
+      server_port = 8999
         connection = libpointer
         sensor_channel = libpointer
         config_json = string
