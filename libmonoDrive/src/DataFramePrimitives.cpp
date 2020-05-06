@@ -130,12 +130,12 @@ void to_json(nlohmann::json& j, const BoundingBox2D& v) {
 	};
 }
 void from_json(const nlohmann::json& j, BoundingBox2D& v) {
-	v.name = j["name"].get<std::string>();
-	auto& box = j["2d_bounding_boxes"];
-	v.xmin = box[0].get<float>();
-	v.xmax = box[1].get<float>();
-	v.ymin = box[2].get<float>();
-	v.ymax = box[3].get<float>();
+	// v.name = j["name"].get<std::string>();
+	// auto& box = j["2d_bounding_boxes"];
+	// v.xmin = box[0].get<float>();
+	// v.xmax = box[1].get<float>();
+	// v.ymin = box[2].get<float>();
+	// v.ymax = box[3].get<float>();
 }
 
 void to_json(nlohmann::json& j, const AnnotationFrame2D& v) {

@@ -22,7 +22,7 @@ public:
 	  // Lazy initialization
 	//static Simulator& getInstance(){return *s_pInstance;}
 	//static Simulator& getInstance(std::string inServer_ip){return *sim_map[inServer_ip];}
-  	static Simulator& getInstance(const Configuration& inConfig);
+  static Simulator& getInstance(const Configuration& inConfig);
 	static Simulator& getInstance(const std::string& inServer_ip, const short& inServer_port);
 	static Simulator& getInstance(const Configuration& inConfig, const std::string& inServer_ip, const short& inServer_port);
 	

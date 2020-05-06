@@ -32,7 +32,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH,IMG_HEIGHT);
+    fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
     fc_config.annotation.include_annotation = true;
     fc_config.annotation.desired_tags = {"traffic_sign"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
@@ -45,7 +45,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
     vp_config.location.z = 200;
-    vp_config.resolution = ViewportCameraConfig::Resolution(256,256);
+    vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     // GPSConfig gps_config;
@@ -115,6 +115,7 @@ void test2(){
 
 int main(int argc, char** argv)
 {
+    std::cout << "Hello World!" << std::endl;
     //Single Simulator Example
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;

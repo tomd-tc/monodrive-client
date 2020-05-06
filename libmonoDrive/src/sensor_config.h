@@ -6,6 +6,14 @@
 #include "DataFrame.h"
 #include <exception>
 
+struct Resolution
+{
+    Resolution(){}
+    Resolution(int x, int y) : x(x), y(y) {}
+    int x{512};
+    int y{512};
+};
+
 class SensorBaseConfig
 {
     public:
@@ -148,13 +156,7 @@ public:
     {
         type = "Camera";
     }
-    struct Resolution
-    {
-        Resolution(){}
-        Resolution(int x, int y) : x(x), y(y) {}
-        int x{512};
-        int y{512};
-    } resolution;
+    Resolution resolution;
     float max_distance{50000.0f};
     float dynamic_range{50.0f};
     float fov{60.0f};
@@ -183,6 +185,27 @@ public:
         else
             throw std::runtime_error("only bgra and gray are supported channel types");
         return new CameraFrame(resolution.x, resolution.y, nChannels, annotation.include_annotation);
+    }
+    virtual nlohmann::json dump(){
+        return *this;
+    }
+};
+
+class OccupancyGridConfig : public SensorBaseConfig
+{
+public:
+    OccupancyGridConfig() {
+        type= "OccupancyGrid";
+    }
+    Resolution resolution;
+    double meters_per_pixel = 0.1;
+    bool follow_yaw = false;
+    bool follow_pitch = false;
+    bool follow_roll = false;
+
+    virtual DataFrame* DataFrameFactory() override{
+        int nChannels = 1;
+        return new CameraFrame(resolution.x, resolution.y, nChannels, false);
     }
     virtual nlohmann::json dump(){
         return *this;
@@ -334,7 +357,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
 
 
 /// Camera Config JSON Parsing
-void inline to_json(nlohmann::json& j, const CameraConfig::Resolution& resolution)
+void inline to_json(nlohmann::json& j, const Resolution& resolution)
 {
     j = nlohmann::json{
         {"x", resolution.x},
@@ -342,7 +365,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig::Resolution& resolutio
     };
 }
 
-void inline from_json(const nlohmann::json& j, CameraConfig::Resolution& resolution)
+void inline from_json(const nlohmann::json& j, Resolution& resolution)
 {
     json_get(j, "x", resolution.x);
     json_get(j, "y", resolution.y);
