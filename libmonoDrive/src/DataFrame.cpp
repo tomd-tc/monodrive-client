@@ -105,10 +105,11 @@ void StateFrame::parse(ByteBuffer& buffer){
 	json_get(j, "time", time);
 	json_get(j, "sample_count", sample_count);
     auto states = j["frame"];
-    auto vehicleStates = states["vehicles"];
 
     vehicles.clear();
-	json_get(vehicleStates, vehicles);
+    objects.clear();
+	json_get(states, "vehicles", vehicles);
+	json_get(states, "objects", objects);
 }
 
 ByteBuffer StateFrame::write() const {
@@ -116,14 +117,11 @@ ByteBuffer StateFrame::write() const {
 		{"frame",
 			{"time", time},
 			{"game_time", game_time},
-			{"sample_count", sample_count}
+			{"sample_count", sample_count},
+            {"vehicles", vehicles},
+            {"objects", objects}
 		}
 	};
-	nlohmann::json vj = nlohmann::json::array();
-	for (auto& vehicle : vehicles) {
-		vj.push_back(vehicle);
-	}
-	j["vehicles"] = vj;
 	return ByteBuffer::JsonToBuffer(j);
 }
 

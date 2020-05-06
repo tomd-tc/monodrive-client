@@ -86,6 +86,7 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
     std::vector<VehicleState> vehicles;
+    std::vector<ObjectState> objects;
     float game_time;
     int time;
 	int sample_count;
