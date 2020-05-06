@@ -232,7 +232,7 @@ public:
 
 
 private:
-	uint8_t* data_;
 	size_t length_;
 	size_t position_;
+	uint8_t* data_;
 };
