@@ -100,14 +100,31 @@ ByteBuffer ImuFrame::write() const{
 }
 
 void StateFrame::parse(ByteBuffer& buffer){
-    auto json = buffer.BufferToJson()["message"];
-    game_time = json["game_time"].get<float>();
-    time = json["time"].get<int>();
-    auto states = json["frame"];
+    auto j = buffer.BufferToJson()["message"];
+	json_get(j, "game_time", game_time);
+	json_get(j, "time", time);
+	json_get(j, "sample_count", sample_count);
+    auto states = j["frame"];
     auto vehicleStates = states["vehicles"];
 
     vehicles.clear();
 	json_get(vehicleStates, vehicles);
+}
+
+ByteBuffer StateFrame::write() const {
+	nlohmann::json j = {
+		{"frame",
+			{"time", time},
+			{"game_time", game_time},
+			{"sample_count", sample_count}
+		}
+	};
+	nlohmann::json vj = nlohmann::json::array();
+	for (auto& vehicle : vehicles) {
+		vj.push_back(vehicle);
+	}
+	j["vehicles"] = vj;
+	return ByteBuffer::JsonToBuffer(j);
 }
 
 void ImuFrame::parse(ByteBuffer& buffer){

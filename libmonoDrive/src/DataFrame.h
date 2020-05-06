@@ -84,14 +84,11 @@ public:
 class MONODRIVECORE_API StateFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
-    virtual ByteBuffer write() const override {
-        // todo
-        throw std::runtime_error("Not implemented");
-        return ByteBuffer();
-    }
+	virtual ByteBuffer write() const override;
     std::vector<VehicleState> vehicles;
     float game_time;
     int time;
+	int sample_count;
 };
 
 // for now 8 bit only, todo: add float higher bit rate etc enum
