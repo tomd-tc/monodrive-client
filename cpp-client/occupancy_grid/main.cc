@@ -4,6 +4,11 @@
 
 #include "Simulator.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
     // Configure the sensors we wish to use
@@ -49,8 +54,6 @@ int main(int argc, char** argv) {
   // Setup and Connect Sensors
   std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
 
-  // Step through scenario while reading sensor outputs
-  std::future<bool> stepTask;
   /// initialize the vehicle, the first control command spawns the vehicle
   sim0.send_command(ApiMessage(123, EgoControl_ID, true,
                                {{"forward_amount", 0.0},
@@ -58,29 +61,22 @@ int main(int argc, char** argv) {
                                 {"brake_amount", 0.0},
                                 {"drive_mode", 1}}));
   for (auto& sensor : sensors) {
-    sensor->sample();
+    sensor->StartSampleLoop();
   }
-  bool bContinue = true;
 
+  sensors[0]->sample_callback = [](DataFrame* frame) {
+    auto camFrame = static_cast<CameraFrame*>(frame);
+    auto imFrame = camFrame->imageFrame;
+    cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
+                imFrame->pixels);
+    cv::imshow("monoDrive", img);
+    cv::waitKey(1);
+  };
+
+  std::cout << "Sampling sensor loop" << std::endl;
+  int count = 0;
   while (true) {
-    std::cout << "Sampling Sensors" << std::endl;
-    ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
-    for (auto& sensor : sensors) {
-      sensor->sampleInProgress.store(true,
-                                     std::memory_order::memory_order_relaxed);
-    }
-    sim0.send_command(sampleMessage);
-    bool samplingInProgress = true;
-    do {
-      samplingInProgress = false;
-      for (auto& sensor : sensors) {
-        if (sensor->sampleInProgress.load(
-                std::memory_order::memory_order_relaxed)) {
-          samplingInProgress = true;
-          break;
-        }
-      }
-    } while (samplingInProgress);
+    sim0.sample_all(sensors);
   }
 
   return 0;
