@@ -1,6 +1,8 @@
 #include "DataFrame.h"
 #include "Stopwatch.h"
 
+#define IMU_DATA_PACKET_SIZE 35
+
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = buffer.BufferToJson()["message"];
     std::cout << frame << std::endl;
@@ -94,12 +96,6 @@ ByteBuffer RadarTargetListFrame::write() const{
     return ByteBuffer::JsonToBuffer(frame);
 }
 
-ByteBuffer ImuFrame::write() const{
-    // todo
-    throw std::runtime_error("no implemented");
-    return ByteBuffer();
-}
-
 void StateFrame::parse(ByteBuffer& buffer){
     auto j = buffer.BufferToJson();
 	json_get(j, "game_time", game_time);
@@ -127,15 +123,29 @@ ByteBuffer StateFrame::write() const {
 	return ByteBuffer::JsonToBuffer(j);
 }
 
+ByteBuffer ImuFrame::write() const{
+    ByteBuffer buffer(IMU_DATA_PACKET_SIZE, 12);
+    buffer.write(0xc2);
+    buffer.writeFloat(acceleration.x);
+    buffer.writeFloat(acceleration.y);
+    buffer.writeFloat(acceleration.z);
+    buffer.writeFloat(angular_velocity.x);
+    buffer.writeFloat(angular_velocity.y);
+    buffer.writeFloat(angular_velocity.z);
+    buffer.writeInt(timer);
+    buffer.writeShort(checksum);
+    buffer.writeInt(time_of_week);
+    return ByteBuffer();
+}
 void ImuFrame::parse(ByteBuffer& buffer){
     // packet_size not needed, old artifact of some specific hardware
     uint8_t packet_size = buffer.readByte();
-    acc_x = buffer.readFloat();
-    acc_y = buffer.readFloat();
-    acc_z = buffer.readFloat();
-    ang_x = buffer.readFloat();
-    ang_y = buffer.readFloat();
-    ang_z = buffer.readFloat();
+    acceleration.x = buffer.readFloat();
+    acceleration.y = buffer.readFloat();
+    acceleration.z = buffer.readFloat();
+    angular_velocity.x = buffer.readFloat();
+    angular_velocity.y = buffer.readFloat();
+    angular_velocity.z = buffer.readFloat();
     // more hardware artifacts
     timer = buffer.readInt();
     checksum = buffer.readShort();

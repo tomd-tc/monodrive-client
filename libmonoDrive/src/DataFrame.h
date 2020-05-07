@@ -42,8 +42,8 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
 
-    float acc_x, acc_y, acc_z;
-    float ang_x, ang_y, ang_z;
+    Vec3f angular_velocity;
+    Vec3f acceleration;
     uint32_t timer;
     uint16_t checksum;
     int time_of_week;

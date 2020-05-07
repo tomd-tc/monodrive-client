@@ -80,10 +80,10 @@
             "externalConsole": false
         },
         {
-            "name": "buffer_dev windows",
+            "name": "camera_sensor windows",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/buffer_dev",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/camera_sensor",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -95,6 +95,17 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/cpp-client/buffer_dev/state_sensor",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "imu_sensor windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/imu_sensor",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
