@@ -3,9 +3,6 @@
 #include <future>
 
 #include "Simulator.h"
-
-#include "opencv2/core.hpp"
-#include "opencv2/core/utility.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
@@ -21,11 +18,21 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     sensors.push_back(std::make_shared<Sensor>(
       std::make_unique<OccupancyGridConfig>(occ_config)));
 
+    // Configure the Viewport but don't add it to the sensors array
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
     vp_config.location.z = 200;
     vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
+
+    // Get the current map information 
+    // MapConfig map_config;
+    // map_config.server_ip = ip;
+    // Sensor map_sensor(std::make_unique<MapConfig>(map_config));
+    // map_sensor.sample_callback = [](DataFrame* frame) {
+    //   std::cout << "Mapping call back called..." << std::endl;
+    // };
+    // map_sensor.configure();
 
     // Send configurations to the simulator
     std::cout << "***********ALL SENSOR's CONFIGS*******" << std::endl;

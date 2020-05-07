@@ -2,17 +2,10 @@
 
 #include <string>    
 #include <iostream>
+#include <exception>
 #include "JsonHelpers.h"
 #include "DataFrame.h"
-#include <exception>
-
-struct Resolution
-{
-    Resolution(){}
-    Resolution(int x, int y) : x(x), y(y) {}
-    int x{512};
-    int y{512};
-};
+#include "config_types.h"
 
 class SensorBaseConfig
 {
@@ -24,12 +17,7 @@ class SensorBaseConfig
         std::string type = "None";
         std::string description;
         int listen_port = 0;
-        struct Location
-        {
-            float x{0.0f};
-            float y{0.0f};
-            float z{0.0f};
-        }location;
+        Location location;
         struct Rotation
         {
             float yaw{0.0f};
@@ -212,6 +200,7 @@ public:
     }
 };
 
+
 class GPSConfig : public SensorBaseConfig
 {
 public:
@@ -264,19 +253,6 @@ public:
 };
 
 /// SensorBaseConfig
-void inline to_json(nlohmann::json& j, const SensorBaseConfig::Location& location)
-{
-    j = nlohmann::json{{"x", location.x},
-                {"y", location.y},
-                {"z", location.z}
-    };
-}
-void inline from_json(const nlohmann::json& j, SensorBaseConfig::Location& location)
-{
-    json_get(j, "x", location.x);
-    json_get(j, "y", location.y);
-    json_get(j, "z", location.z);
-}
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
 {
     j = nlohmann::json{{"yaw", rotation.yaw},
@@ -357,20 +333,6 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
 
 
 /// Camera Config JSON Parsing
-void inline to_json(nlohmann::json& j, const Resolution& resolution)
-{
-    j = nlohmann::json{
-        {"x", resolution.x},
-        {"y", resolution.y}
-    };
-}
-
-void inline from_json(const nlohmann::json& j, Resolution& resolution)
-{
-    json_get(j, "x", resolution.x);
-    json_get(j, "y", resolution.y);
-}
-
 void inline to_json(nlohmann::json& j, const StateConfig& config){
     j = static_cast<SensorBaseConfig>(config);
     j["desired_tags"] = config.desired_tags;
@@ -576,3 +538,23 @@ void inline from_json(const nlohmann::json& j, CollisionConfig& config)
     json_get(j, "undesired_tags", config.undesired_tags);   
 }
 /// END Collision Config JSON Parsing
+
+/// Occupancy Grid Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
+{
+    j = static_cast<SensorBaseConfig>(config);
+    j["resolution"] = config.resolution;
+    j["meters_per_pixel"] = config.meters_per_pixel;
+    j["follow_yaw"] = config.follow_yaw;
+    j["follow_pitch"] = config.follow_pitch;
+    j["follow_roll"] = config.follow_roll;
+}
+void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
+{
+    json_get(j, "resolution", config.resolution);
+    json_get(j, "meters_per_pixel", config.meters_per_pixel);
+    json_get(j, "follow_yaw", config.follow_yaw);
+    json_get(j, "follow_pitch", config.follow_pitch);
+    json_get(j, "follow_roll", config.follow_roll);
+}
+/// END Occupancy Grid Sensor JSON parsing
