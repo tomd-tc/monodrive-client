@@ -2,9 +2,11 @@
 #include <thread>
 #include <future>
 
-#include "Simulator.h"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
+
+#include "Simulator.h"
+#include "LaneSpline.h"
 
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
@@ -61,11 +63,11 @@ int main(int argc, char** argv) {
   ego_control_config.drive_mode = 1;
   sim0.send_command(ego_control_config.message());
 
-  // // Get the current map information
+  // Get the current map information
   MapConfig map_config;
-  std::cout << "====== Sending map request" << std::endl;
-  sim0.send_command(map_config.message());
-  std::cout << "DONE Sending map request" << std::endl;
+  nlohmann::json map_response;
+  sim0.send_command(map_config.message(), &map_response);
+  //lane_spline::LaneSpline ls(map_response);
 
   for (auto& sensor : sensors) {
     sensor->StartSampleLoop();

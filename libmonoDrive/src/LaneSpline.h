@@ -15,10 +15,12 @@ class LaneSpline{
 public:
     LaneSpline(){}
     LaneSpline(const std::string& geoJsonFile);
+    LaneSpline(const nlohmann::json& geoJson);
     void AddLane(const nlohmann::json& lane);
     int GetNearestPoint(const std::string& road, const std::string& lane, const Eigen::VectorXd& point);
-    nlohmann::json geoJson;
     std::map<std::string, std::map<std::string, std::vector<Eigen::VectorXd>>> spline_map;
+private:
+    void ParseLaneSplines(const nlohmann::json& geoJson);
 };
 
 int LaneSpline::GetNearestPoint(const std::string& road, const std::string& lane, const Eigen::VectorXd& point){
@@ -52,7 +54,16 @@ void LaneSpline::AddLane(const nlohmann::json& lane){
 
 LaneSpline::LaneSpline(const std::string& geoJsonFile){
     std::ifstream jsonFile(geoJsonFile);
+    nlohmann::json geoJson;
     jsonFile >> geoJson;
+    ParseLaneSplines(geoJson);
+}
+
+LaneSpline::LaneSpline(const nlohmann::json& geoJson) {
+    ParseLaneSplines(geoJson);
+}
+
+void LaneSpline::ParseLaneSplines(const nlohmann::json& geoJson) {
     auto& features = geoJson["map"]["features"];
     for(auto& feature : features){
         if(feature["properties"]["feature_type"] == "road"){
@@ -64,8 +75,4 @@ LaneSpline::LaneSpline(const std::string& geoJsonFile){
     }
 }
 
-
-
-
 }
-

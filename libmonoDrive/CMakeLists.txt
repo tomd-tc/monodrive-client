@@ -35,3 +35,8 @@ if(LIBRT)
 	target_link_libraries(${PROJECT_NAME} ${LIBRT})
 endif(LIBRT)
 target_link_libraries (${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+message(${EIGEN3_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)

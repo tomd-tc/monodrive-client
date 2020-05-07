@@ -33,7 +33,7 @@ public:
 	bool configure();
 	void disconnect();
 	void stop();
-	bool send_command(ApiMessage msg);
+	bool send_command(ApiMessage msg, nlohmann::json* response_message=nullptr);
 	bool step(int step_idx, int nsteps);
 	std::thread stepThread(int step_idx, int nsteps) {
           return std::thread(&Simulator::step, this, step_idx, nsteps);

@@ -16,7 +16,7 @@ class CommandBaseConfig
         friend void to_json(nlohmann::json& j,const CommandBaseConfig& config);
         friend void from_json(const nlohmann::json& j, CommandBaseConfig& config);
         virtual nlohmann::json dump(){
-            return *this;
+            throw std::runtime_error("CommandBaseConfig cannot be converted to JSON. Implement the conversion in the derived class.");
         }
         virtual ApiMessage message() {
             return ApiMessage(reference, type, success, dump());
@@ -46,8 +46,7 @@ public:
     {
         type = "GetMap";
     }
-    std::string type = "GetMap";
-    std::string format = "point_array";
+    std::string format = "geojson";
     std::string coordinates = "world";
     double point_delta{100.0};
     double orientation{-16.5};
