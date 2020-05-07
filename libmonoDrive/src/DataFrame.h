@@ -52,15 +52,11 @@ public:
 class MONODRIVECORE_API GPSFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
-    virtual ByteBuffer write() const override {
-        // todo
-        throw std::runtime_error("Not implemented");
-        return ByteBuffer();
-    }
-    // uint8_t preamble;
-    // uint16_t MSG_POS_LLH;
+    virtual ByteBuffer write() const override;
+    uint8_t preamble{0x55};
+    uint16_t MSG_POS_LLH{0x020A};
     uint16_t id_hash;
-    // uint8_t payload_size;
+    uint8_t payload_size{34};
 
     double lattitude;
     double longitude;
@@ -68,9 +64,7 @@ public:
 
     float world_x;
     float world_y;
-    float forward_x;
-    float forward_y;
-    float forward_z;
+    Vec3f forward;
     float yaw;
     float speed;
 

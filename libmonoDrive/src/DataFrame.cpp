@@ -2,6 +2,7 @@
 #include "Stopwatch.h"
 
 #define IMU_DATA_PACKET_SIZE 35
+#define GPS_DATA_PACKET_SIZE 66
 
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = buffer.BufferToJson()["message"];
@@ -135,7 +136,7 @@ ByteBuffer ImuFrame::write() const{
     buffer.writeInt(timer);
     buffer.writeShort(checksum);
     buffer.writeInt(time_of_week);
-    return ByteBuffer();
+    return buffer;
 }
 void ImuFrame::parse(ByteBuffer& buffer){
     // packet_size not needed, old artifact of some specific hardware
@@ -153,18 +154,18 @@ void ImuFrame::parse(ByteBuffer& buffer){
 }
 
 void GPSFrame::parse(ByteBuffer& buffer){
-    uint8_t preamble = buffer.readByte();
-    uint16_t MSG_POS_LLH = buffer.readShort();
+    preamble = buffer.readByte();
+    MSG_POS_LLH = buffer.readShort();
     id_hash = buffer.readShort();
-    uint8_t payload_size = buffer.readByte();
+    payload_size = buffer.readByte();
     lattitude = buffer.readDouble();
     longitude = buffer.readDouble();
     elevation = buffer.readDouble();
     world_x = buffer.readFloat();
     world_y = buffer.readFloat();
-    forward_x = buffer.readFloat();
-    forward_y = buffer.readFloat();
-    forward_z = buffer.readFloat();
+    forward.x = buffer.readFloat();
+    forward.y = buffer.readFloat();
+    forward.z = buffer.readFloat();
     yaw = buffer.readFloat();
     speed = buffer.readFloat();
     horizontal_accuracy = buffer.readShort();
@@ -172,6 +173,30 @@ void GPSFrame::parse(ByteBuffer& buffer){
     num_sats_signal = buffer.readByte();
     fixed_mode_status = buffer.readByte();
     crc = buffer.readShort();
+}
+
+ByteBuffer GPSFrame::write() const{
+    ByteBuffer buffer(GPS_DATA_PACKET_SIZE,12);
+    buffer.write(preamble);
+    buffer.writeShort(MSG_POS_LLH);
+    buffer.writeShort(id_hash);
+    buffer.write(payload_size);
+    buffer.writeDouble(lattitude);
+    buffer.writeDouble(longitude);
+    buffer.writeDouble(elevation);
+    buffer.writeFloat(world_x);
+    buffer.writeFloat(world_y);
+    buffer.writeFloat(forward.x);
+    buffer.writeFloat(forward.y);
+    buffer.writeFloat(forward.z);
+    buffer.writeFloat(yaw);
+    buffer.writeFloat(speed);
+    buffer.writeShort(horizontal_accuracy);
+    buffer.writeShort(vertical_accuracy);
+    buffer.write(num_sats_signal);
+    buffer.write(fixed_mode_status);
+    buffer.writeShort(crc);
+    return buffer;
 }
 
 void ImageFrame::parse(ByteBuffer& buffer){

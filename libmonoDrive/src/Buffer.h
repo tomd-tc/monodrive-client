@@ -147,6 +147,16 @@ public:
 		return data.output;
 	}
 
+	void writeDouble(double value){
+		union{
+			double input;
+			uint64_t output;
+		} data;
+		data.input = value;
+		std::bitset<sizeof(double)*CHAR_BIT> bits(data.output);
+		writeLong((uint64_t)bits.to_ullong());
+	}
+
 	void writeFloat(float value){
 		union{
 			float input;
