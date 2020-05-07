@@ -120,21 +120,21 @@ bool Simulator::step(int step_idx, int nsteps)
 	return send_command(step_message);
 }
 
-void Simulator::sample_all()
+void Simulator::sample_all(std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
 	for(auto& sensor : sensors){
-		sensor.sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	send_command(sampleMessage);
 	bool samplingInProgress = true;
 	do{
 		samplingInProgress = false;
 		for(auto& sensor : sensors){
-			if(sensor.sampleInProgress.load(std::memory_order::memory_order_relaxed)){
+			if(sensor->sampleInProgress.load(std::memory_order::memory_order_relaxed)){
 				samplingInProgress = true;
 				break;
 			}
 		}
-	} while(!samplingInProgress);
+	} while(samplingInProgress);
 }

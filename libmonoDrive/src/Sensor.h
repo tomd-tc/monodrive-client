@@ -88,7 +88,7 @@ public:
 	Sensor(const Sensor& ) = delete;
 	Sensor& operator=(const Sensor& ) = delete;
 
-	bool sample();
+	bool StartSampleLoop();
 	bool bContinue = true;
 	std::thread SampleThread;
 	bool parse();

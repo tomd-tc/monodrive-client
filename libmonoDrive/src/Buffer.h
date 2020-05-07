@@ -196,36 +196,21 @@ public:
 		position_ += length;
 	}
 
-	std::string as_string() const {
+	inline std::string as_string() const {
 		if (size() == 0)
 			return std::string("");
-		//std::string str;
-		//str.assign((char*)data(), size());
-		//str.assign(data(), size());
-		std::string str((char*)data(), size());
-		return str;
+		return std::string((char*)data(), size());
 	}
 
     inline nlohmann::json BufferToJson() const{
 		return nlohmann::json::parse(as_string());
 	}
+
     inline static ByteBuffer JsonToBuffer(const nlohmann::json& frame){
 		std::string raw = frame.dump();
 		ByteBuffer buffer(raw.size(), 12);
 		buffer.write((uint8_t*)raw.c_str(), raw.size());
 		buffer.reset(12);
-		//std::cout << "buffer dump: |" << buffer.as_string() << "|" << std::endl;
-		//UE_LOG(LogTemp, Warning, TEXT("%d %d"), UTF8_TO_TCHAR(buffer.as_string().c_str()));
-		//UE_LOG(LogTemp, Warning, TEXT("JSONTOBUFFER %s"), UTF8_TO_TCHAR(frame.dump().c_str()));
-		//UE_LOG(LogTemp, Warning, TEXT("JSONTOBUFFER %d %d %d"), buffer.size(), buffer.length(), buffer.position());
-		//char* c = new char[1000];
-		//memcpy(c, buffer.data(), buffer.size());
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), UTF8_TO_TCHAR(c));
-		//std::string str = buffer.as_string();
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), UTF8_TO_TCHAR(str.c_str()));
-		//delete[] c;
-
-		//delete[] c;
 		
 		return buffer;
 	}
