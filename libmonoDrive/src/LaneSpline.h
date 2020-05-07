@@ -64,7 +64,10 @@ LaneSpline::LaneSpline(const nlohmann::json& geoJson) {
 }
 
 void LaneSpline::ParseLaneSplines(const nlohmann::json& geoJson) {
-    auto& features = geoJson["map"]["features"];
+    for(auto& thing : geoJson) {
+        std::cout << "Thing is: " << thing << std::endl;
+    }
+    auto& features = geoJson["features"];
     for(auto& feature : features){
         if(feature["properties"]["feature_type"] == "road"){
             continue;

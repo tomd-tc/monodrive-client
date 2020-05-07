@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 
   /// initialize the vehicle, the first control command spawns the vehicle
   EgoControlConfig ego_control_config;
-  ego_control_config.forward_amount = 0.1f;
+  ego_control_config.forward_amount = 0.5f;
   ego_control_config.right_amount = 0.0f;
   ego_control_config.brake_amount = 0.0f;
   ego_control_config.drive_mode = 1;
@@ -67,7 +67,16 @@ int main(int argc, char** argv) {
   MapConfig map_config;
   nlohmann::json map_response;
   sim0.send_command(map_config.message(), &map_response);
-  //lane_spline::LaneSpline ls(map_response);
+
+  // Fix the JSON string for the current map output
+  // TODO: Update this when the simulator is updated
+  std::string map_string = map_response.dump();
+  map_string.erase(std::remove(map_string.begin(), map_string.end(), '\\'), 
+    map_string.end());
+  map_string = map_string.substr(1, map_string.size() - 2);
+  map_response = nlohmann::json::parse(map_string);
+
+  lane_spline::LaneSpline ls(map_response);
 
   for (auto& sensor : sensors) {
     sensor->StartSampleLoop();
