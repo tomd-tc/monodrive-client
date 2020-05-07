@@ -25,14 +25,6 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
-    // Get the current map information 
-    // MapConfig map_config;
-    // map_config.server_ip = ip;
-    // Sensor map_sensor(std::make_unique<MapConfig>(map_config));
-    // map_sensor.sample_callback = [](DataFrame* frame) {
-    //   std::cout << "Mapping call back called..." << std::endl;
-    // };
-    // map_sensor.configure();
 
     // Send configurations to the simulator
     std::cout << "***********ALL SENSOR's CONFIGS*******" << std::endl;
@@ -62,11 +54,19 @@ int main(int argc, char** argv) {
   std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
 
   /// initialize the vehicle, the first control command spawns the vehicle
-  sim0.send_command(ApiMessage(123, EgoControl_ID, true,
-                               {{"forward_amount", 0.0},
-                                {"right_amount", 0.0},
-                                {"brake_amount", 0.0},
-                                {"drive_mode", 1}}));
+  EgoControlConfig ego_control_config;
+  ego_control_config.forward_amount = 0.1f;
+  ego_control_config.right_amount = 0.0f;
+  ego_control_config.brake_amount = 0.0f;
+  ego_control_config.drive_mode = 1;
+  sim0.send_command(ego_control_config.message());
+
+  // // Get the current map information
+  MapConfig map_config;
+  std::cout << "====== Sending map request" << std::endl;
+  sim0.send_command(map_config.message());
+  std::cout << "DONE Sending map request" << std::endl;
+
   for (auto& sensor : sensors) {
     sensor->StartSampleLoop();
   }

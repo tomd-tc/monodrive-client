@@ -71,11 +71,13 @@ public:
 		int32_t size = recvBuffer.readInt();
 		int32_t payloadSize = size - header_length;
 		//std::cout<< "payloadSize = " << payloadSize << std::endl;
+		std::cout << std::hex << magic << std::endl;
 		if (magic == CONTROL_HEADER)
 		{
 			recvBuffer.grow(payloadSize);
 			boost::asio::read(socket, boost::asio::buffer(recvBuffer.data(), recvBuffer.available()));
 			nlohmann::json j = nlohmann::json::parse(recvBuffer.as_string());
+			std::cout << "Received: " << j << std::endl;
 			success = deserialize(j);
 		}
 		else {
