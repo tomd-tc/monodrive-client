@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "algorithm": "cpp",
+        "atomic": "cpp",
+        "*.ipp": "cpp",
+        "xstring": "cpp",
+        "utility": "cpp",
+        "xutility": "cpp",
+        "ostream": "cpp",
+        "vector": "cpp"
+    }
+}

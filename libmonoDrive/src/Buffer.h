@@ -5,6 +5,7 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
+#include <bitset>
 #include "JsonHelpers.h"
 
 
@@ -144,6 +145,26 @@ public:
 		} data;
 		data.input = val;
 		return data.output;
+	}
+
+	void writeDouble(double value){
+		union{
+			double input;
+			uint64_t output;
+		} data;
+		data.input = value;
+		std::bitset<sizeof(double)*CHAR_BIT> bits(data.output);
+		writeLong((uint64_t)bits.to_ullong());
+	}
+
+	void writeFloat(float value){
+		union{
+			float input;
+			uint32_t output;
+		} data;
+		data.input = value;
+		std::bitset<sizeof(float)*CHAR_BIT> bits(data.output);
+		writeInt((uint32_t)bits.to_ulong());
 	}
 
 	float readFloat(){

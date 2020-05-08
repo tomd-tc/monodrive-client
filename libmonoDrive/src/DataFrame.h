@@ -5,6 +5,7 @@
 #include "DataFramePrimitives.h"
 #include <algorithm>
 #include "UECompatability.h"
+#include <complex>
 
 class DataFrame{
 public:
@@ -20,21 +21,54 @@ class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
+    std::vector<RadarTarget> targets;
+    std::vector<RadarTarget> gt_targets;
+};
+
+class MONODRIVECORE_API RadarCubeFrame : public DataFrame{
 public:
-    struct Target{
-        std::vector<std::string> target_ids;
-        float range{-1}; // m
-        float aoa{0}; // degrees
-        float velocity{0};
-        float rcs{0}; 
-    };
-    std::vector<Target> targets;
-    std::vector<Target> gt_targets;
-protected:
-    void parse_target_list(const nlohmann::json& target_list);
-    void parse_gt_target_list(const nlohmann::json& target_list);
-    nlohmann::json write_target_list() const;
-    nlohmann::json write_gt_target_list() const;
+    RadarCubeFrame(int numSweeps, int numSamplesPerSweep, int numElements){
+        radar_cube.resize(numSweeps*numSamplesPerSweep*numElements);
+    }
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+    inline size_t size() const{
+        return radar_cube.size();
+    }
+    int numSweeps;
+    int numSamplesPerSweep;
+    int numElements;
+    std::vector<std::complex<float>> radar_cube;
+};
+
+class MONODRIVECORE_API RadarFrame : public DataFrame{
+public:
+    RadarFrame(bool send_radar_cube, int numSweeps, int numSamplesPerSweep, int numElements) 
+    : bSendRadarCube(send_radar_cube),
+    currentFrameIndex(0) 
+    {
+        radarTargetListFrame = new RadarTargetListFrame();
+        radarCubeFrame = new RadarCubeFrame(numSweeps, numSamplesPerSweep, numElements); 
+    }
+    ~RadarFrame(){
+        delete radarTargetListFrame;
+    }
+    // for the double send on image then annotation
+    virtual bool parse_complete(){
+        if(!bSendRadarCube)
+            return true;
+        else if(currentFrameIndex % 2 == 1)
+            return true;
+        else
+            return false;
+    }
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+public:
+    RadarTargetListFrame* radarTargetListFrame;
+    RadarCubeFrame* radarCubeFrame;
+    bool bSendRadarCube;
+    int currentFrameIndex;
 };
 
 class MONODRIVECORE_API ImuFrame : public DataFrame{
@@ -42,8 +76,8 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
 
-    float acc_x, acc_y, acc_z;
-    float ang_x, ang_y, ang_z;
+    Vec3f angular_velocity;
+    Vec3f acceleration;
     uint32_t timer;
     uint16_t checksum;
     int time_of_week;
@@ -52,15 +86,11 @@ public:
 class MONODRIVECORE_API GPSFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
-    virtual ByteBuffer write() const override {
-        // todo
-        throw std::runtime_error("Not implemented");
-        return ByteBuffer();
-    }
-    // uint8_t preamble;
-    // uint16_t MSG_POS_LLH;
+    virtual ByteBuffer write() const override;
+    uint8_t preamble{0x55};
+    uint16_t MSG_POS_LLH{0x020A};
     uint16_t id_hash;
-    // uint8_t payload_size;
+    uint8_t payload_size{34};
 
     double lattitude;
     double longitude;
@@ -68,9 +98,7 @@ public:
 
     float world_x;
     float world_y;
-    float forward_x;
-    float forward_y;
-    float forward_z;
+    Vec3f forward;
     float yaw;
     float speed;
 
@@ -95,7 +123,9 @@ public:
 // for now 8 bit only, todo: add float higher bit rate etc enum
 class MONODRIVECORE_API ImageFrame : public DataFrame{
 public:
-    ImageFrame(int x_res, int y_res, int channels) : channels(channels){
+    ImageFrame(int x_res, int y_res, int channels) 
+        : channels(channels)
+    {
         resolution.x = x_res;
         resolution.y = y_res;
         pixels = new uint8_t[channels * resolution.x * resolution.y];
@@ -103,13 +133,13 @@ public:
     ~ImageFrame(){
         delete[] pixels;
     }
-    uint8_t* pixels;
     int channels;
+    uint8_t* pixels;
     struct Resolution{
         int x;
         int y;
     } resolution;
-    int size() const{
+    inline int size() const{
         return resolution.x * resolution.y * channels;
     }
     virtual void parse(ByteBuffer& buffer);

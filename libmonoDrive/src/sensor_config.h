@@ -129,7 +129,7 @@ public:
         bool debug_rescan{false};
     }sbr;   
     virtual DataFrame* DataFrameFactory() override{
-        return new RadarTargetListFrame;
+        return new RadarFrame(send_radar_cube, num_sweeps, num_samples_per_sweep, elements);
     }
     virtual nlohmann::json dump(){
         return *this;

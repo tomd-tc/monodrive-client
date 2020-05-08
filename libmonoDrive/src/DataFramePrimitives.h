@@ -61,6 +61,14 @@ struct AnnotationFrame2D {
 	std::vector<std::string> tags;
 };
 
+struct RadarTarget{
+    float range;
+    float aoa;
+    float velocity;
+    float rcs;
+    std::vector<std::string> target_ids;
+};
+
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, Quat& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Vec3f& v);
@@ -81,6 +89,8 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const BoundingBox2D& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, BoundingBox2D& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const AnnotationFrame2D& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, AnnotationFrame2D& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const RadarTarget& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, RadarTarget& v);
 
 
 

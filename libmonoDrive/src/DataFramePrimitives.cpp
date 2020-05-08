@@ -152,3 +152,21 @@ void from_json(const nlohmann::json& j, AnnotationFrame2D& v) {
 	json_get(j, "oriented_bounding_boxes", v.oriented_bounding_boxes);
 	json_get(j, "tags", v.tags);
 }
+
+void to_json(nlohmann::json& j, const RadarTarget& v){
+	j = {
+		{"range", v.range},
+		{"aoa", v.aoa},
+		{"velocity", v.velocity},
+		{"rcs", v.rcs},
+		{"target_ids", v.target_ids}
+	};
+}
+
+void from_json(const nlohmann::json& j, RadarTarget& v){
+	json_get(j, "range", v.range);
+	json_get(j, "aoa", v.aoa);
+	json_get(j, "velocity", v.velocity);
+	json_get(j, "rcs", v.rcs);
+	json_get(j, "target_ids", v.target_ids);
+}
