@@ -92,32 +92,32 @@ public:
     {
         type = "Radar";
     }
+    int gpu_number{0};
     bool paint_targets{false};
-    float target_paint_lifetime{0.25f};
+    float target_paint_lifetime{0.5f};
     float nearest_target_label_radius{50.0f};
     bool send_radar_cube{false};
-    int gpu_number{0};
-    float fs{150000000.0f};
-    float fc{77000000000.0f};
+    double fs{50000000.0};
+    double fc{77000000000.0};
     int num_sweeps{32};
     int num_samples_per_sweep{345};
-    float sweep_time{0.0000069f};
+    double sweep_time{0.0000069};
     int bandwidth{250000000};
     int max_radar_returns{500};
     int elements{8};
     struct Transmitter
     {
         float peak_power{5.0f};
-        float aperature{.000859f};
+        double aperature{0.000859};
         float gain{13.5f};
     }transmitter;
     struct Receiver
     {
         float gain{10.0f};
-        float aperature{0.000798f};
+        double aperature{0.000798};
         float nf{10.0f};
         float noise_temp{290.0};
-        float nb{74000000.0};
+        double nb{74000000.0};
     }receiver;
     struct SBR
     {
@@ -419,23 +419,6 @@ void inline to_json(nlohmann::json& j, const RadarConfig& config)
     j["sbr"] = config.sbr;
 }
 
-void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
-{
-     j = nlohmann::json{{ "peak_power", config.peak_power},
-              {"aperature", config.aperature},
-              {"gain", config.gain}
-     };
-}
-
-void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
-{
-    j = nlohmann::json{{"gain", config.gain},
-             {"aperature", config.aperature},
-             {"nf", config.nf},
-             {"noise_temp", config.noise_temp},
-             {"nb", config.nb}    
-    };
-}
 void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
 {
     j = nlohmann::json{
@@ -476,6 +459,14 @@ void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter config)
     json_get(j, "aperature", config.aperature);
     json_get(j, "gain", config.gain);
 }
+void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
+{
+     j = nlohmann::json{
+        {"peak_power", config.peak_power},
+        {"aperature", config.aperature},
+        {"gain", config.gain}
+     };
+}
 
 void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
 {
@@ -484,6 +475,16 @@ void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
     json_get(j, "nf", config.nf);
     json_get(j, "noise_temp", config.noise_temp);
     json_get(j, "nb", config.nb);
+}
+void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
+{
+    j = nlohmann::json{
+        {"gain", config.gain},
+        {"aperature", config.aperature},
+        {"nf", config.nf},
+        {"noise_temp", config.noise_temp},
+        {"nb", config.nb}    
+    };
 }
 
 void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)

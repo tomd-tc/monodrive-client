@@ -17,7 +17,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
     RadarConfig r_config;
-    r_config.location.x = 230.f;
+    r_config.location.x = 300.f;
     r_config.location.z = 50.f;
     r_config.paint_targets = true;
     r_config.send_radar_cube = true;
@@ -61,7 +61,7 @@ void state_test(Simulator& sim0){
 
     sensors[0]->sample_callback = [](DataFrame* frame){
         auto& radarFrame = *static_cast<RadarFrame*>(frame);
-        std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
+        // std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
