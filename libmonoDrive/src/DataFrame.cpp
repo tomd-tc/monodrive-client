@@ -7,7 +7,7 @@
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = buffer.BufferToJson();
     json_get(frame, "target_list", targets);
-    json_get(frame, "gt_target_list", gt_targets);
+    json_get(frame, "gt_targets", gt_targets);
 }
 
 ByteBuffer RadarTargetListFrame::write() const{

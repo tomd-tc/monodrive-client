@@ -17,6 +17,10 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
     RadarConfig r_config;
+    r_config.location.x = 230.f;
+    r_config.location.z = 50.f;
+    r_config.paint_targets = true;
+    r_config.send_radar_cube = true;
     r_config.server_ip = sim0.getServerIp();
     r_config.server_port = sim0.getServerPort();
     r_config.listen_port = 8102;
