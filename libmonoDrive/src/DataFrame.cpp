@@ -31,7 +31,13 @@ void RadarCubeFrame::parse(ByteBuffer& buffer){
 }
 
 void RadarFrame::parse(ByteBuffer& buffer){
-    // todo
+    if(bSendRadarCube and currentFrameIndex % 2 == 1){
+        radarCubeFrame->parse(buffer);
+    }
+    else{
+        radarTargetListFrame->parse(buffer);
+    }
+    currentFrameIndex++;
 }
 
 ByteBuffer RadarFrame::write() const{

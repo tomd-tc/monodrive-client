@@ -53,6 +53,15 @@ public:
     ~RadarFrame(){
         delete radarTargetListFrame;
     }
+    // for the double send on image then annotation
+    virtual bool parse_complete(){
+        if(!bSendRadarCube)
+            return true;
+        else if(currentFrameIndex % 2 == 1)
+            return true;
+        else
+            return false;
+    }
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
 public:
