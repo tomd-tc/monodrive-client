@@ -543,7 +543,7 @@ void inline from_json(const nlohmann::json& j, CollisionConfig& config)
 void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
-    j["resolution"] = config.resolution;
+    j["stream_dimensions"] = config.resolution;
     j["meters_per_pixel"] = config.meters_per_pixel;
     j["follow_yaw"] = config.follow_yaw;
     j["follow_pitch"] = config.follow_pitch;
@@ -551,7 +551,7 @@ void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
 }
 void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
 {
-    json_get(j, "resolution", config.resolution);
+    json_get(j, "stream_dimensions", config.resolution);
     json_get(j, "meters_per_pixel", config.meters_per_pixel);
     json_get(j, "follow_yaw", config.follow_yaw);
     json_get(j, "follow_pitch", config.follow_pitch);

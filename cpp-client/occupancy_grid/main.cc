@@ -8,17 +8,64 @@
 #include "Simulator.h"
 #include "LaneSpline.h"
 
+std::mutex data_snapshot_mutex;
+
+struct DataSnapShot {
+  CameraFrame* camera_frame;
+  StateFrame* state_frame;
+  lane_spline::LaneSpline* map_data;
+} DATA_SNAPSHOT;
+
+void CorrelateSnapshot() {
+  std::lock_guard<std::mutex> lock(data_snapshot_mutex);
+
+  // Get the map points within the certain radius of the vehicle
+  auto ego_location = DATA_SNAPSHOT.state_frame->vehicles[0].state.odometry.pose.position;
+  Eigen::VectorXd ego_vec(2);
+  ego_vec << ego_location.x, ego_location.y;
+  auto pts = DATA_SNAPSHOT.map_data->GetPointsWithinRadius(ego_vec, 100.0);
+  auto imFrame = DATA_SNAPSHOT.camera_frame->imageFrame;
+  cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
+              imFrame->pixels);
+  cv::imshow("monoDrive", img);
+  cv::waitKey(1);
+}
+
+void OccupancyGridCallback(DataFrame* frame) {
+    auto camFrame = static_cast<CameraFrame*>(frame);
+    std::lock_guard<std::mutex> lock(data_snapshot_mutex);
+    DATA_SNAPSHOT.camera_frame = camFrame;
+}
+
+void StateSensorCallback(DataFrame* frame) {
+  auto& state_frame = *static_cast<StateFrame*>(frame);
+  std::lock_guard<std::mutex> lock(data_snapshot_mutex);
+  DATA_SNAPSHOT.state_frame = &state_frame;
+}
+
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
+
     OccupancyGridConfig occ_config;
     occ_config.server_ip = ip;
     occ_config.listen_port = 8100;
-    occ_config.resolution = Resolution(512, 512);
+    occ_config.resolution = Resolution(1920, 1080);
     occ_config.meters_per_pixel = 0.1;
     sensors.push_back(std::make_shared<Sensor>(
       std::make_unique<OccupancyGridConfig>(occ_config)));
+    sensors.back()->sample_callback = OccupancyGridCallback;
+
+    StateConfig s_config;
+    s_config.server_ip = ip;
+    s_config.listen_port = 8101;
+    s_config.desired_tags = {"ego", "vehicle"};
+    s_config.include_obb = true;
+    s_config.debug_drawing = true;
+    sensors.push_back(std::make_shared<Sensor>(
+      std::make_unique<StateConfig>(s_config)));
+    sensors.back()->sample_callback = StateSensorCallback;
 
     // Configure the Viewport but don't add it to the sensors array
     ViewportCameraConfig vp_config;
@@ -27,11 +74,9 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
-
     // Send configurations to the simulator
     std::cout << "***********ALL SENSOR's CONFIGS*******" << std::endl;
     for (auto& sensor : sensors) {
-      std::cout << "Sensor:" << sensor->config->dump() << std::endl;
       sensor->configure();
     }
     return sensors;
@@ -78,23 +123,16 @@ int main(int argc, char** argv) {
 
   lane_spline::LaneSpline ls(map_response);
 
+  DATA_SNAPSHOT.map_data = &ls;
+
   for (auto& sensor : sensors) {
     sensor->StartSampleLoop();
   }
 
-  sensors[0]->sample_callback = [](DataFrame* frame) {
-    auto camFrame = static_cast<CameraFrame*>(frame);
-    auto imFrame = camFrame->imageFrame;
-    cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
-                imFrame->pixels);
-    cv::imshow("monoDrive", img);
-    cv::waitKey(1);
-  };
-
   std::cout << "Sampling sensor loop" << std::endl;
-  int count = 0;
   while (true) {
     sim0.sample_all(sensors);
+    CorrelateSnapshot();
   }
 
   return 0;
