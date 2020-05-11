@@ -158,6 +158,12 @@ ByteBuffer ImageFrame::write() const {
     return buffer;
 }
 
+//ByteBuffer LidarFrame::write() const {
+//	ByteBuffer buffer(size(), 12);
+//	buffer.write(blockBuffer, size());
+//	return buffer;
+//}
+
 void CameraAnnotationFrame::parse(ByteBuffer& buffer) {
     annotations.clear();
 	auto frames = buffer.BufferToJson();

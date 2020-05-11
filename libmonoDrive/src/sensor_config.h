@@ -108,13 +108,13 @@ public:
     struct Transmitter
     {
         float peak_power{5.0f};
-        double aperature{0.000859};
+        double aperture{0.000859};
         float gain{13.5f};
     }transmitter;
     struct Receiver
     {
         float gain{10.0f};
-        double aperature{0.000798};
+        double aperture{0.000798};
         float nf{10.0f};
         float noise_temp{290.0};
         double nb{74000000.0};
@@ -456,14 +456,14 @@ void inline from_json(const nlohmann::json& j, RadarConfig& config)
 void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter config)
 {
     json_get(j, "peak_power", config.peak_power);
-    json_get(j, "aperature", config.aperature);
+    json_get(j, "aperture", config.aperture);
     json_get(j, "gain", config.gain);
 }
 void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
 {
      j = nlohmann::json{
         {"peak_power", config.peak_power},
-        {"aperature", config.aperature},
+        {"aperture", config.aperture},
         {"gain", config.gain}
      };
 }
@@ -471,7 +471,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
 void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
 {
     json_get(j, "gain", config.gain);
-    json_get(j, "aperature", config.aperature);
+    json_get(j, "aperture", config.aperture);
     json_get(j, "nf", config.nf);
     json_get(j, "noise_temp", config.noise_temp);
     json_get(j, "nb", config.nb);
@@ -480,7 +480,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
 {
     j = nlohmann::json{
         {"gain", config.gain},
-        {"aperature", config.aperature},
+        {"aperture", config.aperture},
         {"nf", config.nf},
         {"noise_temp", config.noise_temp},
         {"nb", config.nb}    

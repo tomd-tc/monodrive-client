@@ -183,3 +183,34 @@ public:
     bool bHasAnnotation;
     int currentFrameIndex;
 };
+
+//class MONODRIVECORE_API LidarFrame : public DataFrame {
+//public:
+//	virtual void parse(ByteBuffer& buffer) override;
+//	virtual ByteBuffer write() const override;
+//	LidarFrame(int numLasers, int numBlocks) 
+//		: numLasers(numLasers), 
+//		numBlocks(numBlocks)
+//	{
+//		// StartBlock: blockId uint16, azimuth uint16
+//		// Data: distance uint16, reflection uint8  => numLasers
+//		// EndBlock : lidarClock uint32, blockend uint16
+//		blockSize = sizeof(uint16_t) + sizeof(uint16_t);
+//		blockSize += (sizeof(uint16_t) + sizeof(uint8_t)) * numLasers;
+//		blockSize += sizeof(uint32_t) + sizeof(uint16_t);
+//		blockBuffer = new uint8_t[blockSize * numBlocks];
+//	}
+//
+//	~LidarFrame() {
+//		delete[] blockBuffer;
+//	}
+//
+//	inline size_t size() const {
+//		return numBlocks * numLasers * blockSize;
+//	}
+//
+//	int numLasers;
+//	int numBlocks;
+//	size_t blockSize;
+//	uint8_t* blockBuffer;
+//};

@@ -21,6 +21,9 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     r_config.location.z = 50.f;
     r_config.paint_targets = true;
     r_config.send_radar_cube = true;
+    // r_config.sbr.debug_scan = true;
+    r_config.sbr.debug_rescan = true;
+    r_config.sbr.debug_frustum = true;
     r_config.server_ip = sim0.getServerIp();
     r_config.server_port = sim0.getServerPort();
     r_config.listen_port = 8102;
@@ -85,6 +88,10 @@ int main(int argc, char** argv)
         "config/weather.json",
         "cpp-client/buffer_dev/scenario.json"
     );
+    config.simulator["map"] = "RadarCube";
+    config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};
+    config.scenario["frame"][0]["velocity"] = {0.f, 0.f, 0.f};
+
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     if(!sim0.configure()){
