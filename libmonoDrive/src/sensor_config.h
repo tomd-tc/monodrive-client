@@ -425,7 +425,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
         {"long_range_scan_distance", config.long_range_scan_distance},
         {"short_range_scan_distance", config.short_range_scan_distance},
         {"long_range_fov", config.long_range_fov},
-        {"short_range_fov", config.short_range_scan_distance},
+        {"short_range_fov", config.short_range_fov},
         {"elevation_fov", config.elevation_fov},
         {"ray_division_z", config.ray_division_z},
         {"ray_division_y", config.ray_division_y},
