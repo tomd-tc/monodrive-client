@@ -59,9 +59,7 @@ public:
     }
     // for the double send on image then annotation
     virtual bool parse_complete(){
-        if(!bSendRadarCube)
-            return true;
-        else if(currentFrameIndex % 2 == 1)
+        if(!bSendRadarCube or currentFrameIndex % 2 == 0)
             return true;
         else
             return false;
