@@ -16,6 +16,7 @@ Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensor_config) : config(std::mo
 		listener = new Connection(config->server_ip, config->listen_port);
 	} 
 	frame = config->DataFrameFactory();
+	sample_callback = [](DataFrame* frame){return;};
 }
 
 Sensor::~Sensor()

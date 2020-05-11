@@ -19,15 +19,34 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     RadarConfig r_config;
     r_config.location.x = 300.f;
     r_config.location.z = 50.f;
-    r_config.paint_targets = true;
+    r_config.paint_targets = false;
     r_config.send_radar_cube = true;
+    r_config.max_radar_returns = 100;
+    r_config.sbr.ray_division_y = 20.f;
+    r_config.sbr.ray_division_z = 20.f;
     // r_config.sbr.debug_scan = true;
     r_config.sbr.debug_rescan = true;
-    r_config.sbr.debug_frustum = true;
+    r_config.sbr.debug_frustum = false;
     r_config.server_ip = sim0.getServerIp();
     r_config.server_port = sim0.getServerPort();
     r_config.listen_port = 8102;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r_config)));
+
+    // RadarConfig r2;
+    // r2.location.x = 300.f;
+    // r2.location.z = 50.f;
+    // r2.paint_targets = false;
+    // r2.send_radar_cube = true;
+    // r2.max_radar_returns = 100;
+    // r2.sbr.ray_division_y = 20.f;
+    // r2.sbr.ray_division_z = 20.f;
+    // // r_config.sbr.debug_scan = true;
+    // r2.sbr.debug_rescan = true;
+    // r2.sbr.debug_frustum = false;
+    // r2.server_ip = sim0.getServerIp();
+    // r2.server_port = sim0.getServerPort();
+    // r2.listen_port = 8103;
+    // sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r2)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -88,9 +107,9 @@ int main(int argc, char** argv)
         "config/weather.json",
         "cpp-client/buffer_dev/scenario.json"
     );
-    config.simulator["map"] = "RadarCube";
-    config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};
-    config.scenario["frame"][0]["velocity"] = {0.f, 0.f, 0.f};
+    // config.simulator["map"] = "RadarCube";
+    // config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};
+    // config.scenario["frame"][0]["velocity"] = {0.f, 0.f, 0.f};
 
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
