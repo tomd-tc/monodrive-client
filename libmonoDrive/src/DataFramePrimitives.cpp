@@ -126,12 +126,12 @@ void from_json(const nlohmann::json& j, VehicleState& v) {
 void to_json(nlohmann::json& j, const BoundingBox2D& v) {
 	j = {
 		{"name", v.name},
-		{"2d_bounding_boxes", {v.xmin, v.xmax, v.ymin, v.ymax}}
+		{"2d_bounding_box", {v.xmin, v.xmax, v.ymin, v.ymax}}
 	};
 }
 void from_json(const nlohmann::json& j, BoundingBox2D& v) {
 	v.name = j["name"].get<std::string>();
-	auto& box = j["2d_bounding_boxes"];
+	auto& box = j["2d_bounding_box"];
 	v.xmin = box[0].get<float>();
 	v.xmax = box[1].get<float>();
 	v.ymin = box[2].get<float>();

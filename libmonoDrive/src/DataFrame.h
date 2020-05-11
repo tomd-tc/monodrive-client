@@ -27,7 +27,11 @@ public:
 
 class MONODRIVECORE_API RadarCubeFrame : public DataFrame{
 public:
-    RadarCubeFrame(int numSweeps, int numSamplesPerSweep, int numElements){
+    RadarCubeFrame(int numSweeps, int numSamplesPerSweep, int numElements) 
+        : numSweeps(numSweeps),
+        numSamplesPerSweep(numSamplesPerSweep),
+        numElements(numElements)
+    {
         radar_cube.resize(numSweeps*numSamplesPerSweep*numElements);
     }
     virtual void parse(ByteBuffer& buffer) override;
