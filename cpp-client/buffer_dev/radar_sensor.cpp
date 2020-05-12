@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <future>
+#include <thread>
 
 //monoDrive Includes
 #include "Simulator.h"
@@ -22,8 +23,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     r_config.paint_targets = false;
     r_config.send_radar_cube = true;
     r_config.max_radar_returns = 100;
-    r_config.sbr.ray_division_y = 20.f;
-    r_config.sbr.ray_division_z = 20.f;
+    r_config.sbr.ray_division_y = 10.f;
+    r_config.sbr.ray_division_z = 10.f;
     // r_config.sbr.debug_scan = true;
     r_config.sbr.debug_rescan = true;
     r_config.sbr.debug_frustum = false;
@@ -83,7 +84,8 @@ void state_test(Simulator& sim0){
 
     sensors[0]->sample_callback = [](DataFrame* frame){
         auto& radarFrame = *static_cast<RadarFrame*>(frame);
-        // std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
+        std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     };
 
     std::cout << "Sampling sensor loop" << std::endl;

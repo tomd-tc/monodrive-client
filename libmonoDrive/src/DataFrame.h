@@ -7,11 +7,12 @@
 #include "UECompatability.h"
 #include <complex>
 
+
 class DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) = 0;
     virtual ByteBuffer write() const = 0;
-    virtual bool parse_complete(){
+    virtual bool parse_complete() const{
         return true;
     } 
 	virtual ~DataFrame() {}
@@ -58,7 +59,7 @@ public:
         delete radarTargetListFrame;
     }
     // for the double send on image then annotation
-    virtual bool parse_complete(){
+    virtual bool parse_complete() const override{
         if(!bSendRadarCube or currentFrameIndex % 2 == 0)
             return true;
         else
@@ -172,7 +173,7 @@ public:
         delete annotationFrame;
     }
     // for the double send on image then annotation
-    virtual bool parse_complete(){
+    virtual bool parse_complete() const override{
         if(!bHasAnnotation or currentFrameIndex % 2 == 0){
             return true;
         }
@@ -186,33 +187,51 @@ public:
     int currentFrameIndex;
 };
 
-//class MONODRIVECORE_API LidarFrame : public DataFrame {
-//public:
-//	virtual void parse(ByteBuffer& buffer) override;
-//	virtual ByteBuffer write() const override;
-//	LidarFrame(int numLasers, int numBlocks) 
-//		: numLasers(numLasers), 
-//		numBlocks(numBlocks)
-//	{
-//		// StartBlock: blockId uint16, azimuth uint16
-//		// Data: distance uint16, reflection uint8  => numLasers
-//		// EndBlock : lidarClock uint32, blockend uint16
-//		blockSize = sizeof(uint16_t) + sizeof(uint16_t);
-//		blockSize += (sizeof(uint16_t) + sizeof(uint8_t)) * numLasers;
-//		blockSize += sizeof(uint32_t) + sizeof(uint16_t);
-//		blockBuffer = new uint8_t[blockSize * numBlocks];
-//	}
-//
-//	~LidarFrame() {
-//		delete[] blockBuffer;
-//	}
-//
-//	inline size_t size() const {
-//		return numBlocks * numLasers * blockSize;
-//	}
-//
-//	int numLasers;
-//	int numBlocks;
-//	size_t blockSize;
-//	uint8_t* blockBuffer;
-//};
+class MONODRIVECORE_API LidarPacket : public DataFrame{
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+    inline size_t size() const{
+        return sizeof(LidarPacket);
+    }
+    LidarBlock blocks[12];
+    uint32_t time_stamp;
+    uint16_t packet_end;
+    inline void set_start_block(int blockIndex, uint16_t blockId, uint16_t azimuth){
+        blocks[blockIndex].blockId = blockId;
+        blocks[blockIndex].azimuth = azimuth;
+    }
+    inline void set_hit(int blockIndex, int hitIndex, uint16_t distance, uint8_t reflection){
+        blocks[blockIndex].hits[hitIndex].distance = distance;
+        blocks[blockIndex].hits[hitIndex].reflection = reflection;
+    }
+    inline void set_end_packet(uint32_t timeStamp, uint16_t packetEnd){
+        time_stamp = time_stamp;
+        packet_end = packetEnd;
+    }
+};
+
+class MONODRIVECORE_API LidarFrame : public DataFrame {
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+	LidarFrame(int packetSize, int numPackets)
+    : packetSize(packetSize),
+    numPackets(numPackets)
+	{
+        packets.resize(numPackets);
+	}
+
+	inline size_t size() const {
+		return packetSize * numPackets;
+	}
+
+    virtual bool parse_complete() const override{
+        return packetIndex == 0 ? true : false;
+    }
+
+	int numPackets;
+    int packetSize;
+    std::vector<LidarPacket> packets;
+    uint64_t packetIndex = 0;
+};

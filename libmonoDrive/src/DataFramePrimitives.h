@@ -69,6 +69,17 @@ struct RadarTarget{
     std::vector<std::string> target_ids;
 };
 
+struct LidarHit{
+    uint16_t distance;
+    uint8_t reflection;
+};
+
+struct LidarBlock{
+    uint16_t blockId;
+    uint16_t azimuth;
+    LidarHit hits[32];
+};
+
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, Quat& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Vec3f& v);

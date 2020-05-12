@@ -3,6 +3,7 @@
 
 #define IMU_DATA_PACKET_SIZE 35
 #define GPS_DATA_PACKET_SIZE 66
+#define LIDAR_PACKET_SIZE 1206
 
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = buffer.BufferToJson();
@@ -158,12 +159,6 @@ ByteBuffer ImageFrame::write() const {
     return buffer;
 }
 
-//ByteBuffer LidarFrame::write() const {
-//	ByteBuffer buffer(size(), 12);
-//	buffer.write(blockBuffer, size());
-//	return buffer;
-//}
-
 void CameraAnnotationFrame::parse(ByteBuffer& buffer) {
     annotations.clear();
 	auto frames = buffer.BufferToJson();
@@ -196,4 +191,27 @@ void CameraFrame::parse(ByteBuffer& buffer){
         annotationFrame->parse(buffer);
     }
     currentFrameIndex++;
+}
+
+ByteBuffer LidarFrame::write() const {
+    throw std::runtime_error("Not implemented.");
+	// ByteBuffer buffer(size(), 12);
+	// buffer.write(blockBuffer, size());
+	// return buffer;
+    return ByteBuffer();
+}
+
+void LidarFrame::parse(ByteBuffer& buffer){
+    packets[packetIndex++].parse(buffer);
+    if(packetIndex == packets.size())
+        packetIndex = 0;
+}
+
+ByteBuffer LidarPacket::write() const{
+    ByteBuffer buffer(sizeof(LidarPacket), 12);
+    buffer.write((uint8_t*)this, sizeof(LidarPacket));
+}
+
+void LidarPacket::parse(ByteBuffer& buffer){
+    *this = *reinterpret_cast<LidarPacket*>(buffer.data());
 }

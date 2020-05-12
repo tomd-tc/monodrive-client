@@ -7,6 +7,7 @@ add_executable(camera_sensor camera_sensor.cpp)
 # add_executable(imu_sensor imu_sensor.cpp)
 # add_executable(gps_sensor gps_sensor.cpp)
 add_executable(radar_sensor radar_sensor.cpp)
+add_executable(lidar_sensor lidar_sensor.cpp)
 
 
 target_link_libraries(camera_sensor monoDriveClient)
@@ -14,6 +15,7 @@ target_link_libraries(camera_sensor monoDriveClient)
 # target_link_libraries(imu_sensor monoDriveClient)
 # target_link_libraries(gps_sensor monoDriveClient)
 target_link_libraries(radar_sensor monoDriveClient)
+target_link_libraries(lidar_sensor monoDriveClient)
 
 find_package(OpenCV REQUIRED PATHS "C:/local/opencv/build")
 include_directories(${OpenCV_INCLUDE_DIRS})
