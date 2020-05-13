@@ -194,11 +194,9 @@ void CameraFrame::parse(ByteBuffer& buffer){
 }
 
 ByteBuffer LidarFrame::write() const {
-    throw std::runtime_error("Not implemented.");
-	// ByteBuffer buffer(size(), 12);
-	// buffer.write(blockBuffer, size());
-	// return buffer;
-    return ByteBuffer();
+    ByteBuffer buffer(sizeof(LidarPacket)*packets.size());
+    buffer.write((uint8_t*)packets.data(), sizeof(LidarPacket) * packets.size());
+    return buffer;
 }
 
 void LidarFrame::parse(ByteBuffer& buffer){
@@ -210,6 +208,7 @@ void LidarFrame::parse(ByteBuffer& buffer){
 ByteBuffer LidarPacket::write() const{
     ByteBuffer buffer(sizeof(LidarPacket), 12);
     buffer.write((uint8_t*)this, sizeof(LidarPacket));
+	return buffer;
 }
 
 void LidarPacket::parse(ByteBuffer& buffer){

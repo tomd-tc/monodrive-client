@@ -76,8 +76,9 @@ public:
     int n_lasers{16};
     float reset_angle{0.0f};
     virtual DataFrame* DataFrameFactory() override{
-        std::cout << "Error, no parser for Lidar Sensor yet, you will need to parse the buffer yourself." << std::endl;
-        return nullptr;
+        int rotations_per_scan = 360.f / horizontal_resolution;
+        int numPackets = rotations_per_scan / 12;
+        return new LidarFrame(numPackets);
     }
     virtual nlohmann::json dump(){
         return *this;

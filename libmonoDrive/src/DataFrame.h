@@ -215,23 +215,19 @@ class MONODRIVECORE_API LidarFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
-	LidarFrame(int packetSize, int numPackets)
-    : packetSize(packetSize),
-    numPackets(numPackets)
+	LidarFrame(int numPackets)
 	{
         packets.resize(numPackets);
 	}
 
 	inline size_t size() const {
-		return packetSize * numPackets;
+		return packets.size();
 	}
 
     virtual bool parse_complete() const override{
         return packetIndex == 0 ? true : false;
     }
 
-	int numPackets;
-    int packetSize;
     std::vector<LidarPacket> packets;
     uint64_t packetIndex = 0;
 };
