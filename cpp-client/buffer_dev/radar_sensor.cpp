@@ -17,21 +17,23 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    RadarConfig r_config;
-    r_config.location.x = 300.f;
-    r_config.location.z = 50.f;
-    r_config.paint_targets = false;
-    r_config.send_radar_cube = true;
-    r_config.max_radar_returns = 100;
-    r_config.sbr.ray_division_y = 10.f;
-    r_config.sbr.ray_division_z = 10.f;
-    // r_config.sbr.debug_scan = true;
-    r_config.sbr.debug_rescan = true;
-    r_config.sbr.debug_frustum = false;
-    r_config.server_ip = sim0.getServerIp();
-    r_config.server_port = sim0.getServerPort();
-    r_config.listen_port = 8102;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r_config)));
+    for(int i = 0; i < 5; ++i){
+        RadarConfig r_config;
+        r_config.location.x = 300.f;
+        r_config.location.z = 50.f;
+        r_config.paint_targets = false;
+        r_config.send_radar_cube = true;
+        r_config.max_radar_returns = 4500;
+        r_config.sbr.ray_division_y = 10.f;
+        r_config.sbr.ray_division_z = 10.f;
+        // r_config.sbr.debug_scan = true;
+        r_config.sbr.debug_rescan = true;
+        r_config.sbr.debug_frustum = false;
+        r_config.server_ip = sim0.getServerIp();
+        r_config.server_port = sim0.getServerPort();
+        r_config.listen_port = 8102 + i;
+        sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r_config)));
+    }
 
     // RadarConfig r2;
     // r2.location.x = 300.f;
