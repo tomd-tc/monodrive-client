@@ -144,6 +144,17 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false
+        },
+        {
+            "name": "scenario_file windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/scenario_file",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
         }
     ]
 }
