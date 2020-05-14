@@ -80,7 +80,7 @@ bool Sensor::StartSampleLoop()
 				// std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
 				// std::cout << "read success..." << std::endl;
-				std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
+				// std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 				mono::precise_stopwatch watch1;
 				parse();
 				// std::cout << name << " parse: " <<  watch1.elapsed_time<unsigned int, std::chrono::microseconds>() << " (us)" << std::endl;

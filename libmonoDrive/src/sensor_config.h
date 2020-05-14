@@ -76,7 +76,7 @@ public:
     int n_lasers{16};
     float reset_angle{0.0f};
     virtual DataFrame* DataFrameFactory() override{
-        int rotations_per_scan = 360 / horizontal_resolution;
+        int rotations_per_scan = (int)360 / horizontal_resolution;
         int numPackets = std::ceil((float)rotations_per_scan / 
         (12 * (n_lasers == 16 ? 2 : 1)));
         return new LidarFrame(numPackets);

@@ -196,21 +196,12 @@ void CameraFrame::parse(ByteBuffer& buffer){
 ByteBuffer LidarFrame::write() const {
     ByteBuffer buffer(sizeof(LidarPacket)*packets.size());
     buffer.write((uint8_t*)packets.data(), sizeof(LidarPacket) * packets.size());
+	buffer.reset();
     return buffer;
 }
 
 void LidarFrame::parse(ByteBuffer& buffer){
-    packets[packetIndex++].parse(buffer);
+    packets[packetIndex++] = *reinterpret_cast<LidarPacket*>(buffer.data());
     if(packetIndex == packets.size())
         packetIndex = 0;
-}
-
-ByteBuffer LidarPacket::write() const{
-    ByteBuffer buffer(sizeof(LidarPacket), 12);
-    buffer.write((uint8_t*)this, sizeof(LidarPacket));
-	return buffer;
-}
-
-void LidarPacket::parse(ByteBuffer& buffer){
-    *this = *reinterpret_cast<LidarPacket*>(buffer.data());
 }
