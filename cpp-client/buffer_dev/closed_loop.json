@@ -13,11 +13,11 @@
     "lane_offset": 0.0,
     "limit_speed_in_curves": true,
     "location": {
-      "x": 7590.0,
-      "y": -170.0,
+      "x": 8090.0,
+      "y": -200.0,
       "z": 30.0
     },
-    "obey_road_speed_limits": false,
+    "obey_road_speed_limits": true,
     "overtake_slower_vehicles": false,
     "randomize_turn_preferences": true,
     "rolling_stop_speed": 0.00100000004749745,
@@ -25,6 +25,11 @@
       "pitch": 0.0,
       "roll": 0.0,
       "yaw": 0.0
+    },
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
     },
     "search_forward_distance": 10000.0,
     "snap_to_lane": true,
@@ -39,7 +44,7 @@
   },
   {
     "body_color": "",
-    "class_path": "/Game/Vehicles/compact_monoDrive_01.compact_monoDrive_01_C",
+    "class_path": "/Game/Vehicles/minivan_monoDrive_01.minivan_monoDrive_01_C",
     "delayed_start": 0.0,
     "desired_speed": 0.0,
     "destroy_on_collision": false,
@@ -51,8 +56,8 @@
     "lane_offset": 0.0,
     "limit_speed_in_curves": true,
     "location": {
-      "x": 8700.0,
-      "y": 160.0,
+      "x": 9940.0,
+      "y": 180.0,
       "z": 30.0
     },
     "obey_road_speed_limits": true,
@@ -64,6 +69,11 @@
       "roll": 0.0,
       "yaw": 0.0
     },
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
     "search_forward_distance": 10000.0,
     "snap_to_lane": true,
     "steer_forward_distance": 550.0,
@@ -72,11 +82,11 @@
       "dynamic",
       "car"
     ],
-    "type": "compact_monoDrive_01_C"
+    "type": "minivan_monoDrive_01_C"
   },
   {
     "body_color": "",
-    "class_path": "/Game/Vehicles/crossover_monoDrive_01.crossover_monoDrive_01_C",
+    "class_path": "/Game/Vehicles/SUV_monoDrive_01.SUV_monoDrive_01_C",
     "delayed_start": 0.0,
     "desired_speed": 0.0,
     "destroy_on_collision": false,
@@ -88,8 +98,8 @@
     "lane_offset": 0.0,
     "limit_speed_in_curves": true,
     "location": {
-      "x": 10430.0,
-      "y": -210.0,
+      "x": 11580.0,
+      "y": -240.0,
       "z": 30.0
     },
     "obey_road_speed_limits": true,
@@ -101,6 +111,11 @@
       "roll": 0.0,
       "yaw": 0.0
     },
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
     "search_forward_distance": 10000.0,
     "snap_to_lane": true,
     "steer_forward_distance": 550.0,
@@ -109,6 +124,33 @@
       "dynamic",
       "car"
     ],
-    "type": "crossover_monoDrive_01_C"
+    "type": "SUV_monoDrive_01_C"
+  },
+  {
+    "can_stay_in_lane": false,
+    "center_turn_allowed": false,
+    "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+    "lane_change_left_requested": false,
+    "lane_change_right_requested": true,
+    "left_turn_allowed": false,
+    "location": {
+      "x": 14880.0,
+      "y": -210.0,
+      "z": 30.0
+    },
+    "right_turn_allowed": false,
+    "rotation": {
+      "pitch": 0.0,
+      "roll": 0.0,
+      "yaw": 0.0
+    },
+    "scale": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "speed_change_request": -1.0,
+    "tags": [],
+    "type": "VehicleBehaviorTriggerBox"
   }
 ]
