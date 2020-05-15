@@ -13,6 +13,11 @@
 #include "sensor_config.h"
 #include "Stopwatch.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+
 #define IMG_WIDTH 1920
 #define IMG_HEIGHT 1200
 
@@ -55,40 +60,36 @@ void camera_test(Simulator& sim0){
     //Get number of steps in scenario and start timer
     mono::precise_stopwatch stopwatch;
 
+    nlohmann::json ego_command;
+    ego_command["forward_amount"] = 1.0;
+    ego_command["right_amount"] = 0.0;
+    ego_command["brake_amount"] = 0.0;
+    ego_command["drive_mode"] = 1;
+
     /// initialize the vehicle, the first control command spawns the vehicle
-    sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
-        {   {"forward_amount", 0.5}, 
-            {"right_amount", 0.0},
-            {"brake_amount", 0.0},
-            {"drive_mode", 1}
-        }));
+    sim0.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
     for(auto& sensor : sensors){
         sensor->StartSampleLoop();
     }
 
     sensors[0]->sample_callback = [](DataFrame* frame){
         std::cout << "Sample." << std::endl;
-        // auto camFrame = static_cast<CameraFrame*>(frame);
-        // auto imFrame = camFrame->imageFrame;
-        // cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4, imFrame->pixels);
-        // for(auto& annotation : camFrame->annotationFrame->annotations){
-        //     for(auto& bbox : annotation.second.bounding_boxes_2d)
-        //     cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)), cv::Point(int(bbox.xmax), int(bbox.ymax)), cv::Scalar(0,0,255));
-        // }
-        // cv::imshow("monoDrive", img);
-        // cv::waitKey(1);
+        auto camFrame = static_cast<CameraFrame*>(frame);
+        auto imFrame = camFrame->imageFrame;
+        cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4, imFrame->pixels);
+        for(auto& annotation : camFrame->annotationFrame->annotations){
+            for(auto& bbox : annotation.second.bounding_boxes_2d)
+            cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)), cv::Point(int(bbox.xmax), int(bbox.ymax)), cv::Scalar(0,0,255));
+        }
+        cv::imshow("monoDrive", img);
+        cv::waitKey(1);
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
     int count = 0;
     while(true)
     {
-      std::cout << "Sending control..." << std::endl;
-      sim0.send_command(ApiMessage(123, EgoControl_ID, true,
-                                   {{"forward_amount", 0.5},
-                                    {"right_amount", 0.0},
-                                    {"brake_amount", 0.0},
-                                    {"drive_mode", 1}}));
+      sim0.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
       sim0.sample_all(sensors);
     }
 }

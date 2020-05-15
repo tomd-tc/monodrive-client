@@ -91,9 +91,6 @@ bool Simulator::configure()
 	std::cout << "Send Simulator Config:   success = ";
 	std::cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
-	// cout << "Send Ego Vehicle Config: success = ";
-	// cout << send_command(ApiMessage(1001, EgoVehicleConfig_ID, true, config.vehicle)) << endl;
-
 	if(config.closed_loop != "") {
 		std::cout << "Send Closed Loop Config:    success = ";
 		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.closed_loop)) << std::endl;
