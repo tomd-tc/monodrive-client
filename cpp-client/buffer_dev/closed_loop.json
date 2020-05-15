@@ -1,7 +1,7 @@
 [
   {
     "body_color": "",
-    "class_path": "/Game/Vehicles/minivan_monoDrive_01.minivan_monoDrive_01_C",
+    "class_path": "/Game/Vehicles/compact_monoDrive_01.compact_monoDrive_01_C",
     "delayed_start": 0.0,
     "desired_speed": 0.0,
     "destroy_on_collision": false,
@@ -13,8 +13,46 @@
     "lane_offset": 0.0,
     "limit_speed_in_curves": true,
     "location": {
-      "x": 11720.0,
-      "y": 180.0,
+      "x": 7590.0,
+      "y": -170.0,
+      "z": 30.0
+    },
+    "obey_road_speed_limits": false,
+    "overtake_slower_vehicles": false,
+    "randomize_turn_preferences": true,
+    "rolling_stop_speed": 0.00100000004749745,
+    "rotation": {
+      "pitch": 0.0,
+      "roll": 0.0,
+      "yaw": 0.0
+    },
+    "search_forward_distance": 10000.0,
+    "snap_to_lane": true,
+    "steer_forward_distance": 550.0,
+    "tags": [
+      "vehicle",
+      "dynamic",
+      "car",
+      "ego"
+    ],
+    "type": "compact_monoDrive_01_C"
+  },
+  {
+    "body_color": "",
+    "class_path": "/Game/Vehicles/compact_monoDrive_01.compact_monoDrive_01_C",
+    "delayed_start": 0.0,
+    "desired_speed": 0.0,
+    "destroy_on_collision": false,
+    "distance_to_stop_sign": 400.0,
+    "ignore_lane_change_boxes": false,
+    "ignore_other_vehicles": false,
+    "ignore_traffic_signals": false,
+    "initial_speed": 0.0,
+    "lane_offset": 0.0,
+    "limit_speed_in_curves": true,
+    "location": {
+      "x": 8700.0,
+      "y": 160.0,
       "z": 30.0
     },
     "obey_road_speed_limits": true,
@@ -34,11 +72,11 @@
       "dynamic",
       "car"
     ],
-    "type": "minivan_monoDrive_01_C"
+    "type": "compact_monoDrive_01_C"
   },
   {
     "body_color": "",
-    "class_path": "/Game/Vehicles/coupe_monoDrive_01.coupe_monoDrive_01_C",
+    "class_path": "/Game/Vehicles/crossover_monoDrive_01.crossover_monoDrive_01_C",
     "delayed_start": 0.0,
     "desired_speed": 0.0,
     "destroy_on_collision": false,
@@ -50,8 +88,8 @@
     "lane_offset": 0.0,
     "limit_speed_in_curves": true,
     "location": {
-      "x": 9950.0,
-      "y": -140.0,
+      "x": 10430.0,
+      "y": -210.0,
       "z": 30.0
     },
     "obey_road_speed_limits": true,
@@ -71,43 +109,6 @@
       "dynamic",
       "car"
     ],
-    "type": "coupe_monoDrive_01_C"
-  },
-  {
-    "body_color": "",
-    "class_path": "/Game/Vehicles/truck_monoDrive_01.truck_monoDrive_01_C",
-    "delayed_start": 0.0,
-    "desired_speed": 0.0,
-    "destroy_on_collision": false,
-    "distance_to_stop_sign": 400.0,
-    "ignore_lane_change_boxes": false,
-    "ignore_other_vehicles": false,
-    "ignore_traffic_signals": false,
-    "initial_speed": 0.0,
-    "lane_offset": 0.0,
-    "limit_speed_in_curves": true,
-    "location": {
-      "x": 13290.0,
-      "y": -160.0,
-      "z": 30.0
-    },
-    "obey_road_speed_limits": true,
-    "overtake_slower_vehicles": false,
-    "randomize_turn_preferences": true,
-    "rolling_stop_speed": 0.00100000004749745,
-    "rotation": {
-      "pitch": 0.0,
-      "roll": 0.0,
-      "yaw": 0.0
-    },
-    "search_forward_distance": 10000.0,
-    "snap_to_lane": true,
-    "steer_forward_distance": 550.0,
-    "tags": [
-      "vehicle",
-      "dynamic",
-      "truck"
-    ],
-    "type": "truck_monoDrive_01_C"
+    "type": "crossover_monoDrive_01_C"
   }
 ]

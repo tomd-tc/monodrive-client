@@ -57,7 +57,7 @@ void camera_test(Simulator& sim0){
 
     /// initialize the vehicle, the first control command spawns the vehicle
     sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
-        {   {"forward_amount", 0.0}, 
+        {   {"forward_amount", 0.5}, 
             {"right_amount", 0.0},
             {"brake_amount", 0.0},
             {"drive_mode", 1}
@@ -82,8 +82,14 @@ void camera_test(Simulator& sim0){
     std::cout << "Sampling sensor loop" << std::endl;
     int count = 0;
     while(true)
-    {	
-        sim0.sample_all(sensors);
+    {
+      std::cout << "Sending control..." << std::endl;
+      sim0.send_command(ApiMessage(123, EgoControl_ID, true,
+                                   {{"forward_amount", 0.5},
+                                    {"right_amount", 0.0},
+                                    {"brake_amount", 0.0},
+                                    {"drive_mode", 1}}));
+      sim0.sample_all(sensors);
     }
 }
 
