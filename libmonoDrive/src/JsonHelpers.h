@@ -16,6 +16,8 @@ void MONODRIVECORE_API json_log(const FString& error_message);
 
 void MONODRIVECORE_API json_log(const std::string& error_message);
 
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FName& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FName& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FString& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FString& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FRotator& v);
@@ -28,6 +30,10 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const FVector2D& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FVector2D& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FLinearColor& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FLinearColor& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const TArray<FString>& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, TArray<FString>& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const TArray<FName>& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, TArray<FName>& v);
 
 #else
 void inline json_log(const std::string& error_message)

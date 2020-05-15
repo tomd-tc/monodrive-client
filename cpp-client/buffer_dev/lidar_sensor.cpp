@@ -18,8 +18,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
     LidarConfig l_config;
-    l_config.location.x = 300.f;
-    l_config.location.z = 150.f;
+    l_config.location.x = 0.f;
+    l_config.location.z = 350.f;
     l_config.server_ip = sim0.getServerIp();
     l_config.server_port = sim0.getServerPort();
     l_config.listen_port = 8107;
@@ -68,13 +68,13 @@ void state_test(Simulator& sim0){
         int count = 0;
         for(auto& packet : lidarFrame.packets){
             boost::system::error_code err;
-            socket.send_to(boost::asio::buffer(&packet, sizeof(LidarFrame)), remote_endpoint, 0, err);
+            socket.send_to(boost::asio::buffer(&packet, sizeof(LidarPacket)), remote_endpoint, 0, err);
             std::cout << err << std::endl;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            // std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
         // auto& radarFrame = *static_cast<RadarFrame*>(frame);
         // std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
