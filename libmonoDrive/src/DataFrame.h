@@ -206,7 +206,7 @@ public:
         blocks[blockIndex].hits[hitIndex].reflection = reflection;
     }
     inline void set_end_packet(uint32_t timeStamp, uint16_t packetEnd){
-        time_stamp = time_stamp;
+        time_stamp = timeStamp;
         packet_end = packetEnd;
     }
 };
