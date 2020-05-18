@@ -17,39 +17,13 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    for(int i = 0; i < 5; ++i){
-        RadarConfig r_config;
-        r_config.location.x = 300.f;
-        r_config.location.z = 50.f;
-        r_config.paint_targets = false;
-        r_config.send_radar_cube = true;
-        r_config.max_radar_returns = 4500;
-        r_config.sbr.ray_division_y = 10.f;
-        r_config.sbr.ray_division_z = 10.f;
-        // r_config.sbr.debug_scan = true;
-        r_config.sbr.debug_rescan = true;
-        r_config.sbr.debug_frustum = false;
-        r_config.server_ip = sim0.getServerIp();
-        r_config.server_port = sim0.getServerPort();
-        r_config.listen_port = 8102 + i;
-        sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r_config)));
-    }
-
-    // RadarConfig r2;
-    // r2.location.x = 300.f;
-    // r2.location.z = 50.f;
-    // r2.paint_targets = false;
-    // r2.send_radar_cube = true;
-    // r2.max_radar_returns = 100;
-    // r2.sbr.ray_division_y = 20.f;
-    // r2.sbr.ray_division_z = 20.f;
-    // // r_config.sbr.debug_scan = true;
-    // r2.sbr.debug_rescan = true;
-    // r2.sbr.debug_frustum = false;
-    // r2.server_ip = sim0.getServerIp();
-    // r2.server_port = sim0.getServerPort();
-    // r2.listen_port = 8103;
-    // sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r2)));
+    LidarConfig l_config;
+    l_config.location.x = 0.f;
+    l_config.location.z = 350.f;
+    l_config.server_ip = sim0.getServerIp();
+    l_config.server_port = sim0.getServerPort();
+    l_config.listen_port = 8107;
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<LidarConfig>(l_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -84,10 +58,23 @@ void state_test(Simulator& sim0){
         sensor->StartSampleLoop();
     }
 
-    sensors[0]->sample_callback = [](DataFrame* frame){
-        auto& radarFrame = *static_cast<RadarFrame*>(frame);
-        std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    boost::asio::io_service io_service;
+    boost::asio::ip::udp::socket socket(io_service);
+    boost::asio::ip::udp::endpoint remote_endpoint;
+    socket.open(boost::asio::ip::udp::v4());
+    remote_endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 2368);
+    sensors[0]->sample_callback = [&remote_endpoint, &socket](DataFrame* frame){
+        auto& lidarFrame = *static_cast<LidarFrame*>(frame);
+        int count = 0;
+        for(auto& packet : lidarFrame.packets){
+            boost::system::error_code err;
+            socket.send_to(boost::asio::buffer(&packet, sizeof(LidarPacket)), remote_endpoint, 0, err);
+            std::cout << err << std::endl;
+            // std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        // auto& radarFrame = *static_cast<RadarFrame*>(frame);
+        // std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
@@ -100,6 +87,32 @@ void state_test(Simulator& sim0){
 
 int main(int argc, char** argv)
 {
+    // std::cout << sizeof(LidarHit) << std::endl;
+    // std::cout << sizeof(LidarBlock) << std::endl;
+    // std::cout << sizeof(LidarPacket) << std::endl;
+
+    // LidarPacket packets[3];
+    // std::cout << sizeof(packets) << std::endl;
+    // packets[1].blocks[0].azimuth = 11;
+    // packets[1].blocks[1].azimuth = 22;
+    // packets[2].blocks[0].azimuth = 33;
+    // packets[2].blocks[1].azimuth = 44;
+
+    // void* packetsVoid = packets;
+
+    // std::vector<LidarPacket> vPack(3);
+    // vPack[0] = reinterpret_cast<LidarPacket*>(packetsVoid)[0];
+    // vPack[1] = reinterpret_cast<LidarPacket*>(packetsVoid)[1];
+    // vPack[2] = reinterpret_cast<LidarPacket*>(packetsVoid)[2];
+
+    // std::cout << vPack[1].blocks[0].azimuth << std::endl;
+    // std::cout << vPack[1].blocks[1].azimuth << std::endl;
+    // std::cout << vPack[2].blocks[0].azimuth << std::endl;
+    // std::cout << vPack[2].blocks[1].azimuth << std::endl;
+
+    // memcpy(&data_[position_], buffer, length);
+
+    // return 0;
     //Single Simulator Example
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;

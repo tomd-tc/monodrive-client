@@ -69,6 +69,48 @@ struct RadarTarget{
     std::vector<std::string> target_ids;
 };
 
+#pragma pack(push, 1)
+struct LidarHit{
+    uint16_t distance;
+    uint8_t reflection;
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct LidarBlock{
+    uint16_t blockId;
+    uint16_t azimuth;
+    LidarHit hits[32];
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct LidarPacket{
+    LidarBlock blocks[12];
+    uint32_t time_stamp;
+    uint16_t packet_end;
+    inline void set_start_block(int blockIndex, uint16_t blockId, uint16_t azimuth){
+        blocks[blockIndex].blockId = blockId;
+        blocks[blockIndex].azimuth = azimuth;
+    }
+    inline void set_hit(int blockIndex, int hitIndex, uint16_t distance, uint8_t reflection){
+        // blocks[blockIndex].hits[hitIndex].distance = distance >> 8 | distance << 8;
+        blocks[blockIndex].hits[hitIndex].distance = distance;
+        blocks[blockIndex].hits[hitIndex].reflection = reflection;
+    }
+    inline void set_end_packet(uint32_t timeStamp, uint16_t packetEnd){
+        time_stamp = timeStamp;
+        //time_stamp = timeStamp >> 8 | timeStamp << 8;
+        // time_stamp = ((timeStamp >> 24) & 0x000000ff) |
+		// 	((timeStamp >> 8) & 0x0000ff00) |
+		// 	((timeStamp << 8) & 0x00ff0000) |
+		// 	((timeStamp << 24) & 0xff000000);
+        packet_end = packetEnd;
+    }
+};
+#pragma pack(pop)
+
+
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, Quat& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Vec3f& v);

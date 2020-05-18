@@ -3,6 +3,7 @@
 
 #define IMU_DATA_PACKET_SIZE 35
 #define GPS_DATA_PACKET_SIZE 66
+#define LIDAR_PACKET_SIZE 1206
 
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = buffer.BufferToJson();
@@ -190,4 +191,17 @@ void CameraFrame::parse(ByteBuffer& buffer){
         annotationFrame->parse(buffer);
     }
     currentFrameIndex++;
+}
+
+ByteBuffer LidarFrame::write() const {
+    ByteBuffer buffer(sizeof(LidarPacket)*packets.size());
+    buffer.write((uint8_t*)packets.data(), sizeof(LidarPacket) * packets.size());
+	buffer.reset();
+    return buffer;
+}
+
+void LidarFrame::parse(ByteBuffer& buffer){
+    packets[packetIndex++] = *reinterpret_cast<LidarPacket*>(buffer.data());
+    if(packetIndex == packets.size())
+        packetIndex = 0;
 }

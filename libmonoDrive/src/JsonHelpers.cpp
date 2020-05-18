@@ -125,5 +125,36 @@ void from_json(const nlohmann::json& j, FString& v) {
 	v = FString(UTF8_TO_TCHAR(j.get<std::string>().c_str()));
 }
 
+void to_json(nlohmann::json& j, const FName& v) {
+	j = TCHAR_TO_UTF8(*v.ToString());
+}
+void from_json(const nlohmann::json& j, FName& v) {
+	v = FName(UTF8_TO_TCHAR(j.get<std::string>().c_str()));
+}
 
+void to_json(nlohmann::json& j, const TArray<FString>& v) {
+	auto temp = nlohmann::json::array();
+	for (auto& val : v) {
+		temp.push_back(nlohmann::json(val));
+	}
+	j = temp;
+}
+void from_json(const nlohmann::json& j, TArray<FString>& v) {
+	for (auto& val : j) {
+		v.Add(FString(val.get<std::string>().c_str()));
+	}
+}
+
+void to_json(nlohmann::json& j, const TArray<FName>& v) {
+	auto temp = nlohmann::json::array();
+	for (auto& val : v) {
+		temp.push_back(nlohmann::json(val));
+	}
+	j = temp;
+}
+void from_json(const nlohmann::json& j, TArray<FName>& v) {
+	for (auto& val : j) {
+		v.Add(FName(val.get<std::string>().c_str()));
+	}
+}
 #endif

@@ -20,9 +20,7 @@ class Simulator
 public:
 	
 	~Simulator();
-	  // Lazy initialization
-	//static Simulator& getInstance(){return *s_pInstance;}
-	//static Simulator& getInstance(std::string inServer_ip){return *sim_map[inServer_ip];}
+	// Lazy initialization
   static Simulator& getInstance(const Configuration& inConfig);
 	static Simulator& getInstance(const std::string& inServer_ip, const short& inServer_port);
 	static Simulator& getInstance(const Configuration& inConfig, const std::string& inServer_ip, const short& inServer_port);
@@ -39,7 +37,6 @@ public:
           return std::thread(&Simulator::step, this, step_idx, nsteps);
       }
 	void sample_all(std::vector<std::shared_ptr<Sensor>>& sensors);
-	//static Simulator* s_pInstance;
 	static std::map<const std::string, Simulator*> sim_map;
 
 	const std::string& getServerIp() const{return server_ip;}
@@ -48,7 +45,7 @@ private:
 	Simulator(const Configuration& inConfig);
 	Simulator(const Configuration& inConfig, const std::string& inServer_ip, const short& inServer_port);
 	Simulator(const Simulator&)= delete;
-    Simulator& operator=(const Simulator&)= delete;
+  Simulator& operator=(const Simulator&)= delete;
 
 	boost::asio::io_service io_service;
 	boost::asio::ip::tcp::socket controlSocket{io_service};

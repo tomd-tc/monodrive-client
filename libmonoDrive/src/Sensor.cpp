@@ -16,6 +16,7 @@ Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensor_config) : config(std::mo
 		listener = new Connection(config->server_ip, config->listen_port);
 	} 
 	frame = config->DataFrameFactory();
+	sample_callback = [](DataFrame* frame){return;};
 }
 
 Sensor::~Sensor()
@@ -79,17 +80,16 @@ bool Sensor::StartSampleLoop()
 				// std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
 				// std::cout << "read success..." << std::endl;
-				std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
+				// std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 				mono::precise_stopwatch watch1;
 				parse();
-				std::cout << name << " parse: " <<  watch1.elapsed_time<unsigned int, std::chrono::microseconds>() << " (us)" << std::endl;
+				// std::cout << name << " parse: " <<  watch1.elapsed_time<unsigned int, std::chrono::microseconds>() << " (us)" << std::endl;
 				if(frame->parse_complete()){
-					// std::cout << "PARSE COMPLETE" << std::endl;
 					mono::precise_stopwatch watch2;
 					if(sample_callback) {
 							sample_callback(frame);
 					}
-					std::cout << name << " callback: " << watch2.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
+					//std::cout << name << " callback: " << watch2.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 					sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
 				}
 			}
