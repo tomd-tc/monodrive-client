@@ -138,7 +138,7 @@
             "name": "occupancy grid windows",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/cpp-client/occupancy_grid/occupancy_grid",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/occupancy_grid",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

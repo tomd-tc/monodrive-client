@@ -9,7 +9,7 @@ project(buffer_dev)
 # add_executable(radar_sensor radar_sensor.cpp)
 # add_executable(lidar_sensor lidar_sensor.cpp)
 add_executable(scenario_file scenario_file.cpp)
-
+add_executable(occupancy_grid occupancy_grid_sensor.cpp)
 
 # target_link_libraries(camera_sensor monoDriveClient)
 # target_link_libraries(state_sensor monoDriveClient)
@@ -18,12 +18,19 @@ add_executable(scenario_file scenario_file.cpp)
 # target_link_libraries(radar_sensor monoDriveClient)
 # target_link_libraries(lidar_sensor monoDriveClient)
 target_link_libraries(scenario_file monoDriveClient)
+target_link_libraries(occupancy_grid monoDriveClient)
 
 find_package(OpenCV REQUIRED PATHS "C:/local/opencv/build" "C:/opencv/build")
 include_directories(${OpenCV_INCLUDE_DIRS})
+
 # target_include_directories(camera_sensor PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_include_directories(scenario_file PUBLIC ${OpenCV_INCLUDE_DIRS})
 # link_libraries(camera_sensor ${OpenCV_LIBRARIES})
-link_libraries(scenario_file ${OpenCV_LIBRARIES})
 # target_link_libraries(camera_sensor ${OpenCV_LIBRARIES})
+ 
+target_include_directories(scenario_file PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(scenario_file ${OpenCV_LIBRARIES})
 target_link_libraries(scenario_file ${OpenCV_LIBRARIES})
+
+target_include_directories(occupancy_grid PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(occupancy_grid ${OpenCV_LIBRARIES})
+target_link_libraries(occupancy_grid ${OpenCV_LIBRARIES})

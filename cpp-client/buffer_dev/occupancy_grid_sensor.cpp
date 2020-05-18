@@ -2,11 +2,11 @@
 #include <thread>
 #include <future>
 
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgproc.hpp"
-
 #include "Simulator.h"
 #include "LaneSpline.h"
+
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 std::mutex data_snapshot_mutex;
 
@@ -43,13 +43,14 @@ void StateSensorCallback(DataFrame* frame) {
   DATA_SNAPSHOT.state_frame = &state_frame;
 }
 
-std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
+std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
 
     OccupancyGridConfig occ_config;
-    occ_config.server_ip = ip;
+    occ_config.server_ip = sim0.getServerIp();
+    occ_config.server_port = sim0.getServerPort();
     occ_config.listen_port = 8100;
     occ_config.resolution = Resolution(1920, 1080);
     occ_config.meters_per_pixel = 0.1;
@@ -58,7 +59,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     sensors.back()->sample_callback = OccupancyGridCallback;
 
     StateConfig s_config;
-    s_config.server_ip = ip;
+    s_config.server_ip = sim0.getServerIp();
+    s_config.server_port = sim0.getServerPort();
     s_config.listen_port = 8101;
     s_config.desired_tags = {"ego", "vehicle"};
     s_config.include_obb = true;
@@ -69,7 +71,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 
     // Configure the Viewport but don't add it to the sensors array
     ViewportCameraConfig vp_config;
-    vp_config.server_ip = ip;
+    vp_config.server_ip = sim0.getServerIp();
+    vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
     vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
@@ -90,7 +93,8 @@ int main(int argc, char** argv) {
   // Read JSON files in cpp_client/config directory
   Configuration config("cpp-client/parser_dev/simulator.json",
                        "config/vehicle.json", "config/weather.json",
-                       "cpp-client/buffer_dev/scenario.json");
+                       "",
+                       "cpp-client/buffer_dev/closed_loop.json");
   Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
   if (!sim0.configure()) {
@@ -98,7 +102,7 @@ int main(int argc, char** argv) {
   }
 
   // Setup and Connect Sensors
-  std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
+  std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
 
   /// initialize the vehicle, the first control command spawns the vehicle
   EgoControlConfig ego_control_config;

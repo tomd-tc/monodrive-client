@@ -9,5 +9,4 @@ cmake_minimum_required(VERSION 3.10)
 
 # add_subdirectory(replay)
 # add_subdirectory(parser_dev)
-# add_subdirectory(buffer_dev)
-add_subdirectory(occupancy_grid)
+add_subdirectory(buffer_dev)
