@@ -73,7 +73,6 @@ void camera_test(Simulator& sim0){
     }
 
     sensors[0]->sample_callback = [](DataFrame* frame){
-        std::cout << "Sample." << std::endl;
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4, imFrame->pixels);
@@ -106,7 +105,7 @@ int main(int argc, char** argv)
         "config/vehicle.json",
         "config/weather.json",
         "",
-        "cpp-client/buffer_dev/closed_loop.json"
+        "cpp-client/buffer_dev/scenario_config_multi_vehicle.json"
     );
 
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);

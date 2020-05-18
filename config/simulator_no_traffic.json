@@ -92,7 +92,7 @@
     }
   },
   "traffic_configuration": {
-    "max_vehicles": 0,
+    "max_vehicles": 5,
     "spawn_rate": 0.25
   },
   "client_settings": {
