@@ -73,9 +73,6 @@ void state_test(Simulator& sim0){
             socket.send_to(boost::asio::buffer(&packet, sizeof(LidarPacket)), remote_endpoint, 0, err);
             std::this_thread::sleep_for(std::chrono::microseconds(1327));
         }
-        // auto& radarFrame = *static_cast<RadarFrame*>(frame);
-        // std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     };
 
     std::cout << "Sampling sensor loop" << std::endl;

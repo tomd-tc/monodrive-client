@@ -56,6 +56,7 @@ public:
         radarCubeFrame = new RadarCubeFrame(numSweeps, numSamplesPerSweep, numElements); 
     }
     ~RadarFrame(){
+        delete radarCubeFrame;
         delete radarTargetListFrame;
     }
     // for the double send on image then annotation
@@ -68,8 +69,8 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
 public:
-    RadarTargetListFrame* radarTargetListFrame;
-    RadarCubeFrame* radarCubeFrame;
+    RadarTargetListFrame* radarTargetListFrame = nullptr;
+    RadarCubeFrame* radarCubeFrame = nullptr;
     bool bSendRadarCube;
     int currentFrameIndex;
 };
@@ -137,7 +138,7 @@ public:
         delete[] pixels;
     }
     int channels;
-    uint8_t* pixels;
+    uint8_t* pixels = nullptr;
     struct Resolution{
         int x;
         int y;
@@ -187,31 +188,6 @@ public:
     int currentFrameIndex;
 };
 
-// #pragma pack(push, 1)
-// class MONODRIVECORE_API LidarPacket : public DataFrame{
-// public:
-// 	virtual void parse(ByteBuffer& buffer) override;
-// 	virtual ByteBuffer write() const override;
-//     inline size_t size() const{
-//         return sizeof(LidarPacket);
-//     }
-//     LidarBlock blocks[12];
-//     uint32_t time_stamp;
-//     uint16_t packet_end;
-//     inline void set_start_block(int blockIndex, uint16_t blockId, uint16_t azimuth){
-//         blocks[blockIndex].blockId = blockId;
-//         blocks[blockIndex].azimuth = azimuth;
-//     }
-//     inline void set_hit(int blockIndex, int hitIndex, uint16_t distance, uint8_t reflection){
-//         blocks[blockIndex].hits[hitIndex].distance = distance;
-//         blocks[blockIndex].hits[hitIndex].reflection = reflection;
-//     }
-//     inline void set_end_packet(uint32_t timeStamp, uint16_t packetEnd){
-//         time_stamp = time_stamp;
-//         packet_end = packetEnd;
-//     }
-// };
-
 class MONODRIVECORE_API LidarFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
@@ -231,4 +207,37 @@ public:
 
     std::vector<LidarPacket> packets;
     uint64_t packetIndex = 0;
+};
+
+
+class MONODRIVECORE_API UltrasonicFrame : public DataFrame {
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+    UltrasonicFrame(int numSamples){
+        ultrasonicTargetFrame = new UltrasonicTargetFrame();
+        ultrasonicRawFrame = new UltrasonicRawFrame(numSamples);
+    }
+    ~UltrasonicFrame(){
+        delete ultrasonicTargetFrame;
+        delete ultrasonicRawFrame;
+    }
+    UltrasonicTargetFrame* ultrasonicTargetFrame;
+    UltrasonicRawFrame* ultrasonicRawFrame;
+};
+class MONODRIVECORE_API UltrasonicRawFrame : public DataFrame{
+public:
+    UltrasonicRawFrame(int numSamples){
+        ultrasonic_raw.resize(numSamples);
+    }
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+    std::vector<float> ultrasonic_raw;
+};
+
+class MONODRIVECORE_API UltrasonicTargetFrame : public DataFrame{
+public:
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+    std::vector<UltrasonicTarget> targets;
 };
