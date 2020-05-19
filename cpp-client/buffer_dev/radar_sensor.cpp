@@ -17,7 +17,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    for(int i = 0; i < 5; ++i){
+    // for(int i = 0; i < 5; ++i){
         RadarConfig r_config;
         r_config.location.x = 300.f;
         r_config.location.z = 50.f;
@@ -31,9 +31,10 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
         r_config.sbr.debug_frustum = false;
         r_config.server_ip = sim0.getServerIp();
         r_config.server_port = sim0.getServerPort();
-        r_config.listen_port = 8102 + i;
+        // r_config.listen_port = 8102 + i;
+        r_config.listen_port = 8102;
         sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r_config)));
-    }
+    // }
 
     // RadarConfig r2;
     // r2.location.x = 300.f;

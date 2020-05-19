@@ -92,19 +92,20 @@ struct LidarPacket{
     inline void set_start_block(int blockIndex, uint16_t blockId, uint16_t azimuth){
         blocks[blockIndex].blockId = blockId;
         blocks[blockIndex].azimuth = azimuth;
+        // blocks[blockIndex].azimuth = azimuth >> 8 | azimuth << 8;
     }
     inline void set_hit(int blockIndex, int hitIndex, uint16_t distance, uint8_t reflection){
-        // blocks[blockIndex].hits[hitIndex].distance = distance >> 8 | distance << 8;
+        //  blocks[blockIndex].hits[hitIndex].distance = distance >> 8 | distance << 8;
         blocks[blockIndex].hits[hitIndex].distance = distance;
         blocks[blockIndex].hits[hitIndex].reflection = reflection;
     }
     inline void set_end_packet(uint32_t timeStamp, uint16_t packetEnd){
         time_stamp = timeStamp;
-        //time_stamp = timeStamp >> 8 | timeStamp << 8;
+        // time_stamp = timeStamp >> 8 | timeStamp << 8;
         // time_stamp = ((timeStamp >> 24) & 0x000000ff) |
-		// 	((timeStamp >> 8) & 0x0000ff00) |
-		// 	((timeStamp << 8) & 0x00ff0000) |
-		// 	((timeStamp << 24) & 0xff000000);
+		//  	((timeStamp >> 8) & 0x0000ff00) |
+		//  	((timeStamp << 8) & 0x00ff0000) |
+		//  	((timeStamp << 24) & 0xff000000);
         packet_end = packetEnd;
     }
 };
