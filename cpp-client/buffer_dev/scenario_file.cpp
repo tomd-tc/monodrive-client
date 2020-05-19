@@ -61,9 +61,9 @@ void camera_test(Simulator& sim0){
     mono::precise_stopwatch stopwatch;
 
     nlohmann::json ego_command;
-    ego_command["forward_amount"] = 1.0;
+    ego_command["forward_amount"] = 0.0;
     ego_command["right_amount"] = 0.0;
-    ego_command["brake_amount"] = 0.0;
+    ego_command["brake_amount"] = 1.0;
     ego_command["drive_mode"] = 1;
 
     /// initialize the vehicle, the first control command spawns the vehicle

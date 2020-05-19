@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(buffer_dev)
- 
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+
 add_executable(camera_sensor camera_sensor.cpp)
 add_executable(state_sensor state_sensor.cpp)
 add_executable(imu_sensor imu_sensor.cpp)
