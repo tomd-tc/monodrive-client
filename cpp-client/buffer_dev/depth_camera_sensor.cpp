@@ -17,9 +17,6 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-// #define IMG_WIDTH 4096
-// #define IMG_HEIGHT 2160
-
 #define IMG_WIDTH 1920
 #define IMG_HEIGHT 1080
 
@@ -27,20 +24,17 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    for(int i = 0; i < 5; ++i){
-        CameraConfig fc_config;
-        fc_config.server_ip = sim0.getServerIp();
-        fc_config.server_port = sim0.getServerPort();
-        fc_config.listen_port = 8100 + i;
-        fc_config.location.z = 225;
-        fc_config.rotation.pitch = -5;
-        // Uncomment to receive grayscale images
-        // fc_config.channels = "gray";
-        fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH,IMG_HEIGHT);
-        fc_config.annotation.include_annotation = true;
-        fc_config.annotation.desired_tags = {"traffic_sign"};
-        sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
-    }
+    DepthCameraConfig dc_config;
+    dc_config.server_ip = sim0.getServerIp();
+    dc_config.server_port = sim0.getServerPort();
+    dc_config.listen_port = 8100;
+    dc_config.location.z = 225;
+    dc_config.rotation.pitch = -5;
+    dc_config.resolution = CameraConfig::Resolution(IMG_WIDTH, IMG_HEIGHT);
+    dc_config.annotation.include_annotation = true;
+    dc_config.annotation.desired_tags = {"traffic_sign"};
+    sensors.push_back(std::make_shared<Sensor>(
+        std::make_unique<DepthCameraConfig>(dc_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -53,12 +47,13 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {
+        std::cout << "Sampling..." << std::endl;
         sensor->configure();
     }
     return sensors;
 }
 
-void camera_test(Simulator& sim0){
+void depth_camera_test(Simulator& sim0){
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
     //Get number of steps in scenario and start timer
@@ -75,26 +70,28 @@ void camera_test(Simulator& sim0){
         sensor->StartSampleLoop();
     }
 
-    sensors[0]->sample_callback = [](DataFrame* frame) {
-      auto camFrame = static_cast<CameraFrame*>(frame);
-      auto imFrame = camFrame->imageFrame;
-      cv::Mat img;
-      if(imFrame->channels == 4) {
-        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
-                      imFrame->pixels);
-      } else {
-        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
-                      imFrame->pixels);
-        cv::cvtColor(img, img, cv::COLOR_GRAY2BGRA);
-      }
-      for (auto& annotation : camFrame->annotationFrame->annotations) {
-        for (auto& bbox : annotation.second.bounding_boxes_2d)
-          cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)),
-                        cv::Point(int(bbox.xmax), int(bbox.ymax)),
-                        cv::Scalar(0, 0, 255));
-      }
-      cv::imshow("monoDrive", img);
-      cv::waitKey(1);
+    sensors[0]->sample_callback = [](DataFrame* frame){
+        std::cout << "Sensor callback..." << std::endl;
+        auto camFrame = static_cast<CameraFrame*>(frame);
+        auto imFrame = camFrame->imageFrame;
+        cv::Mat floatMat = cv::Mat(imFrame->resolution.y, imFrame->resolution.x,
+                                   CV_32FC1, imFrame->pixels);
+        double minVal, maxVal;
+        cv::minMaxLoc(floatMat, &minVal, &maxVal);
+        std::cout << "Min val: " << minVal << " Max Val: " << maxVal << std::endl;
+
+        cv::Mat img;
+        floatMat.convertTo(img, CV_8UC1, 0.0, 127.0);
+
+        for(auto& annotation : camFrame->annotationFrame->annotations){
+            for(auto& bbox : annotation.second.bounding_boxes_2d){
+              cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)),
+                            cv::Point(int(bbox.xmax), int(bbox.ymax)),
+                            cv::Scalar(0, 0, 255));
+            }
+        }
+        cv::imshow("monoDrive", img);
+        cv::waitKey(1);
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
@@ -123,7 +120,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    camera_test(sim0);
+    depth_camera_test(sim0);
     
     return 0;
 }

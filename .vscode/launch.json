@@ -144,6 +144,28 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false
+        },
+        {
+            "name": "semantic_camera windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/semantic_camera_sensor",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "depth_camera windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/depth_camera_sensor",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
         }
     ]
 }

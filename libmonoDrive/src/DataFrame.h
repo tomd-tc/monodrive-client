@@ -127,29 +127,30 @@ public:
 // for now 8 bit only, todo: add float higher bit rate etc enum
 class MONODRIVECORE_API ImageFrame : public DataFrame{
 public:
-    ImageFrame(int x_res, int y_res, int channels) 
-        : channels(channels)
+    ImageFrame(int x_res, int y_res, int channels, int channel_depth = 1) 
+        : channels(channels), channel_depth(channel_depth)
     {
         resolution.x = x_res;
         resolution.y = y_res;
-        pixels = new uint8_t[channels * resolution.x * resolution.y];
+        pixels =
+            new uint8_t[channels * channel_depth * resolution.x * resolution.y];
     }
     ~ImageFrame(){
         delete[] pixels;
     }
     int channels;
+    int channel_depth;
     uint8_t* pixels = nullptr;
     struct Resolution{
         int x;
         int y;
     } resolution;
     inline int size() const{
-        return resolution.x * resolution.y * channels;
+        return resolution.x * resolution.y * channels * channel_depth;
     }
     virtual void parse(ByteBuffer& buffer);
     virtual ByteBuffer write() const override;
 };
-
 
 class MONODRIVECORE_API CameraAnnotationFrame : public DataFrame{
 public:
@@ -162,12 +163,11 @@ class MONODRIVECORE_API CameraFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
-    CameraFrame(int x_res, int y_res, int channels, bool hasAnnotation) : 
-        bHasAnnotation(hasAnnotation),
-        currentFrameIndex(0)
-    {
-        imageFrame = new ImageFrame(x_res, y_res, channels);
-        annotationFrame = new CameraAnnotationFrame();
+    CameraFrame(int x_res, int y_res, int channels, int channel_depth,
+        bool hasAnnotation) : 
+        bHasAnnotation(hasAnnotation), currentFrameIndex(0) {
+          imageFrame = new ImageFrame(x_res, y_res, channels, channel_depth);
+          annotationFrame = new CameraAnnotationFrame();
     }
     ~CameraFrame(){
         delete imageFrame;

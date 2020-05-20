@@ -167,6 +167,7 @@ public:
     float max_shutter{.0014f};
     float sensor_size{9.07f};
     std::string channels{"bgra"};
+    int channel_depth{1};
     struct Annotation{
         Annotation(){}
         bool include_annotation{false};
@@ -185,10 +186,32 @@ public:
             nChannels = 1;
         else
             throw std::runtime_error("only bgra and gray are supported channel types");
-        return new CameraFrame(resolution.x, resolution.y, nChannels, annotation.include_annotation);
+        return new CameraFrame(resolution.x, resolution.y, nChannels, 
+            channel_depth, annotation.include_annotation);
     }
     virtual nlohmann::json dump(){
         return *this;
+    }
+};
+
+class SemanticCameraConfig : public CameraConfig
+{
+public:
+    SemanticCameraConfig() : CameraConfig()
+    {
+        type = "SemanticCamera";
+        channels = "gray";
+    }
+};
+
+class DepthCameraConfig : public CameraConfig
+{
+public:
+    DepthCameraConfig() : CameraConfig()
+    {
+        type = "DepthCamera";
+        channels = "gray";
+        channel_depth = 4;
     }
 };
 
@@ -380,6 +403,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["max_shutter"] = config.max_shutter;
     j["sensor_size"] = config.sensor_size;
     j["channels"] = config.channels;
+    j["channel_depth"] = config.channel_depth;
     j["annotation"] = config.annotation;
 }
 
@@ -395,6 +419,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "max_shutter", config.max_shutter); 
     json_get(j, "sensor_size", config.sensor_size); 
     json_get(j, "channels", config.channels);         
+    json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
 }
 
