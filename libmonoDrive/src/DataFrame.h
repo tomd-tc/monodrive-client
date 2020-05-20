@@ -219,7 +219,7 @@ public:
     std::vector<float> ultrasonic_raw;
 };
 
-class MONODRIVECORE_API UltrasonicTargetFrame : public DataFrame{
+class MONODRIVECORE_API UltrasonicTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
@@ -230,14 +230,25 @@ class MONODRIVECORE_API UltrasonicFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
-    UltrasonicFrame(int numSamples){
-        ultrasonicTargetFrame = new UltrasonicTargetFrame();
+    UltrasonicFrame(bool send_ultrasonic_raw, int numSamples) 
+        : bSendUltrasonicRaw(send_ultrasonic_raw),
+        currentFrameIndex(0)
+    {
+        ultrasonicTargetListFrame = new UltrasonicTargetListFrame();
         ultrasonicRawFrame = new UltrasonicRawFrame(numSamples);
     }
     ~UltrasonicFrame(){
-        delete ultrasonicTargetFrame;
+        delete ultrasonicTargetListFrame;
         delete ultrasonicRawFrame;
     }
-    UltrasonicTargetFrame* ultrasonicTargetFrame;
+    virtual bool parse_complete() const{
+        if(!bSendUltrasonicRaw or currentFrameIndex % 2 == 0)
+            return true;
+        else
+            return false;
+    }
+    UltrasonicTargetListFrame* ultrasonicTargetListFrame;
     UltrasonicRawFrame* ultrasonicRawFrame;
+    bool bSendUltrasonicRaw;
+    int currentFrameIndex;
 };
