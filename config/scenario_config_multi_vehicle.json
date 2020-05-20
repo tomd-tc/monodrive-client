@@ -202,7 +202,7 @@
     },
     "search_forward_distance": 10000.0,
     "snap_to_lane": true,
-    "steer_forward_distance": 550.0,
+    "steer_forward_distance": 1000.0,
     "tags": [
       "vehicle",
       "dynamic",
