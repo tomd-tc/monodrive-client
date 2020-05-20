@@ -91,9 +91,9 @@ bool Simulator::configure()
 	std::cout << "Send Simulator Config:   success = ";
 	std::cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
-	if(config.closed_loop != "") {
+	if(config.simulator.value("simulation_mode", 0) == 0) {
 		std::cout << "Send Closed Loop Config:    success = ";
-		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.closed_loop)) << std::endl;
+		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
 	} else {
 		std::cout << "Send Scenario Config:    success = ";
 		std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
@@ -120,6 +120,25 @@ bool Simulator::step(int step_idx, int nsteps)
 	nlohmann::json msg{{"amount", nsteps}};
 	ApiMessage step_message(step_idx, REPLAY_StepSimulationCommand_ID, true, msg);
 	return send_command(step_message);
+}
+
+void Simulator::step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, int step_idx, int nsteps)
+{
+	for(auto& sensor : sensors)
+    {
+		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+	}
+	step(step_idx, nsteps);
+	bool samplingInProgress = true;
+	do{
+		samplingInProgress = false;
+		for(auto& sensor : sensors){
+			if(sensor->sampleInProgress.load(std::memory_order::memory_order_relaxed)){
+				samplingInProgress = true;
+				break;
+			}
+		}
+	} while(samplingInProgress);
 }
 
 void Simulator::sample_all(std::vector<std::shared_ptr<Sensor>>& sensors)

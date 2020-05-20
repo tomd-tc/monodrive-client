@@ -106,7 +106,6 @@ int main(int argc, char** argv)
         "config/simulator_no_traffic.json",
         "config/vehicle.json",
         "config/weather.json",
-        "",
         "config/scenario_config_single_vehicle.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
