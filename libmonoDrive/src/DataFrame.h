@@ -209,22 +209,6 @@ public:
     uint64_t packetIndex = 0;
 };
 
-
-class MONODRIVECORE_API UltrasonicFrame : public DataFrame {
-public:
-	virtual void parse(ByteBuffer& buffer) override;
-	virtual ByteBuffer write() const override;
-    UltrasonicFrame(int numSamples){
-        ultrasonicTargetFrame = new UltrasonicTargetFrame();
-        ultrasonicRawFrame = new UltrasonicRawFrame(numSamples);
-    }
-    ~UltrasonicFrame(){
-        delete ultrasonicTargetFrame;
-        delete ultrasonicRawFrame;
-    }
-    UltrasonicTargetFrame* ultrasonicTargetFrame;
-    UltrasonicRawFrame* ultrasonicRawFrame;
-};
 class MONODRIVECORE_API UltrasonicRawFrame : public DataFrame{
 public:
     UltrasonicRawFrame(int numSamples){
@@ -240,4 +224,20 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
     std::vector<UltrasonicTarget> targets;
+};
+
+class MONODRIVECORE_API UltrasonicFrame : public DataFrame {
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+    UltrasonicFrame(int numSamples){
+        ultrasonicTargetFrame = new UltrasonicTargetFrame();
+        ultrasonicRawFrame = new UltrasonicRawFrame(numSamples);
+    }
+    ~UltrasonicFrame(){
+        delete ultrasonicTargetFrame;
+        delete ultrasonicRawFrame;
+    }
+    UltrasonicTargetFrame* ultrasonicTargetFrame;
+    UltrasonicRawFrame* ultrasonicRawFrame;
 };
