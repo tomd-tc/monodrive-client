@@ -32,7 +32,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH, IMG_HEIGHT);
+    fc_config.resolution = Resolution(IMG_WIDTH, IMG_HEIGHT);
     fc_config.annotation.include_annotation = true;
     fc_config.annotation.desired_tags = {"traffic_sign"};
     sensors.push_back(
@@ -42,7 +42,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     vp_config.server_ip = sim0.getServerIp();
     vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
-    vp_config.resolution = ViewportCameraConfig::Resolution(256,256);
+    vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     // Send configuraitons to the simulator

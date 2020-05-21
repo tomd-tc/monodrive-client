@@ -70,7 +70,6 @@ public:
 		int32_t magic = recvBuffer.readInt();
 		int32_t size = recvBuffer.readInt();
 		int32_t payloadSize = size - header_length;
-		//std::cout<< "payloadSize = " << payloadSize << std::endl;
 		if (magic == CONTROL_HEADER)
 		{
 			recvBuffer.grow(payloadSize);
@@ -79,7 +78,6 @@ public:
 			success = deserialize(j);
 		}
 		else {
-			//ApiMessage error = make_error("Incorrect CONTROL_HEADER");
 			std::cout << "Incorrect CONTROL_HEADER" << std::endl;
 		}
 	}
