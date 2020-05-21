@@ -36,7 +36,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
         fc_config.rotation.pitch = -5;
         // Uncomment to receive grayscale images
         // fc_config.channels = "gray";
-        fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH,IMG_HEIGHT);
+        fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
         fc_config.annotation.include_annotation = true;
         fc_config.annotation.desired_tags = {"traffic_sign"};
         sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
@@ -116,7 +116,6 @@ int main(int argc, char** argv)
         "cpp-client/buffer_dev/simulator.json",
         "config/vehicle.json",
         "config/weather.json",
-        "",
         "config/scenario_config_single_vehicle.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);

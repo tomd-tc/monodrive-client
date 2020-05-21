@@ -32,7 +32,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     sem_config.rotation.pitch = -5;
     // Uncomment to receive grayscale images
     // fc_config.channels = "rgba";
-    sem_config.resolution = CameraConfig::Resolution(IMG_WIDTH, IMG_HEIGHT);
+    sem_config.resolution = Resolution(IMG_WIDTH, IMG_HEIGHT);
     sem_config.annotation.include_annotation = true;
     sem_config.annotation.desired_tags = {"traffic_sign"};
     sensors.push_back(std::make_shared<Sensor>(
@@ -42,7 +42,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     vp_config.server_ip = sim0.getServerIp();
     vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
-    vp_config.resolution = ViewportCameraConfig::Resolution(256,256);
+    vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     // Send configuraitons to the simulator
