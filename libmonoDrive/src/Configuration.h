@@ -14,15 +14,13 @@ public:
         const fs::path& simulatorConfigPath = {"config/simulator.json"},
         const fs::path& vehicleConfigPath = {"config/vehicle.json"},
         const fs::path& weatherConfigPath = {"config/weather.json"},
-        const fs::path& scenarioConfigPath = {"config/scenario.json"},
-        const fs::path& closedLoopConfigPath = {""}
+        const fs::path& scenarioConfigPath = {"config/scenario.json"}
     );
     ~Configuration(){};
     nlohmann::json simulator;
     nlohmann::json vehicle;
     nlohmann::json weather;
     nlohmann::json scenario;
-    nlohmann::json closed_loop;
 private:
     nlohmann::json load(const fs::path& path);
 

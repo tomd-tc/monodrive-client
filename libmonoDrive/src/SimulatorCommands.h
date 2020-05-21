@@ -77,3 +77,8 @@
 #define ImportMapCommand_ID			"ImportMap"
 #define SpawnVehicleCommand_ID "SpawnVehicleCommand_ID"
 #define ClosedLoopConfigCommand_ID "ClosedLoopConfigCommand_ID"
+
+/*
+ * Vehicle lights configuration command
+ */
+#define VehicleLightsConfigCommand_ID "VehicleLightsConfig_ID"

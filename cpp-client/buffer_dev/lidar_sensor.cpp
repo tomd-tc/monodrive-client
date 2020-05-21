@@ -121,8 +121,7 @@ int main(int argc, char** argv)
         "cpp-client/buffer_dev/simulator.json",
         "config/vehicle.json",
         "config/weather.json",
-        "",
-        "cpp-client/buffer_dev/lidar_scenario.json"
+        "config/scenario_config_single_vehicle.json"
     );
     // config.simulator["map"] = "RadarCube";
     // config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};
