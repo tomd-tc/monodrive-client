@@ -108,10 +108,10 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "cpp-client/parser_dev/simulator.json",
+        "cpp-client/buffer_dev/simulator.json",
         "config/vehicle.json",
         "config/weather.json",
-        "cpp-client/buffer_dev/scenario.json"
+        "cpp-client/buffer_dev/lidar_scenario.json"
     );
     // config.simulator["map"] = "RadarCube";
     // config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};
