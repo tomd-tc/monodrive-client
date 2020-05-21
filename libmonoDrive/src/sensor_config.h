@@ -83,6 +83,14 @@ public:
     }
 };
 
+class SemanticLidarConfig : public LidarConfig {
+public:
+    SemanticLidarConfig()
+    {
+        type = "SemanticLidar";
+    }
+};
+
 // todo: make sure defaults are correct
 class RadarConfig : public SensorBaseConfig
 {
