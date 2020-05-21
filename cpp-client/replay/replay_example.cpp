@@ -21,12 +21,12 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.location.z = 200;
     fc_config.rotation.pitch = -5;
     fc_config.resolution = CameraConfig::Resolution(512,512);
-    sensors.push_back(std::make_shared<Sensor>(fc_config));
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
-    IMUConfig im_config;
-    im_config.server_ip = ip;
-    im_config.listen_port = 8105;
-    sensors.push_back(std::make_shared<Sensor>(im_config));
+    IMUConfig imu_config;
+    imu_config.server_ip = ip;
+    imu_config.listen_port = 8105;
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
@@ -63,6 +63,10 @@ int main(int argc, char** argv)
 
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
+
+    for(auto& sensor : sensors){
+        sensor->StartSampleLoop();
+    }
     
     //Get number of steps in scenario and start timer
     int nSteps = config.scenario.size();
@@ -74,25 +78,7 @@ int main(int argc, char** argv)
     std::cout << "Running scenario" << std::endl;
     for(; idx < nSteps; idx++)
     {	
-        std::vector<std::future<bool>> sampleTasks;
-        //step simulator
-        stepTask = std::async([&sim0, &idx](){
-            return sim0.step(idx, 1);
-        });
-        //sample all sensors
-        for(auto& sensor : sensors)
-        {
-            sampleTasks.push_back(
-                std::async([&sensor](){
-                    sensor->sample();
-                    return sensor->parse();
-                }));
-        }
-        for(auto& sampleTask : sampleTasks)
-            sampleTask.get();
-        if(!stepTask.get()){
-            break;
-        }
+        sim0.step_sample_all(sensors, idx, 1);
     }
     //Calculate FPS
     auto scenario_time = stopwatch.elapsed_time<unsigned int, std::chrono::microseconds>();

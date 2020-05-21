@@ -91,24 +91,29 @@ bool Simulator::configure()
 	std::cout << "Send Simulator Config:   success = ";
 	std::cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
-	// cout << "Send Ego Vehicle Config: success = ";
-	// cout << send_command(ApiMessage(1001, EgoVehicleConfig_ID, true, config.vehicle)) << endl;
-
-	std::cout << "Send Scenario Config:    success = ";
-	std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+	if(config.simulator.value("simulation_mode", 0) == 0) {
+		std::cout << "Send Closed Loop Config:    success = ";
+		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
+	} else {
+		std::cout << "Send Scenario Config:    success = ";
+		std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+	}
 
 	std::cout << "Send Weather Config:     success = ";
 	std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;	
 	return true;
 }
 
-bool Simulator::send_command(ApiMessage msg)
+bool Simulator::send_command(ApiMessage msg, nlohmann::json* resp_message)
 {
-    msg.write(controlSocket);
-	ApiMessage response;
-	response.read(controlSocket);
-	if(response.get_success()){
-		return true;
+  msg.write(controlSocket);
+  ApiMessage response;
+  response.read(controlSocket);
+	if(resp_message != nullptr) {
+		*resp_message = response.get_message();
+	}
+  if (response.get_success()) {
+    return true;
 	}
 	return false;
 }
@@ -118,6 +123,25 @@ bool Simulator::step(int step_idx, int nsteps)
 	nlohmann::json msg{{"amount", nsteps}};
 	ApiMessage step_message(step_idx, REPLAY_StepSimulationCommand_ID, true, msg);
 	return send_command(step_message);
+}
+
+void Simulator::step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, int step_idx, int nsteps)
+{
+	for(auto& sensor : sensors)
+    {
+		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+	}
+	step(step_idx, nsteps);
+	bool samplingInProgress = true;
+	do{
+		samplingInProgress = false;
+		for(auto& sensor : sensors){
+			if(sensor->sampleInProgress.load(std::memory_order::memory_order_relaxed)){
+				samplingInProgress = true;
+				break;
+			}
+		}
+	} while(samplingInProgress);
 }
 
 void Simulator::sample_all(std::vector<std::shared_ptr<Sensor>>& sensors)

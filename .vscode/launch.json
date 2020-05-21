@@ -135,6 +135,17 @@
             "externalConsole": false
         },
         {
+            "name": "occupancy grid windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/occupancy_grid",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
             "name": "lidar_sensor windows",
             "type": "cppvsdbg",
             "request": "launch",
@@ -161,6 +172,17 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/cpp-client/buffer_dev/depth_camera_sensor",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "scenario_file windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/scenario_file",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

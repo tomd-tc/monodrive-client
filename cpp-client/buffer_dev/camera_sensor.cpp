@@ -46,7 +46,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     vp_config.server_ip = sim0.getServerIp();
     vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
-    vp_config.resolution = ViewportCameraConfig::Resolution(256,256);
+    vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     // Send configuraitons to the simulator
@@ -71,6 +71,7 @@ void camera_test(Simulator& sim0){
     ego_msg["brake_amount"] = 1.0;
     ego_msg["drive_mode"] = 1;
     sim0.send_command(ApiMessage(123, EgoControl_ID, true, ego_msg));
+
     for(auto& sensor : sensors){
         sensor->StartSampleLoop();
     }
@@ -115,7 +116,8 @@ int main(int argc, char** argv)
         "cpp-client/buffer_dev/simulator.json",
         "config/vehicle.json",
         "config/weather.json",
-        "cpp-client/buffer_dev/scenario.json"
+        "",
+        "config/scenario_config_single_vehicle.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
