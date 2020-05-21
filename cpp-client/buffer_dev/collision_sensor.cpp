@@ -21,8 +21,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     c_config.server_ip = sim0.getServerIp();
     c_config.server_port = sim0.getServerPort();
     c_config.listen_port = 8101;
-    c_config.desired_tags = {"vehicle", "traffic_sign"};
-    c_config.undesired_tags = {};
+    c_config.desired_tags = {"vehicle"};
+    c_config.undesired_tags = {"static"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CollisionConfig>(c_config)));
 
     ViewportCameraConfig vp_config;
@@ -62,6 +62,9 @@ void collision_test(Simulator& sim0){
     sensors[0]->sample_callback = [](DataFrame* frame){
         auto& collisionFrame = *static_cast<CollisionFrame*>(frame);
         std::cout << collisionFrame.time << std::endl;
+        for(auto& target : collisionFrame.collision_targets) {
+            std::cout << "Target: " << target.distance << std::endl;
+        }
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
@@ -82,7 +85,7 @@ int main(int argc, char** argv)
         "config/simulator_no_traffic.json",
         "config/vehicle.json",
         "config/weather.json",
-        "config/scenario_config_single_vehicle.json"
+        "config/scenario_config_multi_vehicle.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
