@@ -18,10 +18,10 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
     LidarConfig l_config;
-    l_config.location.x = 0.f;
-    l_config.location.z = 275.f;
+    l_config.location.x = -10.f;
+    l_config.location.z = 190.f;
     l_config.horizontal_resolution = 0.4f;
-    l_config.n_lasers = 32;
+    l_config.n_lasers = 16;
     l_config.server_ip = sim0.getServerIp();
     l_config.server_port = sim0.getServerPort();
     l_config.listen_port = 8107;
@@ -74,9 +74,6 @@ void state_test(Simulator& sim0){
             socket.send_to(boost::asio::buffer(&packet, sizeof(LidarPacket)), remote_endpoint, 0, err);
             std::this_thread::sleep_for(std::chrono::microseconds(1327));
         }
-        // auto& radarFrame = *static_cast<RadarFrame*>(frame);
-        // std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1));
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
@@ -121,11 +118,11 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "config/simulator_no_traffic.json",
+        "cpp-client/buffer_dev/simulator.json",
         "config/vehicle.json",
         "config/weather.json",
         "",
-        "config/scenario_config_single_vehicle.json"
+        "cpp-client/buffer_dev/lidar_scenario.json"
     );
     // config.simulator["map"] = "RadarCube";
     // config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};

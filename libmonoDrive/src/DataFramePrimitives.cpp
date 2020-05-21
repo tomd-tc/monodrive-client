@@ -170,3 +170,13 @@ void from_json(const nlohmann::json& j, RadarTarget& v){
 	json_get(j, "rcs", v.rcs);
 	json_get(j, "target_ids", v.target_ids);
 }
+
+void to_json(nlohmann::json& j, const UltrasonicTarget& v){
+	j = {
+		{"range", v.range}
+	};
+}
+
+void from_json(const nlohmann::json& j, UltrasonicTarget& v){
+	json_get(j, "range", v.range);
+}

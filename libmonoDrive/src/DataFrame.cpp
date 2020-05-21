@@ -5,6 +5,45 @@
 #define GPS_DATA_PACKET_SIZE 66
 #define LIDAR_PACKET_SIZE 1206
 
+ByteBuffer UltrasonicTargetListFrame::write() const{
+    nlohmann::json frame = {
+        {"targets", targets}
+    };
+    return ByteBuffer::JsonToBuffer(frame);
+}
+
+void UltrasonicTargetListFrame::parse(ByteBuffer& buffer){
+    auto frame = buffer.BufferToJson();
+    json_get(frame, "targets", targets);
+}
+
+ByteBuffer UltrasonicRawFrame::write() const{
+    ByteBuffer buffer(ultrasonic_raw.size()*sizeof(float), 12);
+    auto buffer_data = reinterpret_cast<float*>(buffer.data());
+    std::copy(ultrasonic_raw.data(), ultrasonic_raw.data()+ultrasonic_raw.size(), buffer_data);
+    return buffer;
+}
+
+void UltrasonicFrame::parse(ByteBuffer& buffer){
+    if(bSendUltrasonicRaw and currentFrameIndex % 2 == 1){
+        ultrasonicRawFrame->parse(buffer);
+    }
+    else{
+        ultrasonicTargetListFrame->parse(buffer);
+    }
+    currentFrameIndex++;
+}
+
+void UltrasonicRawFrame::parse(ByteBuffer& buffer){
+    auto data = reinterpret_cast<float*>(buffer.data());
+    std::copy(data, data+ultrasonic_raw.size(), ultrasonic_raw.data());
+}
+
+ByteBuffer UltrasonicFrame::write() const{
+    throw std::runtime_error("Not implemented");
+    return ByteBuffer();
+}
+
 void RadarTargetListFrame::parse(ByteBuffer& buffer){
     auto frame = buffer.BufferToJson();
     json_get(frame, "target_list", targets);
@@ -205,3 +244,4 @@ void LidarFrame::parse(ByteBuffer& buffer){
     if(packetIndex == packets.size())
         packetIndex = 0;
 }
+
