@@ -17,7 +17,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    for(int i = 0; i < 5; ++i){
+    // for(int i = 0; i < 5; ++i){
         RadarConfig r_config;
         r_config.location.x = 300.f;
         r_config.location.z = 50.f;
@@ -31,9 +31,10 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
         r_config.sbr.debug_frustum = false;
         r_config.server_ip = sim0.getServerIp();
         r_config.server_port = sim0.getServerPort();
-        r_config.listen_port = 8102 + i;
+        // r_config.listen_port = 8102 + i;
+        r_config.listen_port = 8102;
         sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(r_config)));
-    }
+    // }
 
     // RadarConfig r2;
     // r2.location.x = 300.f;
@@ -74,12 +75,13 @@ void state_test(Simulator& sim0){
     mono::precise_stopwatch stopwatch;
 
     /// initialize the vehicle, the first control command spawns the vehicle
-    sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
-        {   {"forward_amount", 0.0}, 
-            {"right_amount", 0.0},
-            {"brake_amount", 0.0},
-            {"drive_mode", 1}
-        }));
+    nlohmann::json ego_command;
+    ego_command["forward_amount"] =  0.1;
+    ego_command["right_amount"] =  0.0;
+    ego_command["brake_amount"] =  0.0;
+    ego_command["drive_mode"] =  1;
+    sim0.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
+
     for(auto& sensor : sensors){
         sensor->StartSampleLoop();
     }
@@ -87,6 +89,7 @@ void state_test(Simulator& sim0){
     sensors[0]->sample_callback = [](DataFrame* frame){
         auto& radarFrame = *static_cast<RadarFrame*>(frame);
         std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
+        std::cout << nlohmann::json(radarFrame.radarTargetListFrame->gt_targets).dump() << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     };
 
@@ -106,10 +109,11 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "cpp-client/parser_dev/simulator.json",
+        "config/simulator_no_traffic.json",
         "config/vehicle.json",
         "config/weather.json",
-        "cpp-client/buffer_dev/scenario.json"
+        "",
+        "config/scenario_config_single_vehicle.json"
     );
     // config.simulator["map"] = "RadarCube";
     // config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};

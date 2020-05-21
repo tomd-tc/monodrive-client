@@ -6,6 +6,7 @@
 #include <cstring>
 #include <algorithm>
 #include <bitset>
+#include <limits.h>
 #include "JsonHelpers.h"
 
 

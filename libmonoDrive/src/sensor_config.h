@@ -75,6 +75,7 @@ public:
         int rotations_per_scan = (int)(360.f / horizontal_resolution);
         int numPackets = (int)std::ceil((float)rotations_per_scan / 
         (12.f * (n_lasers == 16 ? 2 : 1)));
+        std::cout << numPackets << std::endl;
         return new LidarFrame(numPackets);
     }
     virtual nlohmann::json dump(){

@@ -61,9 +61,9 @@ void camera_test(Simulator& sim0){
     mono::precise_stopwatch stopwatch;
 
     nlohmann::json ego_command;
-    ego_command["forward_amount"] = 1.0;
+    ego_command["forward_amount"] = 0.0;
     ego_command["right_amount"] = 0.0;
-    ego_command["brake_amount"] = 0.0;
+    ego_command["brake_amount"] = 1.0;
     ego_command["drive_mode"] = 1;
 
     /// initialize the vehicle, the first control command spawns the vehicle
@@ -73,7 +73,6 @@ void camera_test(Simulator& sim0){
     }
 
     sensors[0]->sample_callback = [](DataFrame* frame){
-        std::cout << "Sample." << std::endl;
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4, imFrame->pixels);
@@ -102,11 +101,11 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "cpp-client/parser_dev/simulator.json",
+        "config/simulator_no_traffic.json",
         "config/vehicle.json",
         "config/weather.json",
         "",
-        "cpp-client/buffer_dev/closed_loop.json"
+        "config/scenario_config_multi_vehicle.json"
     );
 
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
