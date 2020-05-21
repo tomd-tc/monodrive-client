@@ -76,3 +76,4 @@
 #define GetMapCommand_ID			"GetMap"
 #define ImportMapCommand_ID			"ImportMap"
 #define SpawnVehicleCommand_ID "SpawnVehicleCommand_ID"
+#define ClosedLoopConfigCommand_ID "ClosedLoopConfigCommand_ID"

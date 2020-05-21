@@ -91,11 +91,13 @@ bool Simulator::configure()
 	std::cout << "Send Simulator Config:   success = ";
 	std::cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
-	// cout << "Send Ego Vehicle Config: success = ";
-	// cout << send_command(ApiMessage(1001, EgoVehicleConfig_ID, true, config.vehicle)) << endl;
-
-	std::cout << "Send Scenario Config:    success = ";
-	std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+	if(config.closed_loop != "") {
+		std::cout << "Send Closed Loop Config:    success = ";
+		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.closed_loop)) << std::endl;
+	} else {
+		std::cout << "Send Scenario Config:    success = ";
+		std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+	}
 
 	std::cout << "Send Weather Config:     success = ";
 	std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;	

@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <future>
+#include <thread>
 
 //monoDrive Includes
 #include "Simulator.h"
@@ -12,19 +13,30 @@
 #include "sensor_config.h"
 #include "Stopwatch.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+
+#define IMG_WIDTH 1920
+#define IMG_HEIGHT 1200
+
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-
-    StateConfig s_config;
-    s_config.server_ip = sim0.getServerIp();
-    s_config.server_port = sim0.getServerPort();
-    s_config.listen_port = 8101;
-    s_config.desired_tags = {"vehicle", "traffic_sign"};
-    s_config.include_obb = true;
-    s_config.debug_drawing = true;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(s_config)));
+    
+    CameraConfig fc_config;
+    fc_config.server_ip = sim0.getServerIp();
+    fc_config.server_port = sim0.getServerPort();
+    fc_config.listen_port = 8100;
+    fc_config.location.z = 225;
+    fc_config.rotation.pitch = -5;
+    fc_config.resolution = CameraConfig::Resolution(IMG_WIDTH, IMG_HEIGHT);
+    fc_config.annotation.include_annotation = true;
+    fc_config.annotation.desired_tags = {"traffic_sign"};
+    sensors.push_back(
+        std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -42,36 +54,42 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     return sensors;
 }
 
-void state_test(Simulator& sim0){
+void camera_test(Simulator& sim0){
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
     //Get number of steps in scenario and start timer
     mono::precise_stopwatch stopwatch;
 
-    /// initialize the vehicle, the first control command spawns the vehicle
     nlohmann::json ego_command;
-    ego_command["forward_amount"] =  0.1;
-    ego_command["right_amount"] =  0.0;
-    ego_command["brake_amount"] =  0.0;
-    ego_command["drive_mode"] =  1;
-    sim0.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
+    ego_command["forward_amount"] = 0.0;
+    ego_command["right_amount"] = 0.0;
+    ego_command["brake_amount"] = 1.0;
+    ego_command["drive_mode"] = 1;
 
+    /// initialize the vehicle, the first control command spawns the vehicle
+    sim0.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
     for(auto& sensor : sensors){
         sensor->StartSampleLoop();
     }
 
     sensors[0]->sample_callback = [](DataFrame* frame){
-        auto& stateFrame = *static_cast<StateFrame*>(frame);
-        // std::cout << stateFrame.vehicles.size() << std::endl;
-        // std::cout << nlohmann::json(stateFrame.vehicles).dump(1) << std::endl;
-        // std::cout << nlohmann::json(stateFrame.objects).dump(1) << std::endl;
+        auto camFrame = static_cast<CameraFrame*>(frame);
+        auto imFrame = camFrame->imageFrame;
+        cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4, imFrame->pixels);
+        for(auto& annotation : camFrame->annotationFrame->annotations){
+            for(auto& bbox : annotation.second.bounding_boxes_2d)
+            cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)), cv::Point(int(bbox.xmax), int(bbox.ymax)), cv::Scalar(0,0,255));
+        }
+        cv::imshow("monoDrive", img);
+        cv::waitKey(1);
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
     int count = 0;
     while(true)
-    {	
-        sim0.sample_all(sensors);
+    {
+      sim0.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
+      sim0.sample_all(sensors);
     }
 }
 
@@ -87,15 +105,15 @@ int main(int argc, char** argv)
         "config/vehicle.json",
         "config/weather.json",
         "",
-        "config/scenario_config_single_vehicle.json"
+        "config/scenario_config_multi_vehicle.json"
     );
+
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     if(!sim0.configure()){
         return -1;
     }
-
-    state_test(sim0);
+    camera_test(sim0);
     
     return 0;
 }
