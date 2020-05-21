@@ -89,6 +89,7 @@ void state_test(Simulator& sim0){
     sensors[0]->sample_callback = [](DataFrame* frame){
         auto& radarFrame = *static_cast<RadarFrame*>(frame);
         std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;
+        std::cout << nlohmann::json(radarFrame.radarTargetListFrame->gt_targets).dump() << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     };
 

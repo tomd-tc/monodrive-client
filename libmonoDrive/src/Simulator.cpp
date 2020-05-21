@@ -104,13 +104,16 @@ bool Simulator::configure()
 	return true;
 }
 
-bool Simulator::send_command(ApiMessage msg)
+bool Simulator::send_command(ApiMessage msg, nlohmann::json* resp_message)
 {
-    msg.write(controlSocket);
-	ApiMessage response;
-	response.read(controlSocket);
-	if(response.get_success()){
-		return true;
+  msg.write(controlSocket);
+  ApiMessage response;
+  response.read(controlSocket);
+	if(resp_message != nullptr) {
+		*resp_message = response.get_message();
+	}
+  if (response.get_success()) {
+    return true;
 	}
 	return false;
 }
