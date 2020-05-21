@@ -23,7 +23,8 @@ void CorrelateSnapshot() {
   auto ego_location = DATA_SNAPSHOT.state_frame->vehicles[0].state.odometry.pose.position;
   Eigen::VectorXd ego_vec(2);
   ego_vec << ego_location.x, ego_location.y;
-  auto pts = DATA_SNAPSHOT.map_data->GetPointsWithinRadius(ego_vec, 100.0);
+  // TODO this function currently segfaults
+  //auto pts = DATA_SNAPSHOT.map_data->GetPointsWithinRadius(ego_vec, 100.0);
   auto imFrame = DATA_SNAPSHOT.camera_frame->imageFrame;
   cv::Mat img(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
               imFrame->pixels);
@@ -91,10 +92,11 @@ int main(int argc, char** argv) {
                            // for connections on this port;
   
   // Read JSON files in cpp_client/config directory
-  Configuration config("cpp-client/parser_dev/simulator.json",
-                       "config/vehicle.json", "config/weather.json",
+  Configuration config("config/simulator_no_traffic.json",
+                       "config/vehicle.json", 
+                       "config/weather.json",
                        "",
-                       "cpp-client/buffer_dev/closed_loop.json");
+                       "config/scenario_config_single_vehicle.json");
   Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
   if (!sim0.configure()) {
