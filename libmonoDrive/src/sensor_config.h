@@ -219,7 +219,8 @@ public:
 
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 1;
-        return new CameraFrame(resolution.x, resolution.y, nChannels, false);
+        int channelDepth = 1;
+        return new CameraFrame(resolution.x, resolution.y, nChannels, channelDepth, false);
     }
     virtual nlohmann::json dump(){
         return *this;
@@ -259,9 +260,9 @@ public:
     }
     std::vector<std::string> desired_tags{"vt"};
     std::vector<std::string> undesired_tags{"static"};
+    virtual nlohmann::json dump() { return *this; }
     virtual DataFrame* DataFrameFactory() override{
-        std::cout << "Error, no parser for Collision Sensor yet, you will need to parse the buffer yourself." << std::endl;
-        return nullptr;
+        return new CollisionFrame;
     }
 };
 

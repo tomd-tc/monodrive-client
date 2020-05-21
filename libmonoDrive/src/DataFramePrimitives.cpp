@@ -180,3 +180,35 @@ void to_json(nlohmann::json& j, const UltrasonicTarget& v){
 void from_json(const nlohmann::json& j, UltrasonicTarget& v){
 	json_get(j, "range", v.range);
 }
+
+void to_json(nlohmann::json& j, const CollisionTarget& v){
+	j = {
+		{"acceleration", v.acceleration},
+		{"brake_input", v.brake_input},
+    {"collision", v.collision},
+    {"distance", v.distance},
+    {"forward_acceleration", v.forward_acceleration},
+    {"forward_velocity", v.forward_velocity},
+    {"name", v.name},
+    {"relative_velocity", v.relative_velocity},
+    {"throttle_input", v.throttle_input},
+    {"time_to_collision", v.time_to_collision},
+    {"velocity", v.velocity},
+    {"wheel_input", v.wheel_input}
+	};
+}
+
+void from_json(const nlohmann::json& j, CollisionTarget& v){
+    json_get(j, "acceleration", v.acceleration);
+    json_get(j, "brake_input", v.brake_input);
+    json_get(j, "collision", v.collision);
+    json_get(j, "distance", v.distance);
+    json_get(j, "forward_acceleration", v.forward_acceleration);
+    json_get(j, "forward_velocity", v.forward_velocity);
+    json_get(j, "name", v.name);
+    json_get(j, "relative_velocity", v.relative_velocity);
+    json_get(j, "throttle_input", v.throttle_input);
+    json_get(j, "time_to_collision", v.time_to_collision);
+    json_get(j, "velocity", v.velocity);
+    json_get(j, "wheel_input", v.wheel_input);
+}

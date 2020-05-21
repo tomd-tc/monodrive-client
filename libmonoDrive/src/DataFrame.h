@@ -124,6 +124,17 @@ public:
 	int sample_count;
 };
 
+class MONODRIVECORE_API CollisionFrame : public DataFrame{
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+	CollisionTarget ego_target;
+	std::vector<CollisionTarget> collision_targets;
+	float game_time;
+	int time;
+	int sample_count;
+};
+
 // for now 8 bit only, todo: add float higher bit rate etc enum
 class MONODRIVECORE_API ImageFrame : public DataFrame{
 public:
