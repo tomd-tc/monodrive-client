@@ -224,11 +224,11 @@ public:
 		return std::string((char*)data(), size());
 	}
 
-    inline nlohmann::json BufferToJson() const{
+	inline nlohmann::json BufferToJson() const {
 		return nlohmann::json::parse(as_string());
 	}
 
-    inline static ByteBuffer JsonToBuffer(const nlohmann::json& frame){
+	inline static ByteBuffer JsonToBuffer(const nlohmann::json& frame){
 		std::string raw = frame.dump();
 		ByteBuffer buffer(raw.size(), 12);
 		buffer.write((uint8_t*)raw.c_str(), raw.size());

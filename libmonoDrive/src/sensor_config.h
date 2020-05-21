@@ -139,6 +139,35 @@ public:
     }
 };
 
+class UltrasonicConfig : public SensorBaseConfig
+{
+public:
+    UltrasonicConfig()
+    {
+        type = "Ultrasonic";
+    }
+    double fc{40000.0};
+    double pwm_factor{2.5};
+    int max_ultrasonic_returns{93};
+    bool send_processed_data{true};
+    struct SBR
+    {
+        float scan_distance{4.0f};
+        float azimuth_fov{30.0f};
+        float elevation_fov{0.5f};
+        float ray_division_y{5.0f};
+        float ray_division_z{5.0f};
+        bool debug_frustum{false};
+        bool debug_scan{false};
+        bool debug_rescan{false};
+    }sbr;   
+    virtual DataFrame* DataFrameFactory() override{
+        return new UltrasonicFrame(send_processed_data, 1);
+    }
+    virtual nlohmann::json dump(){
+        return *this;
+    }
+};
 
 class CameraConfig : public SensorBaseConfig
 {
@@ -490,6 +519,46 @@ void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
 }
 
 /// END Radar Config JSON Parsing
+
+/// Ultrasonic Config JSON Parsing
+void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
+    j = nlohmann::json{
+        {"scan_distance", config.scan_distance},
+        {"azimuth_fov", config.azimuth_fov},
+        {"elevation_fov", config.elevation_fov},
+        {"ray_division_y", config.ray_division_y},
+        {"ray_division_z", config.ray_division_z},
+        {"debug_frustum", config.debug_frustum},
+        {"debug_scan", config.debug_scan},
+        {"debug_rescan", config.debug_rescan}
+    };
+}
+void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR config) {
+    json_get(j, "scan_distance", config.scan_distance);
+    json_get(j, "azimuth_fov", config.azimuth_fov);
+    json_get(j, "elevation_fov", config.elevation_fov);
+    json_get(j, "ray_division_y", config.ray_division_y);
+    json_get(j, "ray_division_z", config.ray_division_z);
+    json_get(j, "debug_frustum", config.debug_frustum);
+    json_get(j, "debug_scan", config.debug_scan);
+    json_get(j, "debug_rescan", config.debug_rescan);
+}
+void inline to_json(nlohmann::json& j, const UltrasonicConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["fc"] = config.fc;
+    j["pwm_factor"] = config.pwm_factor;
+    j["max_ultrasonic_returns"]  = config.max_ultrasonic_returns;
+    j["send_processed_data"]  = config.send_processed_data;
+    j["sbr"] = config.sbr;
+}
+void inline from_json(const nlohmann::json& j, UltrasonicConfig& config) {
+    json_get(j, "fc", config.fc);
+    json_get(j, "pwm_factor", config.pwm_factor);
+    json_get(j, "max_ultrasonic_returns", config.max_ultrasonic_returns);
+    json_get(j, "send_processed_data", config.send_processed_data);
+    from_json(j, config.sbr);
+}
+/// END Ultrasonic Config JSON Parsing
 
 /// Lidar Config JSON Parsing
 void inline to_json(nlohmann::json& j, const LidarConfig& config)
