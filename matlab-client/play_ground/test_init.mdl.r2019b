@@ -1,12 +1,12 @@
 Model {
   Name			  "test_init"
-  Version		  10.1
+  Version		  10.0
   SavedCharacterEncoding  "windows-1252"
   GraphicalInterface {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.50"
+    ComputedModelVersion    "1.49"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -24,10 +24,10 @@ Model {
   }
   DiagnosticSuppressor	  "on"
   LogicAnalyzerPlugin	  "on"
-  WebScopes_FoundationPlugin "on"
-  NotesPlugin		  "on"
   SLCCPlugin		  "on"
   AnimationPlugin	  "on"
+  WebScopes_FoundationPlugin "on"
+  NotesPlugin		  "on"
   EnableAccessToBaseWorkspace on
   ScopeRefreshTime	  0.035000
   OverrideScopeRefreshTime on
@@ -75,10 +75,10 @@ Model {
 	  IsTabbed		  [1]
 	  ViewObjType		  "SimulinkTopLevel"
 	  LoadSaveID		  "0"
-	  Extents		  [1798.0, 894.0]
+	  Extents		  [1768.0, 871.0]
 	  ZoomFactor		  [1.0]
-	  Offset		  [-149.01171875, 106.5]
-	  SceneRectInView	  [-149.01171875, 106.5, 1798.0, 894.0]
+	  Offset		  [-149.01171875, 140.05833931763982]
+	  SceneRectInView	  [-149.01171875, 140.05833931763982, 1768.0, 871.0]
 	}
 	Object {
 	  $ObjectID		  6
@@ -106,7 +106,7 @@ Model {
 	  Floating		  [0]
 	  DockPosition		  "Right"
 	  Width			  [300]
-	  Height		  [400]
+	  Height		  [29]
 	  Minimized		  "On"
 	}
 	Object {
@@ -125,15 +125,16 @@ Model {
 	PropName		"DockComponentsInfo"
       }
       WindowState	      "AAAA/wAAAAD9AAAAAwAAAAAAAAC9AAAB+PwCAAAAA/sAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
-      "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD8AAAAAP////8AAAAAAP////r/////AgAAAAH7AAAAUgBHA"
+      "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD8AAAAAP////8AAAAAAP////r/////AgAAAAL7AAAAUgBHA"
       "EwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAA"
-      "P////8AAABjAP///wAAAAEAAAAAAAAAAPwCAAAAAfsAAABUAEcATABVAEUAMgA6AFAAcgBvAHAAZQByAHQAeQBJAG4AcwBwAGUAYwB0AG8AcgAvA"
-      "FAAcgBvAHAAZQByAHQAeQAgAEkAbgBzAHAAZQBjAHQAbwByAAAAAAD/////AAAAKwD///8AAAADAAAAAAAAAAD8AQAAAAH7AAAANgBHAEwAVQBFA"
-      "DIAOgBTAHAAcgBlAGEAZABTAGgAZQBlAHQALwBNAG8AZABlAGwARABhAHQAYQAAAAAA/////wAAARoA////AAAHLAAAA50AAAABAAAAAgAAAAEAA"
-      "AAC/AAAAAQAAAAAAAAAAQAAADYAYwBvAGwAbABhAHAAcwBpAGIAbABlAFAAYQBuAGUAbABUAG8AbwBsAEIAYQByAEwAZQBmAHQCAAAAAP////8AA"
-      "AAAAAAAAAAAAAEAAAABAAAAOABjAG8AbABsAGEAcABzAGkAYgBsAGUAUABhAG4AZQBsAFQAbwBvAGwAQgBhAHIAUgBpAGcAaAB0AwAAAAD/////A"
-      "AAAAAAAAAAAAAACAAAAAAAAAAMAAAABAAAAOgBjAG8AbABsAGEAcABzAGkAYgBsAGUAUABhAG4AZQBsAFQAbwBvAGwAQgBhAHIAQgBvAHQAdABvA"
-      "G0BAAAAAP////8AAAAAAAAAAA=="
+      "P////8AAABjAP////v/////AAAAAAD/////AAAAIAD///8AAAABAAAAAAAAAAD8AgAAAAH8AAAAAP////8AAAAAAP////r/////AgAAAAL7AAAAV"
+      "ABHAEwAVQBFADIAOgBQAHIAbwBwAGUAcgB0AHkASQBuAHMAcABlAGMAdABvAHIALwBQAHIAbwBwAGUAcgB0AHkAIABJAG4AcwBwAGUAYwB0AG8Ac"
+      "gAAAAAA/////wAAACsA////+/////8AAAAAAP////8AAAAgAP///wAAAAMAAAAAAAAAAPwBAAAAAfsAAAA2AEcATABVAEUAMgA6AFMAcAByAGUAY"
+      "QBkAFMAaABlAGUAdAAvAE0AbwBkAGUAbABEAGEAdABhAAAAAAD/////AAABGgAH//8AAAcOAAADhgAAAAEAAAACAAAAAQAAAAL8AAAABAAAAAAAA"
+      "AABAAAANgBjAG8AbABsAGEAcABzAGkAYgBsAGUAUABhAG4AZQBsAFQAbwBvAGwAQgBhAHIATABlAGYAdAMAAAAA/////wAAAAAAAAAAAAAAAQAAA"
+      "AEAAAA4AGMAbwBsAGwAYQBwAHMAaQBiAGwAZQBQAGEAbgBlAGwAVABvAG8AbABCAGEAcgBSAGkAZwBoAHQDAAAAAP////8AAAAAAAAAAAAAAAIAA"
+      "AAB/////wEAAAAA/////wAAAAAAAAAAAAAAAwAAAAEAAAA6AGMAbwBsAGwAYQBwAHMAaQBiAGwAZQBQAGEAbgBlAGwAVABvAG8AbABCAGEAcgBCA"
+      "G8AdAB0AG8AbQEAAAAA/////wAAAAAAAAAA"
       Array {
 	Type			"Cell"
 	Dimension		0
@@ -150,9 +151,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "celit"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Fri May 08 09:52:54 2020"
-  RTWModifiedTimeStamp	  510765189
-  ModelVersionFormat	  "1.%<AutoIncrement:50>"
+  LastModifiedDate	  "Wed May 06 15:35:24 2020"
+  RTWModifiedTimeStamp	  510679700
+  ModelVersionFormat	  "1.%<AutoIncrement:49>"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
   LibraryLinkDisplay	  "none"
@@ -174,6 +175,8 @@ Model {
   ShowViewerIcons	  on
   SortedOrder		  off
   VariantCondition	  off
+  ShowSubsystemDomainSpec off
+  ExecutionContextIcon	  off
   ShowLinearizationAnnotations on
   ShowVisualizeInsertedRTB on
   ShowMarkup		  on
@@ -186,7 +189,7 @@ Model {
   BrowserShowLibraryLinks off
   FunctionConnectors	  off
   BrowserLookUnderMasks	  off
-  MultiThreadCoSim	  "on"
+  MultiThreadCoSim	  on
   SimulationMode	  "normal"
   SILPILModeSetting	  "automated"
   SILPILSystemUnderTest	  "topmodel"
@@ -255,7 +258,7 @@ Model {
     Dimension		    1
     Simulink.ConfigSet {
       $ObjectID		      10
-      Version		      "20.0.1"
+      Version		      "19.1.1"
       DisabledProps	      []
       Description	      ""
       Array {
@@ -263,12 +266,12 @@ Model {
 	Dimension		9
 	Simulink.SolverCC {
 	  $ObjectID		  11
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  DisabledProps		  []
 	  Description		  ""
 	  Components		  []
 	  StartTime		  "0.0"
-	  StopTime		  "inf"
+	  StopTime		  "100.0"
 	  AbsTol		  "auto"
 	  AutoScaleAbsTol	  on
 	  FixedStep		  "1"
@@ -302,11 +305,11 @@ Model {
 	  SampleTimeProperty	  []
 	  DecoupledContinuousIntegration off
 	  MinimalZcImpactIntegration off
-	  ODENIntegrationMethod	  "ode3"
+	  SolverOrder		  3
 	}
 	Simulink.DataIOCC {
 	  $ObjectID		  12
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  DisabledProps		  []
 	  Description		  ""
 	  Components		  []
@@ -348,7 +351,7 @@ Model {
 	}
 	Simulink.OptimizationCC {
 	  $ObjectID		  13
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    9
@@ -385,7 +388,6 @@ Model {
 	  ExpressionFolding	  on
 	  BooleansAsBitfields	  off
 	  BitfieldContainerType	  "uint_T"
-	  BitwiseOrLogicalOp	  "Same as modeled"
 	  EnableMemcpy		  on
 	  MemcpyThreshold	  64
 	  PassReuseOutputArgsAs	  "Structure reference"
@@ -396,8 +398,8 @@ Model {
 	  StateBitsets		  off
 	  DataBitsets		  off
 	  ActiveStateOutputEnumStorageType "Native Integer"
-	  ZeroExternalMemoryAtStartup off
-	  ZeroInternalMemoryAtStartup off
+	  ZeroExternalMemoryAtStartup on
+	  ZeroInternalMemoryAtStartup on
 	  InitFltsAndDblsToZero	  off
 	  NoFixptDivByZeroProtection off
 	  EfficientFloat2IntCast  off
@@ -422,7 +424,7 @@ Model {
 	}
 	Simulink.DebuggingCC {
 	  $ObjectID		  14
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    1
@@ -479,6 +481,7 @@ Model {
 	  UnderSpecifiedDataTypeMsg "none"
 	  UnnecessaryDatatypeConvMsg "none"
 	  VectorMatrixConversionMsg "none"
+	  InvalidFcnCallConnMsg	  "error"
 	  FcnCallInpInsideContextMsg "error"
 	  SignalLabelMismatchMsg  "none"
 	  UnconnectedInputMsg	  "warning"
@@ -543,7 +546,7 @@ Model {
 	}
 	Simulink.HardwareCC {
 	  $ObjectID		  15
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  DisabledProps		  []
 	  Description		  ""
 	  Components		  []
@@ -593,7 +596,7 @@ Model {
 	}
 	Simulink.ModelReferenceCC {
 	  $ObjectID		  16
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  DisabledProps		  []
 	  Description		  ""
 	  Components		  []
@@ -613,7 +616,7 @@ Model {
 	}
 	Simulink.SFSimCC {
 	  $ObjectID		  17
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  DisabledProps		  []
 	  Description		  ""
 	  Components		  []
@@ -648,7 +651,7 @@ Model {
 	Simulink.RTWCC {
 	  $BackupClass		  "Simulink.RTWCC"
 	  $ObjectID		  18
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  Array {
 	    Type		    "Cell"
 	    Dimension		    16
@@ -742,7 +745,7 @@ Model {
 	    Dimension		    2
 	    Simulink.CodeAppCC {
 	      $ObjectID		      19
-	      Version		      "20.0.1"
+	      Version		      "19.1.1"
 	      Array {
 		Type			"Cell"
 		Dimension		28
@@ -832,7 +835,7 @@ Model {
 	    Simulink.GRTTargetCC {
 	      $BackupClass	      "Simulink.TargetCC"
 	      $ObjectID		      20
-	      Version		      "20.0.1"
+	      Version		      "19.1.1"
 	      Array {
 		Type			"Cell"
 		Dimension		16
@@ -860,7 +863,7 @@ Model {
 		Dimension		1
 		Simulink.CPPComponent {
 		  $ObjectID		  21
-		  Version		  "20.0.1"
+		  Version		  "19.1.1"
 		  Array {
 		    Type		    "Cell"
 		    Dimension		    10
@@ -880,14 +883,12 @@ Model {
 		  Components		  []
 		  Name			  "CPPClassGenComp"
 		  GenerateDestructor	  on
-		  ExternalIOMemberVisibility "public"
 		  GenerateExternalIOAccessMethods "None"
 		  ParameterMemberVisibility "private"
 		  InternalMemberVisibility "private"
 		  GenerateParameterAccessMethods "None"
 		  GenerateInternalMemberAccessMethods "None"
 		  UseOperatorNewForModelRefRegistration	off
-		  IncludeModelTypesInModelClass	off
 		}
 		PropName		"Components"
 	      }
@@ -911,6 +912,7 @@ Model {
 	      CompOptLevelCompliant   on
 	      ConcurrentExecutionCompliant on
 	      IncludeMdlTerminateFcn  on
+	      GeneratePreprocessorConditionals "Use local settings"
 	      CombineOutputUpdateFcns on
 	      CombineSignalStateStructs	off
 	      GroupInternalDataByFunction off
@@ -932,6 +934,7 @@ Model {
 	      SupportVariableSizeSignals off
 	      ParenthesesLevel	      "Nominal"
 	      CastingMode	      "Nominal"
+	      PreserveStateflowLocalDataDimensions off
 	      MATLABClassNameForMDSCustomization "Simulink.SoftwareTarget.GRTCustomization"
 	      ModelStepFunctionPrototypeControlCompliant off
 	      CPPClassGenCompliant    on
@@ -972,7 +975,7 @@ Model {
 	}
 	SlCovCC.ConfigComp {
 	  $ObjectID		  22
-	  Version		  "20.0.1"
+	  Version		  "19.1.1"
 	  DisabledProps		  []
 	  Description		  "Simulink Coverage Configuration Component"
 	  Components		  []
@@ -1014,8 +1017,8 @@ Model {
 	PropName		"Components"
       }
       Name		      "Configuration"
-      CurrentDlgPage	      "Solver"
-      ConfigPrmDlgPosition    [ 1460, 280, 2380, 990 ]
+      CurrentDlgPage	      "Diagnostics/Data Validity"
+      ConfigPrmDlgPosition    [ 1460, 280, 2380, 920 ]
       ExtraOptions	      "-aBlockCommentType=\"BlockPathComment\" -aIgnoreTestpoints=0 "
     }
     PropName		    "ConfigurationSets"
@@ -1038,7 +1041,7 @@ Model {
     ForegroundColor	    "black"
     BackgroundColor	    "white"
     DropShadow		    off
-    NameLocation	    "bottom"
+    NamePlacement	    "normal"
     FontName		    "Helvetica"
     FontSize		    10
     FontWeight		    "normal"
@@ -1131,7 +1134,6 @@ Model {
     Block {
       BlockType		      Inport
       Port		      "1"
-      IconDisplay	      "Port number"
       OutputFunctionCall      off
       OutMin		      "[]"
       OutMax		      "[]"
@@ -1172,13 +1174,13 @@ Model {
       Multiplication	      "Element-wise(.*)"
       CollapseMode	      "All dimensions"
       CollapseDim	      "1"
-      InputSameDT	      off
+      InputSameDT	      on
       OutMin		      "[]"
       OutMax		      "[]"
-      OutDataTypeStr	      "Inherit: Inherit via internal rule"
+      OutDataTypeStr	      "Inherit: Same as first input"
       LockScale		      off
-      RndMeth		      "Floor"
-      SaturateOnIntegerOverflow	off
+      RndMeth		      "Zero"
+      SaturateOnIntegerOverflow	on
       SampleTime	      "-1"
     }
     Block {
@@ -1204,6 +1206,7 @@ Model {
       PermitHierarchicalResolution "All"
       TreatAsAtomicUnit	      off
       MinAlgLoopOccurrences   off
+      PropExecContextOutsideSubsystem off
       ScheduleAs	      "Sample time"
       SystemSampleTime	      "-1"
       RTWSystemCode	      "Auto"
@@ -1211,29 +1214,27 @@ Model {
       RTWFileNameOpts	      "Auto"
       FunctionInterfaceSpec   "void_void"
       FunctionWithSeparateData off
-      MatchGraphicalInterface off
       RTWMemSecFuncInitTerm   "Inherit from model"
       RTWMemSecFuncExecute    "Inherit from model"
       RTWMemSecDataConstants  "Inherit from model"
       RTWMemSecDataInternal   "Inherit from model"
       RTWMemSecDataParameters "Inherit from model"
       SimViewingDevice	      off
-      ActiveForDiff	      off
       DataTypeOverride	      "UseLocalSettings"
       DataTypeOverrideAppliesTo	"AllNumericTypes"
       MinMaxOverflowLogging   "UseLocalSettings"
       Opaque		      off
       MaskHideContents	      off
       SFBlockType	      "NONE"
-      Variant		      off
       VariantControlMode      "Expression"
+      Variant		      off
       GeneratePreprocessorConditionals off
       AllowZeroVariantControls off
       PropagateVariantConditions off
       TreatAsGroupedWhenPropagatingVariantConditions on
       ContentPreviewEnabled   off
       IsWebBlock	      off
-      IsInjectorSS	      off
+      IsObserver	      off
       Latency		      "0"
       AutoFrameSizeCalculation off
       IsWebBlockPanel	      off
@@ -1267,7 +1268,7 @@ Model {
       Position		      [390, 266, 435, 284]
       ZOrder		      100000
       ForegroundColor	      "gray"
-      NameLocation	      "top"
+      NamePlacement	      "alternate"
       HideAutomaticName	      off
       Value		      "0.43125"
       OutDataTypeStr	      "double"
@@ -1296,7 +1297,7 @@ Model {
       System		      "CameraSensor"
       MaskType		      "CameraSensor"
       MaskDisplay	      "disp('CameraSensor');\nport_label('output',1,'y');\n"
-      config_path	      "configurations/camera.json"
+      config_path	      "../configurations/camera.json"
       server_port	      "8999"
       HEADER_CONTROL	      "uint32( hex2dec( '6d6f6e6f' ) )"
       HEADER_RESPONSE	      "uint32( hex2dec( '6f6e6f6d' ) )"
@@ -1374,6 +1375,10 @@ Model {
       Position		      [1350, 427, 1380, 458]
       ZOrder		      100000
       Inputs		      "*/"
+      InputSameDT	      off
+      OutDataTypeStr	      "Inherit: Inherit via internal rule"
+      RndMeth		      "Floor"
+      SaturateOnIntegerOverflow	off
     }
     Block {
       BlockType		      SubSystem
@@ -1408,6 +1413,7 @@ Model {
 	  SID			  "17"
 	  Position		  [20, 33, 50, 47]
 	  ZOrder		  428
+	  IconDisplay		  "Port number"
 	}
 	Block {
 	  BlockType		  DataTypeConversion
@@ -1604,7 +1610,7 @@ Model {
       ZOrder		      100000
       BlockMirror	      on
       ForegroundColor	      "magenta"
-      NameLocation	      "top"
+      NamePlacement	      "alternate"
       ShowName		      off
       LabelPosition	      "Bottom"
       BindingPersistence      "DataTag2"
@@ -1619,6 +1625,7 @@ Model {
       ZOrder		      100000
       ForegroundColor	      "gray"
       HideAutomaticName	      off
+      Value		      "-0.04111195882161456"
       SampleTime	      "-1"
     }
     Block {
@@ -1755,7 +1762,7 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      48
+      ZOrder		      44
       FontSize		      12
     }
     Annotation {
@@ -1771,7 +1778,7 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      46
+      ZOrder		      42
       FontSize		      12
     }
     Annotation {
@@ -1787,7 +1794,7 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      45
+      ZOrder		      41
       FontSize		      12
     }
     Annotation {
@@ -1803,7 +1810,7 @@ Model {
       BackgroundColor	      "[0.956863, 0.980392, 0.921569]"
       DropShadow	      on
       AnnotationType	      "area_annotation"
-      ZOrder		      47
+      ZOrder		      43
       FontSize		      12
     }
   }

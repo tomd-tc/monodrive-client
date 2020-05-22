@@ -6,7 +6,7 @@ classdef Viewport_Camera < Sensor
 
     % Public, tunable properties
     properties
-        config_path = '../configurations/viewport_camera.json'
+        config_path = 'configurations/viewport_camera.json'
           
     end
 
