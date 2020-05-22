@@ -31,8 +31,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     dc_config.location.z = 225;
     dc_config.rotation.pitch = -5;
     dc_config.resolution = Resolution(IMG_WIDTH, IMG_HEIGHT);
-    dc_config.annotation.include_annotation = true;
-    dc_config.annotation.desired_tags = {"traffic_sign"};
+    dc_config.annotation.include_annotation = false;
     sensors.push_back(std::make_shared<Sensor>(
         std::make_unique<DepthCameraConfig>(dc_config)));
 
@@ -71,17 +70,21 @@ void depth_camera_test(Simulator& sim0){
     }
 
     sensors[0]->sample_callback = [](DataFrame* frame){
-        std::cout << "Sensor callback..." << std::endl;
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat floatMat = cv::Mat(imFrame->resolution.y, imFrame->resolution.x,
                                    CV_32FC1, imFrame->pixels);
-        double minVal, maxVal;
-        cv::minMaxLoc(floatMat, &minVal, &maxVal);
-        std::cout << "Min val: " << minVal << " Max Val: " << maxVal << std::endl;
+
+        // Clip the range at 100 meters and convert to grayscale
+        float maxRange = 10000.0f;
+        cv::Mat mask;
+        inRange(floatMat, cv::Scalar(0), cv::Scalar(maxRange), mask);
+        cv::Mat inRangeMat(floatMat.size(), CV_32FC1, cv::Scalar(maxRange));
+        floatMat.copyTo(inRangeMat, mask);
+        inRangeMat *= 255.0 / maxRange;
 
         cv::Mat img;
-        floatMat.convertTo(img, CV_8UC1, 0.0, 127.0);
+        inRangeMat.convertTo(img, CV_8UC1);
 
         for(auto& annotation : camFrame->annotationFrame->annotations){
             for(auto& bbox : annotation.second.bounding_boxes_2d){
