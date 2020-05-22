@@ -157,10 +157,43 @@
             "externalConsole": false
         },
         {
+            "name": "semantic_camera windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/semantic_camera_sensor",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "depth_camera windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/depth_camera_sensor",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
             "name": "scenario_file windows",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/cpp-client/buffer_dev/scenario_file",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "collision windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/cpp-client/buffer_dev/collision",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -112,6 +112,25 @@ ByteBuffer StateFrame::write() const {
 	return ByteBuffer::JsonToBuffer(j);
 }
 
+void CollisionFrame::parse(ByteBuffer& buffer){
+    auto j = buffer.BufferToJson();
+    json_get(j, "game_time", game_time);
+	json_get(j, "time", time);
+	json_get(j, "sample_count", sample_count);
+    from_json(j, ego_target);
+	json_get(j, "targets", collision_targets);
+}
+
+ByteBuffer CollisionFrame::write() const {
+	nlohmann::json j;
+    to_json(j, ego_target);
+    j["time"] = time;
+    j["game_time"] = game_time;
+    j["sample_count"] = sample_count;
+    j["targets"] = collision_targets;
+	return ByteBuffer::JsonToBuffer(j);
+}
+
 ByteBuffer ImuFrame::write() const{
     ByteBuffer buffer(IMU_DATA_PACKET_SIZE, 12);
     buffer.write(0xc2);
