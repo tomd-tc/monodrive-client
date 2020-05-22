@@ -4,23 +4,26 @@
 #include <memory>
 #include <vector>
 #include <future>
+#include <thread>
 
 //monoDrive Includes
 #include "Simulator.h"
 #include "Configuration.h"  // holder for sensor, simulator, scenario, weather, and vehicle configurations
 #include "Sensor.h"
 #include "sensor_config.h"
-#include "Stopwatch.h"
 
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    GPSConfig g_config;
-    g_config.server_ip = sim0.getServerIp();
-    g_config.server_port = sim0.getServerPort();
-    g_config.listen_port = 8102;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(g_config)));
+    UltrasonicConfig u_config;
+    u_config.server_ip = sim0.getServerIp();
+    u_config.server_port = sim0.getServerPort();
+    u_config.listen_port = 8103;
+    u_config.location.x = 300.f;
+    u_config.location.z = 50.f;
+    sensors.push_back(
+        std::make_shared<Sensor>(std::make_unique<UltrasonicConfig>(u_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -38,11 +41,9 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     return sensors;
 }
 
-void state_test(Simulator& sim0){
+void ultrasonic_test(Simulator& sim0){
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
-    //Get number of steps in scenario and start timer
-    mono::precise_stopwatch stopwatch;
 
     /// initialize the vehicle, the first control command spawns the vehicle
     nlohmann::json ego_command;
@@ -57,15 +58,14 @@ void state_test(Simulator& sim0){
     }
 
     sensors[0]->sample_callback = [](DataFrame* frame){
-        auto& gpsFrame = *static_cast<GPSFrame*>(frame);
-        std::cout << gpsFrame.lattitude << " " 
-        << gpsFrame.longitude << " "
-        << gpsFrame.elevation << " "
-        << gpsFrame.yaw << std::endl;
+        auto& ultrasonicFrame = *static_cast<UltrasonicFrame*>(frame);
+        std::cout << ultrasonicFrame.currentFrameIndex << std::endl;
+        for(auto& target : ultrasonicFrame.ultrasonicTargetListFrame->targets) {
+            std::cout << "Target at:" << target.range << std::endl;
+        }
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
-    int count = 0;
     while(true)
     {	
         sim0.sample_all(sensors);
@@ -85,13 +85,14 @@ int main(int argc, char** argv)
         "config/weather.json",
         "config/scenario_config_single_vehicle.json"
     );
+
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     if(!sim0.configure()){
         return -1;
     }
 
-    state_test(sim0);
+    ultrasonic_test(sim0);
     
     return 0;
 }

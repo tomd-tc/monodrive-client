@@ -20,7 +20,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     fc_config.listen_port = 8103;
     fc_config.location.z = 200;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = CameraConfig::Resolution(512,512);
+    fc_config.resolution = Resolution(512,512);
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
     IMUConfig imu_config;

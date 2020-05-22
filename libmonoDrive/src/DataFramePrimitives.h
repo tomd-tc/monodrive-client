@@ -44,6 +44,21 @@ struct ObjectState{
     std::vector<OOBB> oobbs;
 };
 
+struct CollisionTarget {
+    Vec3f acceleration;
+    float brake_input;
+    bool collision;
+    float distance;
+    float forward_acceleration;
+    float forward_velocity;
+    std::string name;
+    Vec3f relative_velocity;
+    float throttle_input;
+    float time_to_collision;
+    Vec3f velocity;
+    float wheel_input;
+};
+
 struct VehicleState{
     ObjectState state;
     std::vector<WheelState> wheels;
@@ -132,6 +147,8 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const RadarTarget& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, RadarTarget& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const UltrasonicTarget& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, UltrasonicTarget& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const CollisionTarget& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, CollisionTarget& v);
 
 
 

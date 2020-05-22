@@ -16,11 +16,14 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    GPSConfig g_config;
-    g_config.server_ip = sim0.getServerIp();
-    g_config.server_port = sim0.getServerPort();
-    g_config.listen_port = 8102;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(g_config)));
+
+    CollisionConfig c_config;
+    c_config.server_ip = sim0.getServerIp();
+    c_config.server_port = sim0.getServerPort();
+    c_config.listen_port = 8101;
+    c_config.desired_tags = {"vehicle"};
+    c_config.undesired_tags = {"static"};
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CollisionConfig>(c_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -38,7 +41,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     return sensors;
 }
 
-void state_test(Simulator& sim0){
+void collision_test(Simulator& sim0){
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
     //Get number of steps in scenario and start timer
@@ -57,15 +60,14 @@ void state_test(Simulator& sim0){
     }
 
     sensors[0]->sample_callback = [](DataFrame* frame){
-        auto& gpsFrame = *static_cast<GPSFrame*>(frame);
-        std::cout << gpsFrame.lattitude << " " 
-        << gpsFrame.longitude << " "
-        << gpsFrame.elevation << " "
-        << gpsFrame.yaw << std::endl;
+        auto& collisionFrame = *static_cast<CollisionFrame*>(frame);
+        std::cout << collisionFrame.time << std::endl;
+        for(auto& target : collisionFrame.collision_targets) {
+            std::cout << "Target: " << target.distance << std::endl;
+        }
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
-    int count = 0;
     while(true)
     {	
         sim0.sample_all(sensors);
@@ -83,7 +85,7 @@ int main(int argc, char** argv)
         "config/simulator_no_traffic.json",
         "config/vehicle.json",
         "config/weather.json",
-        "config/scenario_config_single_vehicle.json"
+        "config/scenario_config_multi_vehicle.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
@@ -91,7 +93,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    state_test(sim0);
+    collision_test(sim0);
     
     return 0;
 }
