@@ -16,15 +16,15 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    LidarConfig l_config;
-    l_config.location.x = -10.f;
-    l_config.location.z = 190.f;
-    l_config.horizontal_resolution = 0.4f;
-    l_config.n_lasers = 16;
-    l_config.server_ip = sim0.getServerIp();
-    l_config.server_port = sim0.getServerPort();
-    l_config.listen_port = 8107;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<LidarConfig>(l_config)));
+    SemanticLidarConfig sl_config;
+    sl_config.location.x = -10.f;
+    sl_config.location.z = 190.f;
+    sl_config.horizontal_resolution = 0.4f;
+    sl_config.n_lasers = 16;
+    sl_config.server_ip = sim0.getServerIp();
+    sl_config.server_port = sim0.getServerPort();
+    sl_config.listen_port = 8107;
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<SemanticLidarConfig>(sl_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -42,7 +42,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     return sensors;
 }
 
-void lidar_test(Simulator& sim0){
+void semantic_lidar_test(Simulator& sim0){
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
 
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    lidar_test(sim0);
+    semantic_lidar_test(sim0);
     
     return 0;
 }
