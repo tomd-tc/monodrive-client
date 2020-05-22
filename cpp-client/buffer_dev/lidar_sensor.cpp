@@ -31,7 +31,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     vp_config.server_ip = sim0.getServerIp();
     vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
-    vp_config.resolution = ViewportCameraConfig::Resolution(256,256);
+    vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     // Send configuraitons to the simulator
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "cpp-client/buffer_dev/simulator.json",
+        "config/simulator_no_traffic.json",
         "config/vehicle.json",
         "config/weather.json",
         "config/scenario_config_single_vehicle.json"
