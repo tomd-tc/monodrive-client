@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-add_subdirectory(libmonoDrive)
-add_subdirectory(cpp-client)
+project(monodrive_clients)
+
+add_subdirectory(monodrive)
+add_subdirectory(examples)

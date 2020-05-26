@@ -8,12 +8,10 @@
 
 Configuration::Configuration(
     const fs::path& simulatorConfigPath,
-    const fs::path& vehicleConfigPath,
     const fs::path& weatherConfigPath,
     const fs::path& scenarioConfigPath
 ){
 	simulator = load(simulatorConfigPath);
-    vehicle   = load(vehicleConfigPath);
     weather   = load(weatherConfigPath);
     scenario  = load(scenarioConfigPath);
 }

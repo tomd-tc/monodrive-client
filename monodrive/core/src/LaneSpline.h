@@ -6,9 +6,6 @@
 #include <Eigen/Eigen>
 #include <tuple>
 
-#include "opencv2/highgui.hpp"
-#include "opencv2/flann/miniflann.hpp"
-
 /// this is a stub for future development, full lane spline graph and commands live server side
 /// this is temporary to provide some functionality for demos, will be replaced by lanelet code
 
@@ -21,14 +18,14 @@ public:
     LaneSpline(const nlohmann::json& geoJson);
     void AddLane(const nlohmann::json& lane);
     int GetNearestPoint(const std::string& road, const std::string& lane, const Eigen::VectorXd& point);
-    cv::Mat GetPointsWithinRadius(Eigen::VectorXd& query_point, double radius);
+    // cv::Mat GetPointsWithinRadius(Eigen::VectorXd& query_point, double radius);
     std::map<std::string, std::map<std::string, std::vector<Eigen::VectorXd>>> spline_map;
 private:
     // Member functions
     void ParseLaneSplines(const nlohmann::json& geoJson);
-    void BuildFlannSearch();
+    // void BuildFlannSearch();
     // Data
-    std::map<std::string, std::map<std::string, cv::flann::Index>> spline_query_map;
+    // std::map<std::string, std::map<std::string, cv::flann::Index>> spline_query_map;
 };
 
 int LaneSpline::GetNearestPoint(const std::string& road, const std::string& lane, const Eigen::VectorXd& point){
@@ -82,39 +79,39 @@ void LaneSpline::ParseLaneSplines(const nlohmann::json& geoJson) {
         }
     }
 
-    BuildFlannSearch();
+    // BuildFlannSearch();
 }
 
-void LaneSpline::BuildFlannSearch() 
-{
-    cv::Mat_<float> features(0, 2);
+// void LaneSpline::BuildFlannSearch() 
+// {
+//     cv::Mat_<float> features(0, 2);
 
-    for(auto& road : spline_map) {
-        for(auto& lane : road.second) {
-            for(auto& pt : lane.second) {
-                cv::Mat row = (cv::Mat_<float>(1, 2) << pt.x() , pt.y());
-                features.push_back(row);
-            }
-            cv::flann::Index flann_index(features, cv::flann::KDTreeIndexParams(1));
-            spline_query_map[road.first][lane.first] = flann_index;
-            features = cv::Mat_<int>(0, 2);
-        }
-    }
-}
+//     for(auto& road : spline_map) {
+//         for(auto& lane : road.second) {
+//             for(auto& pt : lane.second) {
+//                 cv::Mat row = (cv::Mat_<float>(1, 2) << pt.x() , pt.y());
+//                 features.push_back(row);
+//             }
+//             cv::flann::Index flann_index(features, cv::flann::KDTreeIndexParams(1));
+//             spline_query_map[road.first][lane.first] = flann_index;
+//             features = cv::Mat_<int>(0, 2);
+//         }
+//     }
+// }
 
-cv::Mat LaneSpline::GetPointsWithinRadius(
-    Eigen::VectorXd& query_point, double radius) {
-  cv::Mat indices, dists;
-  cv::Mat query = (cv::Mat_<float>(1, 2) << query_point.x(), query_point.y());
+// cv::Mat LaneSpline::GetPointsWithinRadius(
+//     Eigen::VectorXd& query_point, double radius) {
+//   cv::Mat indices, dists;
+//   cv::Mat query = (cv::Mat_<float>(1, 2) << query_point.x(), query_point.y());
 
-  for(auto& road : spline_query_map) {
-      for(auto& lane : road.second) {
-          lane.second.radiusSearch(query, indices, dists, radius, 1000);
-      }
-      break;
-  }
+//   for(auto& road : spline_query_map) {
+//       for(auto& lane : road.second) {
+//           lane.second.radiusSearch(query, indices, dists, radius, 1000);
+//       }
+//       break;
+//   }
 
-  return indices;
-}
+//   return indices;
+// }
 
 }

@@ -4,4 +4,4 @@ project(replay_example)
  
 add_executable(${PROJECT_NAME} replay_example.cpp)
 
-target_link_libraries(${PROJECT_NAME} monoDriveClient)
+target_link_libraries(${PROJECT_NAME} monodrive)

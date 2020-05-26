@@ -51,7 +51,6 @@ int main(int argc, char** argv)
     //Read JSON files in cpp_client/config directory
     Configuration config(
         "config/simulator.json",
-        "config/vehicle.json",
         "config/weather.json",
         "config/scenario.json"
     );
@@ -71,7 +70,6 @@ int main(int argc, char** argv)
     //Get number of steps in scenario and start timer
     int nSteps = config.scenario.size();
     int idx = 0;
-    mono::precise_stopwatch stopwatch;
 
     //Step through scenario while reading sensor ouputs
     std::future<bool> stepTask;
@@ -80,10 +78,6 @@ int main(int argc, char** argv)
     {	
         sim0.step_sample_all(sensors, idx, 1);
     }
-    //Calculate FPS
-    auto scenario_time = stopwatch.elapsed_time<unsigned int, std::chrono::microseconds>();
-    auto fps = float(idx+1)/scenario_time*1000000.0;
-    std::cout<< "fps = " + std::to_string(fps) << std::endl;
     
     return 0;
 }

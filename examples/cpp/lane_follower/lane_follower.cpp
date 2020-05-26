@@ -21,14 +21,14 @@ LaneSpline lanespline;
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
     std::vector<std::shared_ptr<Sensor>> sensors;
-    CameraConfig fc_config;// = *(new CameraConfig());
+    CameraConfig fc_config;
     fc_config.server_ip = ip;
     fc_config.listen_port = 8100;
     fc_config.location.z = 200;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = CameraConfig::Resolution(512,512);
+    fc_config.resolution = Resolution(512,512);
 
-    sensors.push_back(std::make_shared<Sensor>(fc_config));
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
@@ -41,7 +41,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     state_config.listen_port = 8101;
     state_config.debug_drawing = true;
     state_config.undesired_tags = {""};
-    sensors.push_back(std::make_shared<Sensor>(state_config));
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));
 
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
@@ -52,6 +52,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 }
 
 void control_vehicle(Simulator& simulator, Sensor &sensor){
+    static_cast<StateFrame*>(sensor.frame);
     std::string json_string(reinterpret_cast<char*>(sensor.recvBuffer.data()), sensor.recvBuffer.size());
     nlohmann::json frames = nlohmann::json::parse(json_string);
 
@@ -107,46 +108,25 @@ int main(int argc, char** argv)
     //Single Simulator Example
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
+    lanespline = LaneSpline(std::string("cpp-client/lane_follower/Straightaway5k.json"));
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "cpp-client/lane_follower/simulator.json",
-        "config/vehicle.json",
+        "config/simulator_no_traffic.json",
         "config/weather.json",
-        "cpp-client/lane_follower/scenario.json");
+        "config/scenario_config_single_vehicle.json");
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
     sim0.configure();
-    lanespline = LaneSpline("cpp-client/lane_follower/Straightaway5k.json");
 
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
-    
-    //Get number of steps in scenario and start timer
-    int nSteps = config.scenario.size();
 
-    /// initialize the vehicle, the first control command spawns the vehicle
-    sim0.send_command(ApiMessage(123, EgoControl_ID, true, 
-        {   {"forward_amount", 0.5}, 
-            {"right_amount", 0.0},
-            {"brake_amount", 0.0},
-            {"drive_mode", 1}
-        }));
-    //Step through scenario while reading sensor ouputs
-    std::future<bool> task;
+    for(auto& sensor : sensors){
+        sensor->StartSampleLoop();
+    }
     while(true){
-        task = std::async([&sim0](){
-            return sim0.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
-        });
-        //sample all sensors
-        for(auto& sensor : sensors){
-            sensor->sample();
-        }
-        if(!task.get()){
-            break;
-        }
-        else{
-            control_vehicle(sim0, *sensors[1]);
-        }
+        sim0.sample_all(sensors);
+        control_vehicle(sim0, *sensors[1]);
     }
     
     return 0;
