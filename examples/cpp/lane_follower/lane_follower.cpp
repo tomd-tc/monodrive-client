@@ -108,7 +108,7 @@ int main(int argc, char** argv)
     //Single Simulator Example
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
-    lanespline = LaneSpline(std::string("cpp-client/lane_follower/Straightaway5k.json"));
+    lanespline = LaneSpline(std::string("examples/cpp/lane_follower/Straightaway5k.json"));
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
