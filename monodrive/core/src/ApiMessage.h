@@ -16,8 +16,7 @@
 #pragma push_macro("TEXT")
 #undef TEXT
 #pragma warning( push )
-#pragma warning( disable: 4668 4191) 
-
+#pragma warning( disable: 4668 4191 4834) 
 #include <boost/asio.hpp>
 #undef UpdateResource
 #undef DeleteFile

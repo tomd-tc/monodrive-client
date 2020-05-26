@@ -6,6 +6,9 @@
 #include <Eigen/Eigen>
 #include <tuple>
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 /// this is a stub for future development, full lane spline graph and commands live server side
 /// this is temporary to provide some functionality for demos, will be replaced by lanelet code
 
@@ -58,6 +61,7 @@ void LaneSpline::AddLane(const nlohmann::json& lane){
 }
 
 LaneSpline::LaneSpline(const std::string& geoJsonFile){
+    std::cout << fs::current_path() << std::endl;
     std::ifstream jsonFile(geoJsonFile);
     nlohmann::json geoJson;
     jsonFile >> geoJson;
