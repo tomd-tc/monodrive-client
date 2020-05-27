@@ -61,7 +61,7 @@ void LaneSpline::AddLane(const nlohmann::json& lane){
 }
 
 LaneSpline::LaneSpline(const std::string& geoJsonFile){
-    std::cout << fs::current_path() << std::endl;
+    std::cout << fs::current_path() << " " << geoJsonFile << std::endl;
     std::ifstream jsonFile(geoJsonFile);
     nlohmann::json geoJson;
     jsonFile >> geoJson;
@@ -73,7 +73,7 @@ LaneSpline::LaneSpline(const nlohmann::json& geoJson) {
 }
 
 void LaneSpline::ParseLaneSplines(const nlohmann::json& geoJson) {
-    auto& features = geoJson["features"];
+    auto& features = geoJson["map"]["features"];
     for(auto& feature : features){
         if(feature["properties"]["feature_type"] == "road"){
             continue;

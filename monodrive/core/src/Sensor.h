@@ -5,7 +5,6 @@
 #include <thread>
 #include <exception>
 
-#include "boost/asio.hpp"
 #include "json.hpp"
 
 #include "Buffer.h"

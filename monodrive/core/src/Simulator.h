@@ -7,8 +7,6 @@
 #include <vector>
 
 #include "Sensor.h"
-//#include "mono_ex.h"
-#include "boost/asio.hpp"
 #include "Configuration.h"
 #include "command_config.h"
 #include "ApiMessage.h"

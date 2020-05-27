@@ -52,30 +52,31 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 }
 
 void control_vehicle(Simulator& simulator, Sensor &sensor){
-    static_cast<StateFrame*>(sensor.frame);
-    std::string json_string(reinterpret_cast<char*>(sensor.recvBuffer.data()), sensor.recvBuffer.size());
-    nlohmann::json frames = nlohmann::json::parse(json_string);
+    auto frame = static_cast<StateFrame*>(sensor.frame);
 
-    nlohmann::json vehicle_frame;
-    nlohmann::json stop_sign_frame;
-    for(auto& f : frames["frame"]){
-        for(auto& tag : f["tags"]){
+    VehicleState* vehicle_frame = nullptr;
+    for(auto& vehicle : frame->vehicles){
+        for(auto& tag : vehicle.state.tags){
             if(tag == "ego"){
-                vehicle_frame = f;
+                vehicle_frame = &vehicle;
                 break;
             }
         }
     }
+    if(vehicle_frame == nullptr){
+        throw std::runtime_error("Error, No ego was detected in tags.");
+    }
 
     Eigen::VectorXd position(3);
-    position << vehicle_frame["position"][0].get<double>(),
-        vehicle_frame["position"][1].get<double>(),
-        vehicle_frame["position"][2].get<double>();
+    position << vehicle_frame->state.odometry.pose.position.x,
+        vehicle_frame->state.odometry.pose.position.y,
+        vehicle_frame->state.odometry.pose.position.z;
     Eigen::Quaternion<double> orientation(
-        vehicle_frame["orientation"][3].get<float>(),
-        vehicle_frame["orientation"][0].get<float>(),
-        vehicle_frame["orientation"][1].get<float>(),
-        vehicle_frame["orientation"][2].get<float>());
+        vehicle_frame->state.odometry.pose.orientation.w,
+        vehicle_frame->state.odometry.pose.orientation.x,
+        vehicle_frame->state.odometry.pose.orientation.y,
+        vehicle_frame->state.odometry.pose.orientation.z
+    );
     auto nearestIndex = lanespline.GetNearestPoint("road_0", "lane_2", position);
     auto& lane_points = lanespline.spline_map["road_0"]["lane_2"];
     int nextPointIndex = nearestIndex;
@@ -112,7 +113,7 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "config/simulator_no_traffic.json",
+        "examples/cpp/lane_follower/simulator_no_traffic.json",
         "config/weather.json",
         "config/scenario_config_single_vehicle.json");
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);

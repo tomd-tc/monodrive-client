@@ -4,6 +4,13 @@
   "server_port": 8999,
   "client_ip": "127.0.0.1",
   "map": "Straightaway5k",
+  "ego_config":{
+    "vehicle_dynamics": "physx",
+    "body":{
+      "type": "Blueprint'/Game/Vehicles/crossover_monoDrive_01.crossover_monoDrive_01_C'",
+      "color": "CarPaint_White.CarPaint_White"
+    }
+  },
   "simulation_mode": 0,
   "phys_materials": {
     "Aluminum": {
