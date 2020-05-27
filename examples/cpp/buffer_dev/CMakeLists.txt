@@ -34,9 +34,7 @@ target_link_libraries(semantic_lidar_sensor monodrive)
 target_link_libraries(ultrasonic_sensor monodrive)
 target_link_libraries(collision_sensor monodrive)
 
-find_package(Eigen3 REQUIRED PATHS "C:/local/Eigen/build" "C:/Eigen/build")
 include_directories(${EIGEN3_INCLUDE_DIR})
-# target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
 
 find_package(OpenCV REQUIRED PATHS "C:/local/opencv/build" "C:/opencv/build")
 include_directories(${OpenCV_INCLUDE_DIRS})
