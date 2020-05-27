@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     }
     
     //Get number of steps in scenario and start timer
-    int nSteps = config.scenario.size();
+    int nSteps = (int)config.scenario.size();
     int idx = 0;
 
     //Step through scenario while reading sensor ouputs

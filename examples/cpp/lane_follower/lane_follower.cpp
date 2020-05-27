@@ -3,6 +3,7 @@
 #include <thread>         // std::thread
 #include <memory>
 #include <vector>
+#include <future>
 
 //monoDrive Includes
 #include "Simulator.h"
@@ -11,7 +12,6 @@
 #include "sensor_config.h"
 #include "Stopwatch.h"
 #include "LaneSpline.h"
-#include <future>
 #include "DataFrame.h"
 
 using namespace lane_spline;
@@ -81,7 +81,7 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
     auto& lane_points = lanespline.spline_map["road_0"]["lane_2"];
     int nextPointIndex = nearestIndex;
     if(nearestIndex >= lane_points.size()-4){
-        nextPointIndex = lane_points.size()-1;
+        nextPointIndex = (int)lane_points.size() - 1;
     }
     else{
         nextPointIndex += 3;
