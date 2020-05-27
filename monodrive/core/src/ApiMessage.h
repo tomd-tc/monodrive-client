@@ -17,6 +17,7 @@
 #undef TEXT
 #pragma warning( push )
 #pragma warning( disable: 4668 4191 4834 4267) 
+#include "targetver.h"
 #include <boost/asio.hpp>
 #undef UpdateResource
 #undef DeleteFile
