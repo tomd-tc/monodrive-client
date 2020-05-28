@@ -87,7 +87,7 @@ bool Sensor::StartSampleLoop()
 				if(frame->parse_complete()){
 					// mono::precise_stopwatch watch2;
 					if(sample_callback) {
-							sample_callback(frame);
+						sample_callback(frame);
 					}
 					//std::cout << name << " callback: " << watch2.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 					sampleInProgress.store(false, std::memory_order::memory_order_relaxed);

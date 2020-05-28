@@ -72,7 +72,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     return sensors;
 }
 
-void control_callback(DataFrame* dataFrame){
+ EgoControlConfig planning(DataFrame* dataFrame){
     auto& frame = *static_cast<StateFrame*>(dataFrame);
 
     VehicleState* vehicle_frame = nullptr;
@@ -86,7 +86,7 @@ void control_callback(DataFrame* dataFrame){
     }
     if(vehicle_frame == nullptr){
         std::cout << "No ego vehicle in frame." << std::endl;
-        return;
+        return EgoControlConfig();
     }
 
     Eigen::VectorXd position(3);
@@ -116,15 +116,13 @@ void control_callback(DataFrame* dataFrame){
     dirToNextPoint.normalize();
 
     double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
-    
-    nlohmann::json msg;
-    msg["forward_amount"] = 0.75;
-    msg["brake_amount"] = 0.0f;
-    msg["drive_mode"] = 1;
-    msg["right_amount"] = angle;
 
-    Simulator& sim0 = Simulator::getInstance(server0_ip, server_port);
-    sim0.send_command(ApiMessage(777, EgoControl_ID, true, msg));
+    EgoControlConfig egoControl;
+    egoControl.forward_amount = 0.75;
+    egoControl.brake_amount = 0.0;
+    egoControl.drive_mode = 1;
+    egoControl.right_amount = angle;
+    return egoControl;
 }
 
 void run_loop(Simulator& sim0){
@@ -135,6 +133,8 @@ void run_loop(Simulator& sim0){
         sensor->StartSampleLoop();
     }
 
+    // Can register callbacks for sensors which trigger on the sensors thread
+    // during sampling 
     sensors[0]->sample_callback = [](DataFrame* frame) {
       auto camFrame = static_cast<CameraFrame*>(frame);
       auto imFrame = camFrame->imageFrame;
@@ -157,13 +157,16 @@ void run_loop(Simulator& sim0){
       cv::waitKey(1);
     };
 
-    sensors[1]->sample_callback = control_callback;
-
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
     {	
         sim0.send_command(ApiMessage(1234, ClosedLoopStepCommand_ID, true, {}));
+        // perception
         sim0.sample_all(sensors);
+        // planning
+        EgoControlConfig egoControl = planning(sensors[1]->frame);
+        // control
+        sim0.send_command(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
     }
 }
 
