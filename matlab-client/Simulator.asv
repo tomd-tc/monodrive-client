@@ -69,11 +69,11 @@ classdef Simulator < handle
 
        function response = configure_scenario(obj)
             command = obj.ID_CLOSED_LOOP_CONFIG_COMMAND;
-            config.vehicles = {obj.scenario_config.vehicles};
+            config.frame = obj.scenario_config;
             %response = obj.send_message(command, config);
              msg = struct(...
             'type', command,... 
-            'message', {config},...
+            'message', {{config}},...
             'reference', randi(1000));
             disp(msg)
             data_length = uint32(length(jsonencode(msg)) + 8);

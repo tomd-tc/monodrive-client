@@ -19,7 +19,7 @@ classdef Camera < Sensor
 
     methods(Access = protected)
         function setupImpl(obj)
-            % Setup super class then             
+            % Setup super class             
             setupImpl@Sensor(obj);
             obj.width = obj.config.stream_dimensions.x;
             obj.height = obj.config.stream_dimensions.y;

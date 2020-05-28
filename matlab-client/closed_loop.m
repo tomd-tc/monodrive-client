@@ -16,5 +16,7 @@ vp_cam.setup();
 for n = 1:100
        vehicle.step(0.0,0.0,0.0);
        mono.sample_sensors();
+       pause(.1)
        cam.step();
+       
 end
