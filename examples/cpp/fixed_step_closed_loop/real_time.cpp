@@ -11,38 +11,59 @@
 #include "Sensor.h"
 #include "sensor_config.h"
 #include "Stopwatch.h"
+
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+
 #include "LaneSpline.h"
 #include "DataFrame.h"
 
 using namespace lane_spline;
 
-LaneSpline lanespline;
+LaneSpline lanespline = LaneSpline(std::string("examples/cpp/lane_follower/Straightaway5k.json"));
 
-std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
+#define IMG_WIDTH 1920
+#define IMG_HEIGHT 1080
+
+//Single Simulator Example
+std::string server0_ip = "127.0.0.1";
+int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
+
+std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
+    // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
     CameraConfig fc_config;
-    fc_config.server_ip = ip;
+    fc_config.server_ip = sim0.getServerIp();
+    fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
-    fc_config.location.z = 200;
+    fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = Resolution(512,512);
-
+    fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
+    fc_config.annotation.include_annotation = true;
+    fc_config.annotation.desired_tags = {"traffic_sign"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
     ViewportCameraConfig vp_config;
-    vp_config.server_ip = ip;
+    vp_config.server_ip = sim0.getServerIp();
+    vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
+    vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
     state_config.desired_tags = {"ego"};
-    state_config.server_ip = ip;
+    state_config.server_ip = sim0.getServerIp();
+    state_config.server_port = sim0.getServerPort();
     state_config.listen_port = 8101;
     state_config.debug_drawing = true;
     state_config.undesired_tags = {""};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));
 
+
+    // Send configuraitons to the simulator
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {
@@ -51,11 +72,11 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     return sensors;
 }
 
-void control_vehicle(Simulator& simulator, Sensor &sensor){
-    auto frame = static_cast<StateFrame*>(sensor.frame);
+void control_callback(DataFrame* dataFrame){
+    auto& frame = *static_cast<StateFrame*>(dataFrame);
 
     VehicleState* vehicle_frame = nullptr;
-    for(auto& vehicle : frame->vehicles){
+    for(auto& vehicle : frame.vehicles){
         for(auto& tag : vehicle.state.tags){
             if(tag == "ego"){
                 vehicle_frame = &vehicle;
@@ -64,7 +85,8 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
         }
     }
     if(vehicle_frame == nullptr){
-        throw std::runtime_error("Error, No ego was detected in tags.");
+        std::cout << "No ego vehicle in frame." << std::endl;
+        return;
     }
 
     Eigen::VectorXd position(3);
@@ -96,39 +118,69 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
     double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
     
     nlohmann::json msg;
-    msg["forward_amount"] = 0.75f;
+    msg["forward_amount"] = 0.65;
     msg["brake_amount"] = 0.0f;
     msg["drive_mode"] = 1;
     msg["right_amount"] = angle;
 
-    simulator.send_command(ApiMessage(777, EgoControl_ID, true, msg));
+    Simulator& sim0 = Simulator::getInstance(server0_ip, server_port);
+    sim0.send_command(ApiMessage(777, EgoControl_ID, true, msg));
 }
 
-int main(int argc, char** argv)
-{
-    //Single Simulator Example
-    std::string server0_ip = "127.0.0.1";
-    int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
-    lanespline = LaneSpline(std::string("examples/cpp/lane_follower/Straightaway5k.json"));
-    
-    //Read JSON files in cpp_client/config directory
-    Configuration config(
-        "examples/cpp/lane_follower/simulator_no_traffic.json",
-        "config/weather.json",
-        "config/scenario_config_single_vehicle.json");
-    Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
-    sim0.configure();
-
+void run_loop(Simulator& sim0){
     //Setup and Connect Sensors
-    std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
+    std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
 
     for(auto& sensor : sensors){
         sensor->StartSampleLoop();
     }
-    while(true){
+
+    sensors[0]->sample_callback = [](DataFrame* frame) {
+      auto camFrame = static_cast<CameraFrame*>(frame);
+      auto imFrame = camFrame->imageFrame;
+      cv::Mat img;
+      if(imFrame->channels == 4) {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
+                      imFrame->pixels);
+      } else {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
+                      imFrame->pixels);
+        cv::cvtColor(img, img, cv::COLOR_GRAY2BGRA);
+      }
+      for (auto& annotation : camFrame->annotationFrame->annotations) {
+        for (auto& bbox : annotation.second.bounding_boxes_2d)
+          cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)),
+                        cv::Point(int(bbox.xmax), int(bbox.ymax)),
+                        cv::Scalar(0, 0, 255));
+      }
+      cv::imshow("monoDrive", img);
+      cv::waitKey(1);
+    };
+
+    sensors[1]->sample_callback = control_callback;
+
+    std::cout << "Sampling sensor loop" << std::endl;
+    while(true)
+    {	
         sim0.sample_all(sensors);
-        control_vehicle(sim0, *sensors[1]);
     }
+}
+
+int main(int argc, char** argv)
+{
+    //Read JSON files in cpp_client/config directory
+    Configuration config(
+        "examples/cpp/lane_follower/simulator_no_traffic.json",
+        "config/weather.json",
+        "config/scenario_config_multi_vehicle.json"
+    );
+    Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
+
+    if(!sim0.configure()){
+        return -1;
+    }
+
+    run_loop(sim0);
     
     return 0;
 }
