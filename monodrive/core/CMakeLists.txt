@@ -13,7 +13,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 #include boost
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost 1.65 REQUIRED COMPONENTS system PATHS "C:/local/boost_1_73_0/lib64-msvc-14.2/cmake")
+find_package(Boost 1.65 REQUIRED COMPONENTS system)
 if(Boost_Found)
 message("HI I FOUND BOOST")
 endif()
