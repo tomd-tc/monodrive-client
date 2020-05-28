@@ -14,6 +14,8 @@ Collection of monoDrive client software for different languages.
 - [VSCode](https://code.visualstudio.com/)
 - [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.65.1/boost_1_65_1-msvc-14.1-64.exe/download)
     *Note: Use the default install location for cmake to find.*
+- [Eigen](http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2) (optional for examples) *Note: Install this to C:/local/Eigen3*
+- [OpenCV](https://github.com/opencv/opencv/releases/download/4.2.0/opencv-4.2.0-vc14_vc15.exe) (optional for examples)
  
 
 ## Ubuntu 18.04 Prerequisites
