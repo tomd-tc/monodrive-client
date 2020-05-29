@@ -26,5 +26,6 @@
     "min_shutter":  0.000500,
     "max_shutter":  0.001400,
     "sensor_size":  9.07
+    
 }
 ]

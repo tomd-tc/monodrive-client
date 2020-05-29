@@ -6,7 +6,7 @@ classdef CameraSensor < Sensor
 
     % Public, tunable properties
     properties
-        config_path = '../configurations/camera.json'
+        config_path = 'configurations/camera.json'
     end
 
     % Pre-computed constants
@@ -21,7 +21,7 @@ classdef CameraSensor < Sensor
 
         
         function setupImpl(obj)
-            % Setup super class then             
+            % Setup super class             
             setupImpl@Sensor(obj);
             obj.width = obj.config.stream_dimensions.x;
             obj.height = obj.config.stream_dimensions.y;
