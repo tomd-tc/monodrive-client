@@ -91,7 +91,9 @@ bool Simulator::configure()
 	std::cout << "Send Simulator Config:   success = ";
 	std::cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
-	if(config.simulator.value("simulation_mode", 0) == 0) {
+	int simulation_mode = 0;
+	json_get(config.simulator, "simulation_mode", simulation_mode);
+	if(simulation_mode == 0 or simulation_mode == 3) {
 		std::cout << "Send Closed Loop Config:    success = ";
 		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
 	} else {

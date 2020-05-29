@@ -181,7 +181,7 @@ int main(int argc, char** argv)
 {
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/cpp/lane_follower/simulator_no_traffic.json",
+        "examples/cpp/fixed_step_closed_loop/simulator_no_traffic.json",
         "config/weather.json",
         "config/scenario_config_multi_vehicle.json"
     );
