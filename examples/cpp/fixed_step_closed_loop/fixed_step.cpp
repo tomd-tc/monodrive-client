@@ -72,7 +72,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     return sensors;
 }
 
- EgoControlConfig planning(DataFrame* dataFrame){
+EgoControlConfig planning(DataFrame* dataFrame){
     auto& frame = *static_cast<StateFrame*>(dataFrame);
 
     VehicleState* vehicle_frame = nullptr;
@@ -121,7 +121,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     egoControl.forward_amount = 0.75;
     egoControl.brake_amount = 0.0;
     egoControl.drive_mode = 1;
-    egoControl.right_amount = angle;
+    egoControl.right_amount = (float)angle;
     return egoControl;
 }
 
@@ -129,6 +129,7 @@ void run_loop(Simulator& sim0){
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim0);
 
+    // start sensor sample loops so they are ready to receive data from the simulator
     for(auto& sensor : sensors){
         sensor->StartSampleLoop();
     }
@@ -160,12 +161,18 @@ void run_loop(Simulator& sim0){
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
     {	
-        sim0.send_command(ApiMessage(1234, ClosedLoopStepCommand_ID, true, {}));
+        // step the simulation one simulation frame
+        ClosedLoopStepCommandConfig stepCommand;
+        stepCommand.time_step = 0.01;
+        sim0.send_command(ApiMessage(1234, ClosedLoopStepCommand_ID, true, stepCommand.dump()));
         // perception
+        // tell simulator to send all sensor data frames to client sensors
         sim0.sample_all(sensors);
         // planning
+        // besides callbacks can always access the latest data frame on the sensor
         EgoControlConfig egoControl = planning(sensors[1]->frame);
         // control
+        // send ego control message calculated from our planning and control
         sim0.send_command(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
     }
 }
@@ -180,10 +187,12 @@ int main(int argc, char** argv)
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
+    // configure the simulator with scenario, weather, and environment information
     if(!sim0.configure()){
         return -1;
     }
 
+    // start our main perception planning and control loop
     run_loop(sim0);
     
     return 0;
