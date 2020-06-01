@@ -19,6 +19,7 @@ add_executable(occupancy_grid_sensor occupancy_grid_sensor.cpp)
 add_executable(semantic_lidar_sensor semantic_lidar_sensor.cpp)
 add_executable(ultrasonic_sensor ultrasonic_sensor.cpp)
 add_executable(collision_sensor collision_sensor.cpp)
+add_executable(replay_dev replay.cpp)
 
 target_link_libraries(camera_sensor monodrive)
 target_link_libraries(state_sensor monodrive)
@@ -33,6 +34,7 @@ target_link_libraries(occupancy_grid_sensor monodrive)
 target_link_libraries(semantic_lidar_sensor monodrive)
 target_link_libraries(ultrasonic_sensor monodrive)
 target_link_libraries(collision_sensor monodrive)
+target_link_libraries(replay_dev monodrive)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 
@@ -58,3 +60,7 @@ target_link_libraries(scenario_file ${OpenCV_LIBRARIES})
 target_include_directories(occupancy_grid_sensor PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(occupancy_grid_sensor ${OpenCV_LIBRARIES})
 target_link_libraries(occupancy_grid_sensor ${OpenCV_LIBRARIES})
+
+target_include_directories(replay_dev PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(replay_dev ${OpenCV_LIBRARIES})
+target_link_libraries(replay_dev ${OpenCV_LIBRARIES})

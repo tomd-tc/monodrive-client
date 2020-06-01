@@ -12,14 +12,21 @@
 #include "sensor_config.h"
 #include "Stopwatch.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 {
     std::vector<std::shared_ptr<Sensor>> sensors;
     CameraConfig fc_config;// = *(new CameraConfig());
     fc_config.server_ip = ip;
     fc_config.listen_port = 8103;
-    fc_config.location.z = 200;
-    fc_config.rotation.pitch = -5;
+    fc_config.location.z = 400;
+    fc_config.location.y = 500;
+    fc_config.rotation.yaw = -90;
+    fc_config.rotation.pitch = -45;
     fc_config.resolution = Resolution(1920,1080);
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
@@ -30,8 +37,10 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = ip;
-    vp_config.location.x = -750;
     vp_config.location.z = 400;
+    vp_config.location.y = 500;
+    vp_config.rotation.yaw = -90;
+    vp_config.rotation.pitch = -45;
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
 
@@ -63,6 +72,29 @@ int main(int argc, char** argv)
 
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
+
+    sensors[0]->sample_callback = [](DataFrame* frame) {
+      auto camFrame = static_cast<CameraFrame*>(frame);
+      auto imFrame = camFrame->imageFrame;
+      cv::Mat img;
+      if(imFrame->channels == 4) {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
+                      imFrame->pixels);
+      } else {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
+                      imFrame->pixels);
+        cv::cvtColor(img, img, cv::COLOR_GRAY2BGRA);
+      }
+      for (auto& annotation : camFrame->annotationFrame->annotations) {
+        for (auto& bbox : annotation.second.bounding_boxes_2d)
+          cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)),
+                        cv::Point(int(bbox.xmax), int(bbox.ymax)),
+                        cv::Scalar(0, 0, 255));
+      }
+      cv::imshow("monoDrive", img);
+      cv::waitKey(1);
+      std::this_thread::sleep_for(std::chrono::seconds(5));
+    };
 
     for(auto& sensor : sensors){
         sensor->StartSampleLoop();

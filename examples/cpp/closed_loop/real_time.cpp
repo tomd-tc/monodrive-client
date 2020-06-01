@@ -160,12 +160,14 @@ void run_loop(Simulator& sim0){
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
     {	
+        mono::precise_stopwatch watch;
         // perception
         sim0.sample_all(sensors);
         // planning
         EgoControlConfig egoControl = planning(sensors[1]->frame);
         // control
         sim0.send_command(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
+        std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
     }
 }
 
@@ -173,7 +175,7 @@ int main(int argc, char** argv)
 {
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/cpp/lane_follower/simulator_no_traffic.json",
+        "examples/cpp/closed_loop/simulator_no_traffic.json",
         "config/weather.json",
         "config/scenario_config_multi_vehicle.json"
     );
