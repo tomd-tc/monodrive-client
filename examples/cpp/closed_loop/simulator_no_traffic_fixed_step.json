@@ -3,7 +3,7 @@
   "server_ip": "127.0.0.1",
   "server_port": 8999,
   "client_ip": "127.0.0.1",
-  "map": "Straightaway5k",
+  "map": "Almono",
   "ego_config":{
     "vehicle_dynamics": "physx",
     "body":{
@@ -11,7 +11,8 @@
       "color": "CarPaint_White.CarPaint_White"
     }
   },
-  "simulation_mode": 0,
+  "simulation_mode": 3,
+  "time_step": 0.01,
   "phys_materials": {
     "Aluminum": {
       "specular_exponent": 15.0,

@@ -163,7 +163,7 @@ void run_loop(Simulator& sim0){
     {	
         // step the simulation one simulation frame
         ClosedLoopStepCommandConfig stepCommand;
-        stepCommand.time_step = 0.01;
+        stepCommand.time_step = 0.01f;
         sim0.send_command(ApiMessage(1234, ClosedLoopStepCommand_ID, true, stepCommand.dump()));
         // perception
         // tell simulator to send all sensor data frames to client sensors

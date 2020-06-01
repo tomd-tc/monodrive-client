@@ -113,7 +113,7 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/cpp/lane_follower/simulator_no_traffic.json",
+        "config/simulator_no_traffic.json",
         "config/weather.json",
         "config/scenario_config_single_vehicle.json");
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);

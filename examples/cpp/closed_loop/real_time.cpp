@@ -121,7 +121,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     egoControl.forward_amount = 0.75;
     egoControl.brake_amount = 0.0;
     egoControl.drive_mode = 1;
-    egoControl.right_amount = angle;
+    egoControl.right_amount = (float)angle;
     return egoControl;
 }
 
