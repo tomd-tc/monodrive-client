@@ -11,7 +11,7 @@ ByteBuffer UltrasonicTargetListFrame::write() const{
     };
     ByteBuffer buffer = ByteBuffer::JsonToBuffer(frame);
     write_mono_header(buffer);
-    return ByteBuffer::JsonToBuffer(frame);
+    return buffer;
 }
 
 void UltrasonicTargetListFrame::parse(ByteBuffer& buffer){
@@ -29,9 +29,11 @@ ByteBuffer UltrasonicRawFrame::write() const{
 
 void UltrasonicFrame::parse(ByteBuffer& buffer){
     if(bSendUltrasonicRaw and currentFrameIndex % 2 == 1){
+        ultrasonicRawFrame->parse_header(buffer);
         ultrasonicRawFrame->parse(buffer);
     }
     else{
+        ultrasonicTargetListFrame->parse_header(buffer);
         ultrasonicTargetListFrame->parse(buffer);
     }
     currentFrameIndex++;
@@ -43,7 +45,7 @@ void UltrasonicRawFrame::parse(ByteBuffer& buffer){
 }
 
 ByteBuffer UltrasonicFrame::write() const{
-    throw std::runtime_error("Not implemented");
+    throw std::runtime_error("Not implemented. Use its member frames.");
     return ByteBuffer();
 }
 
@@ -78,16 +80,18 @@ void RadarCubeFrame::parse(ByteBuffer& buffer){
 
 void RadarFrame::parse(ByteBuffer& buffer){
     if(bSendRadarCube and currentFrameIndex % 2 == 1){
+        radarCubeFrame->parse_header(buffer);
         radarCubeFrame->parse(buffer);
     }
     else{
+        radarTargetListFrame->parse_header(buffer);
         radarTargetListFrame->parse(buffer);
     }
     currentFrameIndex++;
 }
 
 ByteBuffer RadarFrame::write() const{
-    throw std::runtime_error("Not implemented");
+    throw std::runtime_error("Not implemented. Use its member frames.");
     return ByteBuffer();
 };
 
@@ -248,28 +252,31 @@ ByteBuffer CameraAnnotationFrame::write() const {
 	}
     ByteBuffer buffer = ByteBuffer::JsonToBuffer(j);
     write_mono_header(buffer);
-	return ByteBuffer::JsonToBuffer(j);
+	return buffer;
 }
 
 ByteBuffer CameraFrame::write() const{
-    throw std::runtime_error("Not implemented");
+    throw std::runtime_error("Not implemented. Use it's member frames.");
     return ByteBuffer();
 }
 
 void CameraFrame::parse(ByteBuffer& buffer){
     if(!bHasAnnotation or currentFrameIndex % 2 == 0){
+        buffer.reset();
+        imageFrame->parse_header(buffer);
         imageFrame->parse(buffer);
     }
     else{
+        buffer.reset();
+        annotationFrame->parse_header(buffer);
         annotationFrame->parse(buffer);
     }
     currentFrameIndex++;
 }
 
 ByteBuffer LidarFrame::write() const {
-    ByteBuffer buffer(sizeof(LidarPacket)*packets.size());
+    ByteBuffer buffer(sizeof(LidarPacket)*packets.size(), DATA_FRAME_HEADER_SIZE);
     buffer.write((uint8_t*)packets.data(), sizeof(LidarPacket) * packets.size());
-	buffer.reset();
     write_mono_header(buffer);
     return buffer;
 }
@@ -280,3 +287,16 @@ void LidarFrame::parse(ByteBuffer& buffer){
         packetIndex = 0;
 }
 
+
+void RPMFrame::parse(ByteBuffer& buffer){
+    wheel_number = buffer.readInt();
+    speed = buffer.readFloat();
+}
+
+ByteBuffer RPMFrame::write() const {
+    ByteBuffer buffer(4, DATA_FRAME_HEADER_SIZE);
+    buffer.writeInt(wheel_number);
+    buffer.writeFloat(speed);
+    write_mono_header(buffer);
+    return buffer;
+}

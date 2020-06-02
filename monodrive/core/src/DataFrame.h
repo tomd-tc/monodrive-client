@@ -279,3 +279,13 @@ public:
     bool bSendUltrasonicRaw;
     int currentFrameIndex;
 };
+
+class MONODRIVECORE_API RPMFrame : public DataFrame{
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+    RPMFrame(int wheel_number) : wheel_number(wheel_number){
+    }
+    uint32_t wheel_number;
+    float speed;
+};
