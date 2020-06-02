@@ -1,5 +1,6 @@
-[
-  {
+{
+  "vehicles": [
+    {
     "body_color": "Carpaint_White",
     "class_path": "/Game/Vehicles/subcompact_monoDrive_01.subcompact_monoDrive_01_C",
     "delayed_start": 0.0,
@@ -41,5 +42,6 @@
       "ego"
     ],
     "type": "subcompact_monoDrive_01_C"
-  }
-]
+    }
+  ]
+}

@@ -36,7 +36,6 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
 
     ViewportCameraConfig vp_config;
-    vp_config.server_ip = ip;
     vp_config.location.z = 400;
     vp_config.location.y = 500;
     vp_config.rotation.yaw = -90;
@@ -93,7 +92,7 @@ int main(int argc, char** argv)
       }
       cv::imshow("monoDrive", img);
       cv::waitKey(1);
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
     };
 
     for(auto& sensor : sensors){
