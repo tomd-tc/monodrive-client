@@ -12,7 +12,6 @@
     }
   },
   "simulation_mode": 0,
-  "time_step": 0.01,
   "phys_materials": {
     "Aluminum": {
       "specular_exponent": 15.0,

@@ -12,6 +12,22 @@ class DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) = 0;
     virtual ByteBuffer write() const = 0;
+    uint32_t wall_time;
+    float game_time;
+    uint32_t sample_count;
+    inline void parse_header(ByteBuffer& buffer){
+        buffer.reset(4);
+        wall_time = buffer.readInt();
+        game_time = buffer.readFloat();
+        sample_count = buffer.readInt();
+    }
+    inline void write_mono_header(ByteBuffer& buffer) const{
+        buffer.reset(0);
+        buffer.writeInt(buffer.length());
+        buffer.writeInt(wall_time);
+        buffer.writeFloat(game_time);
+		buffer.writeInt(sample_count);
+    }
     virtual bool parse_complete() const{
         return true;
     } 

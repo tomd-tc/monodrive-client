@@ -93,7 +93,7 @@ int main(int argc, char** argv)
       }
       cv::imshow("monoDrive", img);
       cv::waitKey(1);
-      std::this_thread::sleep_for(std::chrono::seconds(5));
+      std::this_thread::sleep_for(std::chrono::seconds(1));
     };
 
     for(auto& sensor : sensors){

@@ -27,19 +27,19 @@ public:
 		auto ipaddress = boost::asio::ip::address::from_string(ip);
 		server_endpoint = boost::asio::ip::tcp::endpoint(ipaddress, port);
 	}
-    //Connection(boost::asio::io_service& io_service) : socket(io_service) {}
+
 	bool read_sensor_packet(ByteBuffer& buffer)
 	{
-		auto header_length = 12;
+		auto header_length = DATA_FRAME_HEADER_SIZE;
 		boost::asio::read(socket, boost::asio::buffer(buffer.data(), buffer.available()));
 		auto packet_size = buffer.readInt();
 		auto time = buffer.readInt();
 		auto gameTime = buffer.readInt();
+		auto sampleCount = buffer.readInt();
 		auto payloadSize = packet_size - header_length;
 
 		if (payloadSize > 0)
 		{
-			// std::cout<< "received:" << std::to_string(payloadSize) << " bytes" << std::endl;
 			buffer.grow(payloadSize);
 			boost::asio::read(socket, boost::asio::buffer(buffer.data(), buffer.available()));
 		}
@@ -47,6 +47,7 @@ public:
 		{
 			std::cout << "NO DATA AVAILABLE" << std::endl;
 		}
+		buffer.reset(0);
 		return true;
 	}
 

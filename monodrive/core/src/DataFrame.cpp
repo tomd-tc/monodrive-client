@@ -9,6 +9,8 @@ ByteBuffer UltrasonicTargetListFrame::write() const{
     nlohmann::json frame = {
         {"targets", targets}
     };
+    ByteBuffer buffer = ByteBuffer::JsonToBuffer(frame);
+    write_mono_header(buffer);
     return ByteBuffer::JsonToBuffer(frame);
 }
 
@@ -18,9 +20,10 @@ void UltrasonicTargetListFrame::parse(ByteBuffer& buffer){
 }
 
 ByteBuffer UltrasonicRawFrame::write() const{
-    ByteBuffer buffer(ultrasonic_raw.size()*sizeof(float), 12);
+    ByteBuffer buffer(ultrasonic_raw.size()*sizeof(float), DATA_FRAME_HEADER_SIZE);
     auto buffer_data = reinterpret_cast<float*>(buffer.data());
     std::copy(ultrasonic_raw.data(), ultrasonic_raw.data()+ultrasonic_raw.size(), buffer_data);
+    write_mono_header(buffer);
     return buffer;
 }
 
@@ -55,13 +58,16 @@ ByteBuffer RadarTargetListFrame::write() const{
         {"target_list", targets},
         {"gt_targets", gt_targets}
     };
-    return ByteBuffer::JsonToBuffer(frame);
+    ByteBuffer buffer = ByteBuffer::JsonToBuffer(frame);
+    write_mono_header(buffer);
+    return buffer;
 }
 
 ByteBuffer RadarCubeFrame::write() const{
-    ByteBuffer buffer(size()*sizeof(std::complex<float>), 12);
+    ByteBuffer buffer(size()*sizeof(std::complex<float>), DATA_FRAME_HEADER_SIZE);
     auto buffer_data = reinterpret_cast<std::complex<float>*>(buffer.data());
     std::copy(radar_cube.data(), radar_cube.data()+size(), buffer_data);
+    write_mono_header(buffer);
     return buffer;
 }
 
@@ -109,7 +115,9 @@ ByteBuffer StateFrame::write() const {
             }
 		}
 	};
-	return ByteBuffer::JsonToBuffer(j);
+    ByteBuffer buffer = ByteBuffer::JsonToBuffer(j);
+    write_mono_header(buffer);
+	return buffer;
 }
 
 void CollisionFrame::parse(ByteBuffer& buffer){
@@ -128,11 +136,13 @@ ByteBuffer CollisionFrame::write() const {
     j["game_time"] = game_time;
     j["sample_count"] = sample_count;
     j["targets"] = collision_targets;
-	return ByteBuffer::JsonToBuffer(j);
+    ByteBuffer buffer = ByteBuffer::JsonToBuffer(j);
+    write_mono_header(buffer);
+	return buffer;
 }
 
 ByteBuffer ImuFrame::write() const{
-    ByteBuffer buffer(IMU_DATA_PACKET_SIZE, 12);
+    ByteBuffer buffer(IMU_DATA_PACKET_SIZE, DATA_FRAME_HEADER_SIZE);
     buffer.write(0xc2);
     buffer.writeFloat(acceleration.x);
     buffer.writeFloat(acceleration.y);
@@ -143,6 +153,7 @@ ByteBuffer ImuFrame::write() const{
     buffer.writeInt(timer);
     buffer.writeShort(checksum);
     buffer.writeInt(time_of_week);
+    write_mono_header(buffer);
     return buffer;
 }
 void ImuFrame::parse(ByteBuffer& buffer){
@@ -183,7 +194,7 @@ void GPSFrame::parse(ByteBuffer& buffer){
 }
 
 ByteBuffer GPSFrame::write() const{
-    ByteBuffer buffer(GPS_DATA_PACKET_SIZE,12);
+    ByteBuffer buffer(GPS_DATA_PACKET_SIZE, DATA_FRAME_HEADER_SIZE);
     buffer.write(preamble);
     buffer.writeShort(MSG_POS_LLH);
     buffer.writeShort(id_hash);
@@ -203,6 +214,7 @@ ByteBuffer GPSFrame::write() const{
     buffer.write(num_sats_signal);
     buffer.write(fixed_mode_status);
     buffer.writeShort(crc);
+    write_mono_header(buffer);
     return buffer;
 }
 
@@ -212,8 +224,9 @@ void ImageFrame::parse(ByteBuffer& buffer){
 }
 
 ByteBuffer ImageFrame::write() const {
-    ByteBuffer buffer(size(), 12); 
+    ByteBuffer buffer(size(), DATA_FRAME_HEADER_SIZE); 
     buffer.write(pixels, size());
+    write_mono_header(buffer);
     return buffer;
 }
 
@@ -233,6 +246,8 @@ ByteBuffer CameraAnnotationFrame::write() const {
 	for (auto& annotation : annotations) {
 		j.push_back(annotation.second);
 	}
+    ByteBuffer buffer = ByteBuffer::JsonToBuffer(j);
+    write_mono_header(buffer);
 	return ByteBuffer::JsonToBuffer(j);
 }
 
@@ -255,6 +270,7 @@ ByteBuffer LidarFrame::write() const {
     ByteBuffer buffer(sizeof(LidarPacket)*packets.size());
     buffer.write((uint8_t*)packets.data(), sizeof(LidarPacket) * packets.size());
 	buffer.reset();
+    write_mono_header(buffer);
     return buffer;
 }
 

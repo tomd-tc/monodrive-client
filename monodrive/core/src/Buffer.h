@@ -9,6 +9,7 @@
 #include <limits.h>
 #include "JsonHelpers.h"
 
+#define DATA_FRAME_HEADER_SIZE 16
 
 class BufferOverrunException : public std::exception {
 public:
@@ -230,9 +231,9 @@ public:
 
 	inline static ByteBuffer JsonToBuffer(const nlohmann::json& frame){
 		std::string raw = frame.dump();
-		ByteBuffer buffer(raw.size(), 12);
+		ByteBuffer buffer(raw.size(), DATA_FRAME_HEADER_SIZE);
 		buffer.write((uint8_t*)raw.c_str(), raw.size());
-		buffer.reset(12);
+		buffer.reset(DATA_FRAME_HEADER_SIZE);
 		
 		return buffer;
 	}

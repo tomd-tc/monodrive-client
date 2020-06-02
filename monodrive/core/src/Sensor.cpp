@@ -106,6 +106,7 @@ bool Sensor::StartSampleLoop()
 bool Sensor::parse(){
 	if(frame == nullptr)
 		return false;
+	frame->parse_header(recvBuffer);
 	frame->parse(recvBuffer);
 	return true;
 }
