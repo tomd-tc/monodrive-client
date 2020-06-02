@@ -12,10 +12,16 @@ Collection of monoDrive client software for different languages.
 - Windows 10
 - Visual Studio 2019 Community Edition
 - [VSCode](https://code.visualstudio.com/)
-- [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.65.1/boost_1_65_1-msvc-14.1-64.exe/download)
-    *Note: Use the default install location for cmake to find.*
-- [Eigen](http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2) (optional for examples) *Note: Install this to C:/local/Eigen3*
-- [OpenCV](https://github.com/opencv/opencv/releases/download/4.2.0/opencv-4.2.0-vc14_vc15.exe) (optional for examples)
+
+### Windows Library Dependencies
+Note: Extract or install these libraries to **C:/local** for cmake can find them.
+
+- [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.65.1/boost_1_65_1-msvc-14.1-64.exe/download) Add `C:\local\boost_1_73_0\lib64-msvc-14.2` to your path.
+
+To build the examples the following are required:
+- [OpenCV](https://github.com/opencv/opencv/releases/download/4.3.0/opencv-4.3.0-vc14_vc15.exe) Extract to `C:\local\opencv` and add `C:\local\opencv\build\x64\vc15\lib` to your path.
+- [Eigen](https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip) Extract to `C:\local\Eigen3` and add `C:\local\Eigen3` to your path.
+
  
 
 ## Ubuntu 18.04 Prerequisites

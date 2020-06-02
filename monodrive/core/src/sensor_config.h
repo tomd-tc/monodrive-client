@@ -17,6 +17,7 @@ class SensorBaseConfig
         std::string type = "None";
         std::string description;
         int listen_port = 0;
+        bool wait_for_fresh_frame = true;
         Location location;
         struct Rotation
         {
@@ -357,7 +358,8 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig& config)
         {"listen_port", config.listen_port},
         {"location", config.location},
         {"rotation", config.rotation},
-        {"ros", config.ros}
+        {"wait_for_fresh_frame", config.wait_for_fresh_frame},
+        {"ros", config.ros},
     };
 };
 void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
@@ -367,6 +369,7 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
     json_get(j, "listen_port", config.listen_port);
     json_get(j, "location", config.location);
     json_get(j, "rotation", config.rotation);
+    json_get(j, "wait_for_fresh_frame", config.wait_for_fresh_frame);
     json_get(j, "ros", config.ros);
 }
 /// End SensorBaseConfig JSON Parsing

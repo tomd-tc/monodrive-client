@@ -12,6 +12,22 @@ class DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) = 0;
     virtual ByteBuffer write() const = 0;
+    uint32_t wall_time;
+    float game_time;
+    uint32_t sample_count;
+    inline void parse_header(ByteBuffer& buffer){
+        buffer.reset(4);
+        wall_time = buffer.readInt();
+        game_time = buffer.readFloat();
+        sample_count = buffer.readInt();
+    }
+    inline void write_mono_header(ByteBuffer& buffer) const{
+        buffer.reset();
+        buffer.writeInt(buffer.length());
+        buffer.writeInt(wall_time);
+        buffer.writeFloat(game_time);
+		buffer.writeInt(sample_count);
+    }
     virtual bool parse_complete() const{
         return true;
     } 
@@ -262,4 +278,14 @@ public:
     UltrasonicRawFrame* ultrasonicRawFrame;
     bool bSendUltrasonicRaw;
     int currentFrameIndex;
+};
+
+class MONODRIVECORE_API RPMFrame : public DataFrame{
+public:
+	virtual void parse(ByteBuffer& buffer) override;
+	virtual ByteBuffer write() const override;
+    RPMFrame(int wheel_number) : wheel_number(wheel_number){
+    }
+    uint32_t wheel_number;
+    float speed;
 };

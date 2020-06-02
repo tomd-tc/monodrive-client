@@ -14,6 +14,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.65 REQUIRED COMPONENTS system)
+if(Boost_Found)
+message("HI I FOUND BOOST")
+endif()
 if(MSVC)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_ALL_NO_LIB)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_PROGRAM_OPTIONS_DYN_LINK)
@@ -21,7 +24,6 @@ else()
 	# not required for msvc
 	target_link_libraries(${PROJECT_NAME} -lstdc++fs)
 endif()
-
 
 include_directories(${Boost_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${Boost_INCLUDE_DIRS})
