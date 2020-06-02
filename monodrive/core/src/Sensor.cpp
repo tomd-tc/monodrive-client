@@ -76,18 +76,18 @@ bool Sensor::StartSampleLoop()
 				return false;
 			recvBuffer.resize(header_length);
 			if(listener->socket.is_open()){
-				mono::precise_stopwatch watch0;
+				// mono::precise_stopwatch watch0;
 				// std::cout << "reading data frame..." << std::endl;
 				listener->read_sensor_packet(recvBuffer);
 				// std::cout << "read success..." << std::endl;
 				// std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
-				mono::precise_stopwatch watch1;
+				// mono::precise_stopwatch watch1;
 				parse();
 				// std::cout << name << " parse: " <<  watch1.elapsed_time<unsigned int, std::chrono::microseconds>() << " (us)" << std::endl;
 				if(frame->parse_complete()){
-					mono::precise_stopwatch watch2;
+					// mono::precise_stopwatch watch2;
 					if(sample_callback) {
-							sample_callback(frame);
+						sample_callback(frame);
 					}
 					//std::cout << name << " callback: " << watch2.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 					sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
@@ -106,6 +106,7 @@ bool Sensor::StartSampleLoop()
 bool Sensor::parse(){
 	if(frame == nullptr)
 		return false;
+	frame->parse_header(recvBuffer);
 	frame->parse(recvBuffer);
 	return true;
 }

@@ -2,9 +2,8 @@
   "id": "simulator_test",
   "server_ip": "127.0.0.1",
   "server_port": 8999,
-  "map": "Almono",
   "client_ip": "127.0.0.1",
-  "simulation_mode": 2,
+  "map": "Straightaway5k",
   "ego_config":{
     "vehicle_dynamics": "physx",
     "body":{
@@ -12,6 +11,8 @@
       "color": "CarPaint_White.CarPaint_White"
     }
   },
+  "simulation_mode": 3,
+  "time_step": 0.01,
   "phys_materials": {
     "Aluminum": {
       "specular_exponent": 15.0,
@@ -92,7 +93,7 @@
     }
   },
   "traffic_configuration": {
-    "max_vehicles": 10,
+    "max_vehicles": 0,
     "spawn_rate": 0.25
   },
   "client_settings": {

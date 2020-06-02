@@ -36,7 +36,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
-    state_config.desired_tags = {"vehicle", "ego"};
+    state_config.desired_tags = {"ego"};
     state_config.server_ip = ip;
     state_config.listen_port = 8101;
     state_config.debug_drawing = true;
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/cpp/lane_follower/simulator_no_traffic.json",
+        "config/simulator_no_traffic.json",
         "config/weather.json",
         "config/scenario_config_single_vehicle.json");
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
