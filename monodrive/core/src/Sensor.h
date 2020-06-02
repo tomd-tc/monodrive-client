@@ -108,6 +108,6 @@ public:
 private:
 	Connection* listener = nullptr;
 	std::string name;
-	enum { header_length = 12 };
+	enum { header_length = DATA_FRAME_HEADER_SIZE };
 };
 

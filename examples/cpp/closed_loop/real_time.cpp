@@ -74,6 +74,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 
  EgoControlConfig planning(DataFrame* dataFrame){
     auto& frame = *static_cast<StateFrame*>(dataFrame);
+    std::cout << "sample, game, wall " << frame.sample_count << " " << frame.game_time << " " << frame.wall_time << std::endl;
 
     VehicleState* vehicle_frame = nullptr;
     for(auto& vehicle : frame.vehicles){

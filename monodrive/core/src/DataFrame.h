@@ -22,7 +22,7 @@ public:
         sample_count = buffer.readInt();
     }
     inline void write_mono_header(ByteBuffer& buffer) const{
-        buffer.reset(0);
+        buffer.reset();
         buffer.writeInt(buffer.length());
         buffer.writeInt(wall_time);
         buffer.writeFloat(game_time);
