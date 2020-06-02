@@ -48,7 +48,7 @@ void lidar_test(Simulator& sim0){
 
     /// initialize the vehicle, the first control command spawns the vehicle
     nlohmann::json ego_command;
-    ego_command["forward_amount"] =  0.1;
+    ego_command["forward_amount"] =  0.0;
     ego_command["right_amount"] =  0.0;
     ego_command["brake_amount"] =  0.0;
     ego_command["drive_mode"] =  1;
