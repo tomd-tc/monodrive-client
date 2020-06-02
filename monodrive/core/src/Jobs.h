@@ -15,7 +15,7 @@ namespace fs = std::experimental::filesystem;
 #define Scenario_FLAG "md_scenario"
 #define Weather_FLAG "md_weather"
 #define Vehicle_FLAG "md_vehicle"
-#define Sensors_FLAG "md_vehicle"
+#define Sensors_FLAG "md_sensors"
 #define Results_FLAG "md_results"
 
 
@@ -25,7 +25,7 @@ class Result
 public:
     bool pass = false;
     std::string message = "";
-    virtual nlohmann::json dump();
+    virtual nlohmann::json dump() const;
 };
 
 // result serialization
@@ -44,4 +44,12 @@ public:
 
 private:
     void parseArguments(int argc, char** argv);
+
+    fs::path assetDirPath;
+    fs::path simulatorPath;
+    fs::path scenarioPath;
+    fs::path weatherPath;
+    fs::path vehiclePath;
+    fs::path sensorsPath;
+    fs::path resultsPath;
 };
