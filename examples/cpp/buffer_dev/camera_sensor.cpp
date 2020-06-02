@@ -101,7 +101,7 @@ void camera_test(Simulator& sim0){
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
     {	
-        sim0.send_command(ApiMessage(1234, ClosedLoopStepCommand_ID, true, {}));
+        // sim0.send_command(ApiMessage(1234, ClosedLoopStepCommand_ID, true, {}));
         sim0.sample_all(sensors);
     }
 }
