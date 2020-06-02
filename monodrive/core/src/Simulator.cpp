@@ -43,26 +43,27 @@ Simulator& Simulator::getInstance(const std::string& inServer_ip, const short& i
 } 
 
 
-Simulator& Simulator::getInstance(const Configuration& inConfig) 
+Simulator& Simulator::getInstance(const Configuration& inConfig)
 {
-		std::lock_guard<std::mutex> simLock(_mutex);
 		std::string ip_address = inConfig.simulator.at("server_ip").get<std::string>();
 		short port = inConfig.simulator.at("server_port").get<short>();
 		return getInstance(inConfig, ip_address, port);
 }
 
-Simulator& Simulator::getInstance(const Configuration& inConfig, 
-											  const std::string& inServer_ip, 
-											  const short& inServer_port) 
- 	{
-		std::lock_guard<std::mutex> simLock(_mutex);
-		const std::string sim_key = inServer_ip +":" + std::to_string(inServer_port);
-		if (sim_map[sim_key] == nullptr) {
-			sim_map[sim_key] = new Simulator(inConfig, inServer_ip, inServer_port);
-			std::cout<<"created new simulator:"<< sim_key << std::endl;
-		}
-		return *sim_map[sim_key];
+Simulator& Simulator::getInstance(
+	const Configuration& inConfig,
+	const std::string& inServer_ip,
+	const short& inServer_port
+)
+{
+	std::lock_guard<std::mutex> simLock(_mutex);
+	const std::string sim_key = inServer_ip +":" + std::to_string(inServer_port);
+	if (sim_map[sim_key] == nullptr) {
+		sim_map[sim_key] = new Simulator(inConfig, inServer_ip, inServer_port);
+		std::cout<<"created new simulator:"<< sim_key << std::endl;
 	}
+	return *sim_map[sim_key];
+}
 
 void Simulator::connect()
 {
@@ -93,16 +94,26 @@ bool Simulator::configure()
 
 	int simulation_mode = 0;
 	json_get(config.simulator, "simulation_mode", simulation_mode);
-	if(simulation_mode == 0 or simulation_mode == 3) {
-		std::cout << "Send Closed Loop Config:    success = ";
-		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
-	} else {
-		std::cout << "Send Scenario Config:    success = ";
-		std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+	if (!config.scenario.empty())
+	{
+		if (simulation_mode == 0 or simulation_mode == 3)
+		{
+			std::cout << "Send Closed Loop Config:    success = ";
+			std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
+		}
+		else
+		{
+			std::cout << "Send Scenario Config:    success = ";
+			std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+		}
 	}
 
-	std::cout << "Send Weather Config:     success = ";
-	std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;	
+	if (!config.weather.empty())
+	{
+		std::cout << "Send Weather Config:     success = ";
+		std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;
+	}
+
 	return true;
 }
 
