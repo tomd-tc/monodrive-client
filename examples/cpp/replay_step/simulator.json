@@ -4,7 +4,7 @@
   "server_port": 8999,
   "map": "Almono",
   "client_ip": "127.0.0.1",
-  "simulation_mode": 1,
+  "simulation_mode": 2,
   "ego_config":{
     "vehicle_dynamics": "physx",
     "body":{
