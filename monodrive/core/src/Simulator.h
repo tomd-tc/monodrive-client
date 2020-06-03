@@ -34,6 +34,7 @@ public:
 	std::thread stepThread(int step_idx, int nsteps) {
           return std::thread(&Simulator::step, this, step_idx, nsteps);
       }
+	bool state_step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state);
 	void step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, int step_idx, int nsteps);
 	void sample_all(std::vector<std::shared_ptr<Sensor>>& sensors);
 	static std::map<const std::string, Simulator*> sim_map;

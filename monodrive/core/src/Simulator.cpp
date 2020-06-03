@@ -127,6 +127,29 @@ bool Simulator::step(int step_idx, int nsteps)
 	return send_command(step_message);
 }
 
+bool Simulator::state_step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state)
+{
+	ApiMessage step_message(333, REPLAY_StateStepSimulationCommand_ID, true, state);	
+	for(auto& sensor : sensors)
+    {
+		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+	}
+	bool success = send_command(step_message);
+	if(!success)
+		return success;
+	bool samplingInProgress = true;
+	do{
+		samplingInProgress = false;
+		for(auto& sensor : sensors){
+			if(sensor->sampleInProgress.load(std::memory_order::memory_order_relaxed)){
+				samplingInProgress = true;
+				break;
+			}
+		}
+	} while(samplingInProgress);
+	return success;
+}
+
 void Simulator::step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, int step_idx, int nsteps)
 {
 	for(auto& sensor : sensors)
