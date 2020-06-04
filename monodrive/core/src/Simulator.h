@@ -37,6 +37,8 @@ public:
 	bool state_step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state);
 	void step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, int step_idx, int nsteps);
 	void sample_all(std::vector<std::shared_ptr<Sensor>>& sensors);
+	bool sendControl(float forward, float right, float brake, int mode);
+
 	static std::map<const std::string, Simulator*> sim_map;
 
 	const std::string& getServerIp() const{return server_ip;}

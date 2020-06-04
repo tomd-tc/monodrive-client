@@ -198,3 +198,13 @@ void Simulator::sample_all(std::vector<std::shared_ptr<Sensor>>& sensors)
 		}
 	} while(samplingInProgress);
 }
+
+bool Simulator::sendControl(float forward, float right, float brake, int mode)
+{
+    nlohmann::json ego_msg;
+    ego_msg["forward_amount"] = forward;
+    ego_msg["right_amount"] = right;
+    ego_msg["brake_amount"] = brake;
+    ego_msg["drive_mode"] = mode;
+    return send_command(ApiMessage(123, EgoControl_ID, true, ego_msg));
+}
