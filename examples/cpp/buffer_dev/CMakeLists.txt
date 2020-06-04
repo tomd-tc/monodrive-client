@@ -22,6 +22,7 @@ add_executable(collision_sensor collision_sensor.cpp)
 add_executable(replay_dev replay.cpp)
 add_executable(sensor_frame_count sensor_frame_count.cpp)
 add_executable(sensor_frame_count_fixed sensor_frame_count_fixed.cpp)
+add_executable(replay_step_dev replay_step.cpp)
 
 target_link_libraries(camera_sensor monodrive)
 target_link_libraries(state_sensor monodrive)
@@ -39,6 +40,7 @@ target_link_libraries(collision_sensor monodrive)
 target_link_libraries(replay_dev monodrive)
 target_link_libraries(sensor_frame_count monodrive)
 target_link_libraries(sensor_frame_count_fixed monodrive)
+target_link_libraries(replay_step_dev monodrive)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 
@@ -76,3 +78,7 @@ target_link_libraries(sensor_frame_count ${OpenCV_LIBRARIES})
 target_include_directories(sensor_frame_count_fixed PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(sensor_frame_count_fixed ${OpenCV_LIBRARIES})
 target_link_libraries(sensor_frame_count_fixed ${OpenCV_LIBRARIES})
+
+target_include_directories(replay_step_dev PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
+target_link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
