@@ -165,9 +165,9 @@ void run_loop(Simulator& sim0){
         // perception
         sim0.sample_all(sensors);
         // planning
-        // EgoControlConfig egoControl = planning(sensors[1]->frame);
+        EgoControlConfig egoControl = planning(sensors[1]->frame);
         // control
-        // sim0.send_command(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
+        sim0.send_command(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
         std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
     }
 }
