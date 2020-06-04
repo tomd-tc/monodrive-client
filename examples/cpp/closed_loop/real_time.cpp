@@ -136,27 +136,27 @@ void run_loop(Simulator& sim0){
 
     // Can register callbacks for sensors which trigger on the sensors thread
     // during sampling 
-    // sensors[0]->sample_callback = [](DataFrame* frame) {
-    //   auto camFrame = static_cast<CameraFrame*>(frame);
-    //   auto imFrame = camFrame->imageFrame;
-    //   cv::Mat img;
-    //   if(imFrame->channels == 4) {
-    //     img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
-    //                   imFrame->pixels);
-    //   } else {
-    //     img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
-    //                   imFrame->pixels);
-    //     cv::cvtColor(img, img, cv::COLOR_GRAY2BGRA);
-    //   }
-    //   for (auto& annotation : camFrame->annotationFrame->annotations) {
-    //     for (auto& bbox : annotation.second.bounding_boxes_2d)
-    //       cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)),
-    //                     cv::Point(int(bbox.xmax), int(bbox.ymax)),
-    //                     cv::Scalar(0, 0, 255));
-    //   }
-    //   cv::imshow("monoDrive", img);
-    //   cv::waitKey(1);
-    // };
+    sensors[0]->sample_callback = [](DataFrame* frame) {
+      auto camFrame = static_cast<CameraFrame*>(frame);
+      auto imFrame = camFrame->imageFrame;
+      cv::Mat img;
+      if(imFrame->channels == 4) {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
+                      imFrame->pixels);
+      } else {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
+                      imFrame->pixels);
+        cv::cvtColor(img, img, cv::COLOR_GRAY2BGRA);
+      }
+      for (auto& annotation : camFrame->annotationFrame->annotations) {
+        for (auto& bbox : annotation.second.bounding_boxes_2d)
+          cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)),
+                        cv::Point(int(bbox.xmax), int(bbox.ymax)),
+                        cv::Scalar(0, 0, 255));
+      }
+      cv::imshow("monoDrive", img);
+      cv::waitKey(1);
+    };
 
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
@@ -165,9 +165,9 @@ void run_loop(Simulator& sim0){
         // perception
         sim0.sample_all(sensors);
         // planning
-        // EgoControlConfig egoControl = planning(sensors[1]->frame);
+        EgoControlConfig egoControl = planning(sensors[1]->frame);
         // control
-        // sim0.send_command(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
+        sim0.send_command(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
         std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
     }
 }

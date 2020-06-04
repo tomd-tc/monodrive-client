@@ -78,7 +78,13 @@ bool Sensor::StartSampleLoop()
 			if(listener->socket.is_open()){
 				// mono::precise_stopwatch watch0;
 				// std::cout << "reading data frame..." << std::endl;
-				listener->read_sensor_packet(recvBuffer);
+				try{
+					listener->read_sensor_packet(recvBuffer);
+				}
+				catch(const std::exception& e){
+					std::cout << e.what() << std::endl;
+					return false;
+				}
 				// std::cout << "read success..." << std::endl;
 				// std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 				// mono::precise_stopwatch watch1;
