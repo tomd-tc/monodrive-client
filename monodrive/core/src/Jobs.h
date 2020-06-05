@@ -19,16 +19,30 @@ namespace fs = std::experimental::filesystem;
 #define Results_FLAG "md_results"
 
 
+// result metric data model
+class ResultMetric
+{
+public:
+    std::string name = "";
+    float score = 0.0;
+    virtual nlohmann::json dump() const;
+};
+
+
 // result data model
 class Result
 {
 public:
     bool pass = false;
     std::string message = "";
+    std::vector<ResultMetric> metrics;
     virtual nlohmann::json dump() const;
 };
 
+
 // result serialization
+void to_json(nlohmann::json& j, const ResultMetric& r);
+void from_json(const nlohmann::json& j, ResultMetric& r);
 void to_json(nlohmann::json& j, const Result& r);
 void from_json(const nlohmann::json& j, Result& r);
 

@@ -66,18 +66,36 @@ void Job::parseArguments(int argc, char** argv)
     }
 }
 
+nlohmann::json ResultMetric::dump() const
+{
+    return *this;
+}
+
 nlohmann::json Result::dump() const
 {
     return *this;
+}
+
+void to_json(nlohmann::json& j, const ResultMetric& m)
+{
+    j["name"] = m.name;
+    j["score"] = m.score;
+}
+void from_json(const nlohmann::json& j, ResultMetric& m)
+{
+    json_get(j, "name", m.name);
+    json_get(j, "score", m.score);
 }
 
 void to_json(nlohmann::json& j, const Result& r)
 {
     j["pass"] = r.pass;
     j["message"] = r.message;
+    j["metrics"] = r.metrics;
 }
 void from_json(const nlohmann::json& j, Result& r)
 {
     json_get(j, "pass", r.pass);
     json_get(j, "message", r.message);
+    json_get(j, "metrics", r.metrics);
 }
