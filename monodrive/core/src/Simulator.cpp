@@ -29,10 +29,7 @@ Simulator::Simulator(const Configuration& inConfig, const std::string& inServer_
 
 Simulator::~Simulator()
 {
-	if (controlSocket.is_open())
-		{
-			controlSocket.close();
-		}
+	stop();
 }
 
 Simulator& Simulator::getInstance(const std::string& inServer_ip, const short& inServer_port)
@@ -65,6 +62,33 @@ Simulator& Simulator::getInstance(
 	return *sim_map[sim_key];
 }
 
+bool Simulator::deleteInstance(
+	const Configuration& inConfig,
+	const std::string& inServer_ip,
+	const short& inServer_port
+)
+{
+	std::lock_guard<std::mutex> simLock(_mutex);
+	const std::string sim_key = inServer_ip + ":" + std::to_string(inServer_port);
+	if (sim_map[sim_key] == nullptr)
+	{
+		return false;
+	}
+	delete sim_map[sim_key];
+	sim_map.erase(sim_key);
+	return true;
+}
+
+void Simulator::clearInstances()
+{
+	std::lock_guard<std::mutex> simLock(_mutex);
+	for (auto const& [key, sim] : sim_map)
+	{
+		delete sim_map[key];
+		sim_map.erase(key);
+	}
+}
+
 void Simulator::connect()
 {
 	std::cout << "******Simulator Connect********" << std::endl;
@@ -72,6 +96,14 @@ void Simulator::connect()
 	const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, server_port);
 	std::cout << endpoint << std::endl;
 	controlSocket.connect(endpoint);
+}
+
+void Simulator::stop()
+{
+	if (controlSocket.is_open())
+	{
+		controlSocket.close();
+	}
 }
 
 bool Simulator::configure()
