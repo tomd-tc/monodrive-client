@@ -61,7 +61,7 @@ int main(int argc, char** argv)
     Configuration config(
         "config/simulator.json",
         "config/weather.json",
-        "config/scenario.json"
+        "examples/cpp/buffer_dev/replay.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
       }
       cv::imshow("monoDrive", img);
       cv::waitKey(1);
-      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      // std::this_thread::sleep_for(std::chrono::milliseconds(200));
     };
 
     for(auto& sensor : sensors){
