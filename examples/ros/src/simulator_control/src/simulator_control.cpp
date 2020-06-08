@@ -18,44 +18,58 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-std::string vehicle_name;
 
-std::vector<Sensor> create_sensors_for(const std::string& ip, const int& port)
+std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
-    std::vector<Sensor> sensors;
+    std::vector<std::shared_ptr<Sensor>> sensors;
 
     ViewportCameraConfig vp_config;
-    vp_config.server_ip = ip;
+    vp_config.server_ip = sim0.getServerIp();
+    vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
-    vp_config.server_port = port;
-    Sensor(vp_config).configure();
+    vp_config.resolution = Resolution(256,256);
+    Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
+    vp_config.server_ip = sim0.getServerIp();
+    vp_config.server_port = sim0.getServerPort();
     state_config.desired_tags = {"vehicle", "ego"};
-    state_config.server_ip = ip;
-    state_config.server_port = port;
     state_config.listen_port = 8101;
     state_config.debug_drawing = false;
-    state_config.undesired_tags = {""};
-
+    state_config.undesired_tags = {"static"};
     state_config.ros.publish_to_ros = true;
     state_config.ros.advertise = true;
     state_config.ros.topic = "/monodrive/state_sensor";
     state_config.ros.message_type = "monodrive_msgs/StateSensor";
-    sensors.emplace_back(state_config);
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));
 
     std::cout<<"***********ALL SENSOR CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {
-        sensor.configure();
+        sensor->configure();
     }
     return sensors;
 }
 
 void run_monodrive(float fps, Simulator& sim){
+    std::cout << "Creating Sensors." << std::endl;
+    std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(sim);
+    std::cout << "Sensors configured!" << std::endl;
+
     ros::Rate rate(fps);
+
+    // Drive forward slowly
+    nlohmann::json ego_command;
+    ego_command["forward_amount"] =  0.1;
+    ego_command["right_amount"] =  0.0;
+    ego_command["brake_amount"] =  0.0;
+    ego_command["drive_mode"] =  1;
+
     while(ros::ok()){
-        sim.send_command(ApiMessage(999, SampleSensorsCommand_ID, true, {}));
+        // Control the vehicle
+        sim.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
+        // Sample the sensors
+        sim.sample_all(sensors);
         rate.sleep();
     }
 }
@@ -70,26 +84,19 @@ int main(int argc, char** argv)
     //Read JSON files in cpp_client/config directory
     Configuration config(
         configPath / "simulator.json",
-        configPath / "vehicle.json",
         configPath / "weather.json",
         configPath / "scenario.json");
     
-    vehicle_name = config.vehicle["name"];
     std::string server0_ip = config.simulator["server_ip"];
     int server_port = config.simulator["server_port"];
-
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
-    sim0.configure();
 
-    //Setup and Connect Sensors
-    std::cout << "Creating Sensors." << std::endl;
-    std::vector<Sensor> sensors = create_sensors_for(server0_ip, server_port);
+    if(!sim0.configure()) {
+        std::cerr << "Unable to configure simulator!" << std::endl;
+        return -1;
+    }
 
     /// initialize the vehicle
-    std::cout << "Spawning vehicle." << std::endl;
-    if(!sim0.send_command(ApiMessage(777, SpawnVehicleCommand_ID, true, config.vehicle)))
-        return 0;
-
     float fps = 60.f;
     run_monodrive(fps, sim0);
 
