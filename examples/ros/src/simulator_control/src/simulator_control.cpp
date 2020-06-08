@@ -31,8 +31,8 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
-    vp_config.server_ip = sim0.getServerIp();
-    vp_config.server_port = sim0.getServerPort();
+    state_config.server_ip = sim0.getServerIp();
+    state_config.server_port = sim0.getServerPort();
     state_config.desired_tags = {"vehicle", "ego"};
     state_config.listen_port = 8101;
     state_config.debug_drawing = false;
