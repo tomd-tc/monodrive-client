@@ -107,7 +107,9 @@ int main(int argc, char** argv)
     std::cout << "Running scenario" << std::endl;
     for(; idx < nSteps; idx++)
     {	
-        sim0.step_sample_all(sensors, idx, 1);
+      mono::precise_stopwatch watch;
+      sim0.step_sample_all(sensors, idx, 1);
+      std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << std::endl;
     }
     
     return 0;

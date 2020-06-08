@@ -20,7 +20,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     l_config.location.x = -10.f;
     l_config.location.z = 190.f;
     l_config.horizontal_resolution = 0.1f;
-    l_config.n_lasers = 32;
+    l_config.n_lasers = 16;
     l_config.server_ip = sim0.getServerIp();
     l_config.server_port = sim0.getServerPort();
     l_config.listen_port = 8107;
