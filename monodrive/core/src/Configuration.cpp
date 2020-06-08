@@ -11,9 +11,18 @@ Configuration::Configuration(
     const fs::path& weatherConfigPath,
     const fs::path& scenarioConfigPath
 ){
-	simulator = load(simulatorConfigPath);
-    weather   = load(weatherConfigPath);
-    scenario  = load(scenarioConfigPath);
+    if (!simulatorConfigPath.empty())
+    {
+        simulator = load(simulatorConfigPath);
+    }
+    if (!weatherConfigPath.empty())
+    {
+        weather = load(weatherConfigPath);
+    }
+    if (!scenarioConfigPath.empty())
+    {
+        scenario  = load(scenarioConfigPath);
+    }
 }
 
 // Configuration::Configuration(int argc, char** argv)

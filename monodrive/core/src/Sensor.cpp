@@ -42,7 +42,6 @@ bool Sensor::send_configure()
 	Simulator& sim = Simulator::getInstance(config->server_ip, config->server_port);
 	nlohmann::json msg = config->dump();
 	std::cout << msg << std::endl;
-	// nlohmann::json::parse(dump_json());
 	return sim.send_command(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));	
 }
 
@@ -59,47 +58,45 @@ bool Sensor::start_listening()
 bool Sensor::stop_listening()
 {
 	bContinue = false;
-	if(listener==nullptr)
+	if (listener == nullptr)
+	{
 		return true;
-	if(listener->socket.is_open()){
-		listener->socket.close();
 	}
-	SampleThread.join();
+	if (listener->socket.is_open())
+	{
+		listener->close();
+	}
+	if (SampleThread.joinable())
+	{
+		SampleThread.join();
+	}
 	return true;
 }
 
 bool Sensor::StartSampleLoop()
 {
-	SampleThread = std::thread([this](){
-		while(bContinue){
-			if(config->listen_port == 0)
+	SampleThread = std::thread([this]() {
+		while (bContinue) {
+			if (config->listen_port == 0)
 				return false;
 			recvBuffer.resize(header_length);
-			if(listener->socket.is_open()){
-				// mono::precise_stopwatch watch0;
-				// std::cout << "reading data frame..." << std::endl;
-				try{
+			if (listener->socket.is_open()) {
+				try {
 					listener->read_sensor_packet(recvBuffer);
 				}
-				catch(const std::exception& e){
+				catch (const std::exception& e) {
 					std::cout << e.what() << std::endl;
 					return false;
 				}
-				// std::cout << "read success..." << std::endl;
-				// std::cout << name << " read : " <<  watch0.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
-				// mono::precise_stopwatch watch1;
 				parse();
-				// std::cout << name << " parse: " <<  watch1.elapsed_time<unsigned int, std::chrono::microseconds>() << " (us)" << std::endl;
-				if(frame->parse_complete()){
-					// mono::precise_stopwatch watch2;
-					if(sample_callback) {
+				if (frame->parse_complete()) {
+					if (sample_callback) {
 						sample_callback(frame);
 					}
-					//std::cout << name << " callback: " << watch2.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
 					sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
 				}
 			}
-			else{
+			else {
 				std::cout << "Sensor Channel is not open" << std::endl;
 				return false;
 			}
@@ -109,7 +106,8 @@ bool Sensor::StartSampleLoop()
 	return true;
 }
 
-bool Sensor::parse(){
+bool Sensor::parse()
+{
 	if(frame == nullptr)
 		return false;
 	frame->parse_header(recvBuffer);
