@@ -65,15 +65,29 @@ sudo apt-get install ros-melodic-rosbridge-suite
 
 ### monoDrive ROS Packages and example build
 
-1. Execute the following to build the ROS packages: 
+1. Execute the following to build the monoDrive ROS library with:
+
 ```bash
-cd ros-examples
+cd ./monodrive/ros
 catkin_make
 source devel/setup.bash
 ```
-2. Add the setup file to your .bashrc to add the packages to your ros path on terminal load:
+
+2. Add the monoDrive ROS library setup file to your .bashrc to add the packages to your ros path on terminal load:
+
 ```bash
-echo "source <path/to/devel/setup.bash>" >> ~/.bashrc
+echo "source <path/to/monodrive/ros/devel/setup.bash>" >> ~/.bashrc
+
+1. Execute the following to build the ROS packages: 
+```bash
+cd ./examples/ros
+catkin_make
+source devel/setup.bash
+```
+
+1. Add the examples setup file to your .bashrc to add the packages to your ros path on terminal load:
+```bash
+echo "source <path/to/examples/ros/devel/setup.bash>" >> ~/.bashrc
 ```
 
 ### monoDrive Simulator and Client network setup
