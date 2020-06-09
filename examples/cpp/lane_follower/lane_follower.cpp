@@ -95,13 +95,7 @@ void control_vehicle(Simulator& simulator, Sensor &sensor){
 
     double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
     
-    nlohmann::json msg;
-    msg["forward_amount"] = 0.75f;
-    msg["brake_amount"] = 0.0f;
-    msg["drive_mode"] = 1;
-    msg["right_amount"] = angle;
-
-    simulator.send_command(ApiMessage(777, EgoControl_ID, true, msg));
+    simulator.sendControl(0.75f, 0.0f, 1, angle);
 }
 
 int main(int argc, char** argv)
@@ -113,9 +107,9 @@ int main(int argc, char** argv)
     
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "config/simulator_no_traffic.json",
-        "config/weather.json",
-        "config/scenario_config_single_vehicle.json");
+        "examples/config/simulator_no_traffic.json",
+        "examples/config/weather.json",
+        "examples/config/scenario_config_single_vehicle.json");
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
     sim0.configure();
 
@@ -123,10 +117,10 @@ int main(int argc, char** argv)
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
 
     for(auto& sensor : sensors){
-        sensor->StartSampleLoop();
+        sensor->startSampleLoop();
     }
     while(true){
-        sim0.sample_all(sensors);
+        sim0.sampleAll(sensors);
         control_vehicle(sim0, *sensors[1]);
     }
     

@@ -17,50 +17,18 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-std::vector<std::shared_ptr<Sensor>> create_sensors_for(const std::string& ip)
-{
-    std::vector<std::shared_ptr<Sensor>> sensors;
-    CameraConfig fc_config;// = *(new CameraConfig());
-    fc_config.server_ip = ip;
-    fc_config.listen_port = 8103;
-    fc_config.location.z = 200;
-    fc_config.rotation.pitch = -5;
-    fc_config.fov = 60;
-    fc_config.resolution = Resolution(1920,1080);
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
-
-    IMUConfig imu_config;
-    imu_config.server_ip = ip;
-    imu_config.listen_port = 8105;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
-
-    ViewportCameraConfig vp_config;
-    vp_config.server_ip = ip;
-    vp_config.location.x = -750;
-    vp_config.location.z = 400;
-    vp_config.fov = 60;
-    Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
-
-
-    std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
-    for (auto& sensor : sensors)
-    {
-        sensor->configure();
-    }
-    return sensors;
-}
 
 int main(int argc, char** argv)
 {
     //Single Simulator Example
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
-    
+
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "config/simulator.json",
-        "config/weather.json",
-        "config/scenario.json"
+        "examples/config/simulator.json",
+        "examples/config/weather.json",
+        "examples/config/scenario.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
@@ -69,9 +37,35 @@ int main(int argc, char** argv)
     }
 
     //Setup and Connect Sensors
-    std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
+    std::vector<std::shared_ptr<Sensor>> sensors;
+    CameraConfig fc_config;// = *(new CameraConfig());
+    fc_config.server_ip = server0_ip;
+    fc_config.listen_port = 8103;
+    fc_config.location.z = 200;
+    fc_config.rotation.pitch = -5;
+    fc_config.fov = 60;
+    fc_config.resolution = Resolution(1920,1080);
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
-    sensors[0]->sample_callback = [](DataFrame* frame) {
+    IMUConfig imu_config;
+    imu_config.server_ip = server0_ip;
+    imu_config.listen_port = 8105;
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
+
+    ViewportCameraConfig vp_config;
+    vp_config.server_ip = server0_ip;
+    vp_config.location.x = -750;
+    vp_config.location.z = 400;
+    vp_config.fov = 60;
+    Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
+
+    std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
+    for (auto& sensor : sensors)
+    {
+        sensor->configure();
+    }
+
+    sensors[0]->sampleCallback = [](DataFrame* frame) {
       auto camFrame = static_cast<CameraFrame*>(frame);
       auto imFrame = camFrame->imageFrame;
       cv::Mat img;
@@ -94,7 +88,7 @@ int main(int argc, char** argv)
     };
 
     for(auto& sensor : sensors){
-        sensor->StartSampleLoop();
+        sensor->startSampleLoop();
     }
     
     //Get number of steps in scenario and start timer
@@ -106,7 +100,7 @@ int main(int argc, char** argv)
     for(; idx < nSteps; idx++)
     {	
         mono::precise_stopwatch watch;
-        sim0.state_step_sample_all(sensors, config.scenario[idx]);
+        sim0.stateStepSampleAll(sensors, config.scenario[idx]);
         std::cout << watch.elapsed_time<unsigned int, std::chrono::milliseconds>() << " (ms)" << std::endl;
     }
     
