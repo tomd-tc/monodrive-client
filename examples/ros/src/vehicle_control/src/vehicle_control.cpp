@@ -20,7 +20,7 @@ LaneSpline lanespline;
 namespace fs = std::experimental::filesystem;
 
 // LaneSpline lanespline;
-std::string vehicle_name = "Ego";
+std::string vehicle_name = "subcompact_monoDrive_01";
 std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
@@ -31,7 +31,7 @@ monodrive_msgs::StateSensor state_data;
 void control_vehicle(){
     monodrive_msgs::VehicleState vs;
     for(auto& vehicle : state_data.vehicles){
-        if(vehicle.name == "Ego"){
+        if(vehicle.name == vehicle_name) {
             vs = vehicle;
         }
     }
@@ -65,7 +65,7 @@ void control_vehicle(){
     double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
 
     monodrive_msgs::VehicleControl msg;
-    msg.name = "Ego";
+    msg.name = vehicle_name;
     msg.throttle = 0.75f;
     msg.brake = 0.f;
     msg.steer = angle;
@@ -90,7 +90,8 @@ int main(int argc, char** argv)
     // create vehicle controller publisher and sensor subscriber
     node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
     vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
-    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, &state_sensor_callback);
+    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
+        &state_sensor_callback);
 
     ros::Rate rate(100);
 

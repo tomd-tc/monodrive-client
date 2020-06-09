@@ -57,7 +57,6 @@ Simulator& Simulator::getInstance(
 	const std::string sim_key = inServer_ip +":" + std::to_string(inServer_port);
 	if (sim_map[sim_key] == nullptr) {
 		sim_map[sim_key] = new Simulator(inConfig, inServer_ip, inServer_port);
-		std::cout<<"created new simulator:"<< sim_key << std::endl;
 	}
 	return *sim_map[sim_key];
 }
@@ -90,10 +89,8 @@ void Simulator::clearInstances()
 
 void Simulator::connect()
 {
-	std::cout << "******Simulator Connect********" << std::endl;
 	const auto ipaddress = boost::asio::ip::address::from_string(server_ip);
 	const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, server_port);
-	std::cout << endpoint << std::endl;
 	controlSocket.connect(endpoint);
 }
 
@@ -114,7 +111,6 @@ bool Simulator::configure()
 			connect();
 		}
 		catch (const std::exception& e){
-			std::cout << "Failed to connect to server. Is it running?" << std::endl;
 			std::cerr << e.what() << std::endl;
 			return false;
 		}
@@ -153,13 +149,15 @@ bool Simulator::send_command(ApiMessage msg, nlohmann::json* resp_message)
   msg.write(controlSocket);
   ApiMessage response;
   response.read(controlSocket);
-	if(resp_message != nullptr) {
-		*resp_message = response.get_message();
-	}
-  if (response.get_success()) {
-    return true;
-	}
-	return false;
+  if (resp_message != nullptr)
+  {
+	  *resp_message = response.get_message();
+  }
+  if (response.get_success())
+  {
+	  return true;
+  }
+  return false;
 }
 
 bool Simulator::step(int step_idx, int nsteps)
