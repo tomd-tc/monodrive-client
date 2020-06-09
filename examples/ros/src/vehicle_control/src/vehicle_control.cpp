@@ -20,7 +20,7 @@ LaneSpline lanespline;
 namespace fs = std::experimental::filesystem;
 
 // LaneSpline lanespline;
-std::string vehicle_name = "Ego";
+std::string vehicle_name = "subcompact_monoDrive_01";
 std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
@@ -31,7 +31,7 @@ monodrive_msgs::StateSensor state_data;
 void control_vehicle(){
     monodrive_msgs::VehicleState vs;
     for(auto& vehicle : state_data.vehicles){
-        if(vehicle.name == "Ego"){
+        if(vehicle.name == vehicle_name) {
             vs = vehicle;
         }
     }
@@ -65,7 +65,7 @@ void control_vehicle(){
     double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
 
     monodrive_msgs::VehicleControl msg;
-    msg.name = "subcompact_monoDrive_01";
+    msg.name = vehicle_name;
     msg.throttle = 0.75f;
     msg.brake = 0.f;
     msg.steer = angle;

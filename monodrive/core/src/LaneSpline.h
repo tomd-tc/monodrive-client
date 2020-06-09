@@ -53,8 +53,9 @@ void LaneSpline::AddLane(const nlohmann::json& lane,
     std::vector<Eigen::VectorXd> points;
     for(int i = 0; i < laneGeo["coordinates"].size(); i++) {
         Eigen::VectorXd location(3);
-        location << laneGeo["coordinates"][i][0].get<double>(),
-            laneGeo["coordinates"][i][1].get<double>(), 
+        // x and y need to be swapped for converting geoJSON to UE4
+        location << laneGeo["coordinates"][i][1].get<double>(),
+            laneGeo["coordinates"][i][0].get<double>(), 
             lane["z_values"][i];
         points.emplace_back(location);
     }
