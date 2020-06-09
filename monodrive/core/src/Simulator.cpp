@@ -29,10 +29,7 @@ Simulator::Simulator(const Configuration& inConfig, const std::string& inServer_
 
 Simulator::~Simulator()
 {
-	if (controlSocket.is_open())
-		{
-			controlSocket.close();
-		}
+	stop();
 }
 
 Simulator& Simulator::getInstance(const std::string& inServer_ip, const short& inServer_port)
@@ -43,31 +40,66 @@ Simulator& Simulator::getInstance(const std::string& inServer_ip, const short& i
 } 
 
 
-Simulator& Simulator::getInstance(const Configuration& inConfig) 
+Simulator& Simulator::getInstance(const Configuration& inConfig)
 {
-		std::lock_guard<std::mutex> simLock(_mutex);
 		std::string ip_address = inConfig.simulator.at("server_ip").get<std::string>();
 		short port = inConfig.simulator.at("server_port").get<short>();
 		return getInstance(inConfig, ip_address, port);
 }
 
-Simulator& Simulator::getInstance(const Configuration& inConfig, 
-											  const std::string& inServer_ip, 
-											  const short& inServer_port) 
- 	{
-		std::lock_guard<std::mutex> simLock(_mutex);
-		const std::string sim_key = inServer_ip +":" + std::to_string(inServer_port);
-		if (sim_map[sim_key] == nullptr) {
-			sim_map[sim_key] = new Simulator(inConfig, inServer_ip, inServer_port);
-		}
-		return *sim_map[sim_key];
+Simulator& Simulator::getInstance(
+	const Configuration& inConfig,
+	const std::string& inServer_ip,
+	const short& inServer_port
+)
+{
+	std::lock_guard<std::mutex> simLock(_mutex);
+	const std::string sim_key = inServer_ip +":" + std::to_string(inServer_port);
+	if (sim_map[sim_key] == nullptr) {
+		sim_map[sim_key] = new Simulator(inConfig, inServer_ip, inServer_port);
 	}
+	return *sim_map[sim_key];
+}
+
+bool Simulator::deleteInstance(
+	const Configuration& inConfig,
+	const std::string& inServer_ip,
+	const short& inServer_port
+)
+{
+	std::lock_guard<std::mutex> simLock(_mutex);
+	const std::string sim_key = inServer_ip + ":" + std::to_string(inServer_port);
+	if (sim_map[sim_key] == nullptr)
+	{
+		return false;
+	}
+	delete sim_map[sim_key];
+	sim_map.erase(sim_key);
+	return true;
+}
+
+void Simulator::clearInstances()
+{
+	std::lock_guard<std::mutex> simLock(_mutex);
+	for(auto& sim : sim_map){
+		delete sim.second;
+		sim_map.erase(sim.first);
+	}
+}
 
 void Simulator::connect()
 {
 	const auto ipaddress = boost::asio::ip::address::from_string(server_ip);
 	const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, server_port);
 	controlSocket.connect(endpoint);
+}
+
+void Simulator::stop()
+{
+	if (controlSocket.is_open())
+	{
+		controlSocket.close();
+	}
 }
 
 bool Simulator::configure()
@@ -89,16 +121,26 @@ bool Simulator::configure()
 
 	int simulation_mode = 0;
 	json_get(config.simulator, "simulation_mode", simulation_mode);
-	if(simulation_mode == 0 or simulation_mode == 3) {
-		std::cout << "Send Closed Loop Config:    success = ";
-		std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
-	} else {
-		std::cout << "Send Scenario Config:    success = ";
-		std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+	if (!config.scenario.empty())
+	{
+		if (simulation_mode == 0 or simulation_mode == 3)
+		{
+			std::cout << "Send Closed Loop Config:    success = ";
+			std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
+		}
+		else
+		{
+			std::cout << "Send Scenario Config:    success = ";
+			std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+		}
 	}
 
-	std::cout << "Send Weather Config:     success = ";
-	std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;	
+	if (!config.weather.empty())
+	{
+		std::cout << "Send Weather Config:     success = ";
+		std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;
+	}
+
 	return true;
 }
 
@@ -184,4 +226,14 @@ void Simulator::sample_all(std::vector<std::shared_ptr<Sensor>>& sensors)
 			}
 		}
 	} while(samplingInProgress);
+}
+
+bool Simulator::sendControl(float forward, float right, float brake, int mode)
+{
+    nlohmann::json ego_msg;
+    ego_msg["forward_amount"] = forward;
+    ego_msg["right_amount"] = right;
+    ego_msg["brake_amount"] = brake;
+    ego_msg["drive_mode"] = mode;
+    return send_command(ApiMessage(123, EgoControl_ID, true, ego_msg));
 }

@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
   map_string = map_string.substr(1, map_string.size() - 2);
   map_response = nlohmann::json::parse(map_string);
 
-  lane_spline::LaneSpline ls(map_response);
+  lane_spline::LaneSpline ls;
 
   DATA_SNAPSHOT.map_data = &ls;
 

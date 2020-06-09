@@ -19,11 +19,13 @@
 
 class Connection  {
 public:
-	Connection(){};
-	~Connection(){
-		socket.close();
+	Connection() {};
+	~Connection()
+	{
+		close();
 	}
-	Connection(std::string& ip, int port){
+	Connection(std::string& ip, int port)
+	{
 		auto ipaddress = boost::asio::ip::address::from_string(ip);
 		server_endpoint = boost::asio::ip::tcp::endpoint(ipaddress, port);
 	}
@@ -37,7 +39,6 @@ public:
 		auto gameTime = buffer.readInt();
 		auto sampleCount = buffer.readInt();
 		auto payloadSize = packet_size - header_length;
-
 		if (payloadSize > 0)
 		{
 			buffer.grow(payloadSize);
@@ -71,6 +72,15 @@ public:
 			return false;
 		}
 		return true;
+	}
+
+	inline void close()
+	{
+		if (socket.is_open())
+		{
+			socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+			socket.close();
+		}
 	}
 	friend class Sensor;
 private:

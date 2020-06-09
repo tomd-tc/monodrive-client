@@ -11,9 +11,9 @@ class Configuration
 public:
     // Configuration(int argc, char** argv);
     Configuration(
-        const fs::path& simulatorConfigPath = {"config/simulator.json"},
-        const fs::path& weatherConfigPath = {"config/weather.json"},
-        const fs::path& scenarioConfigPath = {"config/scenario.json"}
+        const fs::path& simulatorConfigPath = {""},
+        const fs::path& weatherConfigPath = {""},
+        const fs::path& scenarioConfigPath = {""}
     );
     ~Configuration(){};
     nlohmann::json simulator;
