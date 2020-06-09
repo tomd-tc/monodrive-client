@@ -80,9 +80,9 @@ bool Simulator::deleteInstance(
 void Simulator::clearInstances()
 {
 	std::lock_guard<std::mutex> simLock(_mutex);
-	for(auto& sim : sim_map){
+	for(auto& sim : simMap){
 		delete sim.second;
-		sim_map.erase(sim.first);
+		simMap.erase(sim.first);
 	}
 }
 
