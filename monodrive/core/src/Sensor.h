@@ -17,7 +17,7 @@
 #define CONTROL_HEADER			0x6d6f6e6f
 #define RESPONSE_HEADER			0x6f6e6f6d
 
-class Connection  {
+class Connection {
 public:
 	Connection() {};
 	~Connection()
@@ -27,18 +27,18 @@ public:
 	Connection(std::string& ip, int port)
 	{
 		auto ipaddress = boost::asio::ip::address::from_string(ip);
-		server_endpoint = boost::asio::ip::tcp::endpoint(ipaddress, port);
+		serverEndpoint = boost::asio::ip::tcp::endpoint(ipaddress, port);
 	}
 
-	bool read_sensor_packet(ByteBuffer& buffer)
+	bool readSensorPacket(ByteBuffer& buffer)
 	{
-		auto header_length = DATA_FRAME_HEADER_SIZE;
+		auto headerLength = DATA_FRAME_HEADER_SIZE;
 		boost::asio::read(socket, boost::asio::buffer(buffer.data(), buffer.available()));
-		auto packet_size = buffer.readInt();
+		auto packetSize = buffer.readInt();
 		auto time = buffer.readInt();
 		auto gameTime = buffer.readInt();
 		auto sampleCount = buffer.readInt();
-		auto payloadSize = packet_size - header_length;
+		auto payloadSize = packetSize - headerLength;
 		if (payloadSize > 0)
 		{
 			buffer.grow(payloadSize);
@@ -52,12 +52,12 @@ public:
 		return true;
 	}
 
-	bool open_connection()
+	bool connect()
 	{
-		std::cout << "Connecting sensor to: " << server_endpoint << std::endl;
+		std::cout << "Connecting sensor to: " << serverEndpoint << std::endl;
 		try
 		{
-			socket.connect(server_endpoint);
+			socket.connect(serverEndpoint);
 			if (socket.is_open()){
 				std::cout << "Sensor Connected" << std::endl;
 			}
@@ -84,9 +84,9 @@ public:
 	}
 	friend class Sensor;
 private:
-	boost::asio::ip::tcp::endpoint server_endpoint;
-	boost::asio::io_service io_service;
-    boost::asio::ip::tcp::socket socket{io_service};
+	boost::asio::ip::tcp::endpoint serverEndpoint;
+	boost::asio::io_service ioService;
+	boost::asio::ip::tcp::socket socket{ioService};
 };
 
 class Sensor  
@@ -94,26 +94,24 @@ class Sensor
 public:
 	//Constructors
 	~Sensor();
-	Sensor(std::unique_ptr<SensorBaseConfig> sensor_config);
+	Sensor(std::unique_ptr<SensorBaseConfig> sensorConfig);
 	Sensor(const Sensor& ) = delete;
 	Sensor& operator=(const Sensor& ) = delete;
 
-	bool StartSampleLoop();
-	bool bContinue = true;
-	std::thread SampleThread;
 	bool parse();
-	// std::string dump_json();
 	bool configure();
-	bool send_configure();
-	bool start_listening();
-	bool stop_listening();
+	bool sendConfigure();
+	bool startListening();
+	bool stopListening();
+	bool startSampleLoop();
 
-	
+	bool bContinue = true;
+	std::thread sampleThread;
 	ByteBuffer recvBuffer;
 	std::unique_ptr<SensorBaseConfig> config = nullptr;
 	DataFrame* frame = nullptr;
 	std::atomic<bool> sampleInProgress{false};
-	std::function<void(DataFrame*)> sample_callback;
+	std::function<void(DataFrame*)> sampleCallback;
 	
 private:
 	Connection* listener = nullptr;
