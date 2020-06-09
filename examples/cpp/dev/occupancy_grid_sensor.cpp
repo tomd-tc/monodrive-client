@@ -51,7 +51,7 @@ int main(int argc, char **argv)
                           // for connections on this port;
 
   // Read JSON files in cpp_client/config directory
-  Configuration config("examples/config/simulator_no_traffic.json",
+  Configuration config("examples/config/simulator_straightaway.json",
                        "examples/config/weather.json",
                        "examples/config/scenario_config_single_vehicle.json");
   Simulator &sim0 = Simulator::getInstance(config, server0_ip, server_port);

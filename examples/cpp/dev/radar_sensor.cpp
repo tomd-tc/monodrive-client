@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/config/simulator_no_traffic.json",
+        "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
         "examples/config/scenario_config_single_vehicle.json"
     );
