@@ -64,15 +64,16 @@ int main(int argc, char** argv)
     for (auto& sensor : sensors)
     {
         sensor->configure();
+        sensor->startSampleLoop();
     }
 
     //Get number of steps in scenario and start timer
     mono::precise_stopwatch stopwatch;
 
     /// initialize the vehicle, the first control command spawns the vehicle
-    sim0.sendControl(0,0,1,1);
+    sim0.sendControl(0, 0, 1, 1);
 
-    sensors[0]->sampleCallback = [](DataFrame* frame){
+    sensors[0]->sampleCallback = [](DataFrame* frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat floatMat = cv::Mat(imFrame->resolution.y, imFrame->resolution.x,
@@ -102,7 +103,7 @@ int main(int argc, char** argv)
 
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
-    {	
+    {
         sim0.sampleAll(sensors);
     }
 
