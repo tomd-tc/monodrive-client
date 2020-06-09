@@ -41,7 +41,7 @@
       "car",
       "ego"
     ],
-    "type": "subcompact_monoDrive_01_C"
+    "name": "subcompact_monoDrive_01"
     }
   ]
 }

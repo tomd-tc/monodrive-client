@@ -19,7 +19,7 @@ public:
     LaneSpline(){}
     LaneSpline(const std::string& geoJsonFile);
     LaneSpline(const nlohmann::json& geoJson);
-    void AddLane(const nlohmann::json& lane);
+    void AddLane(const nlohmann::json& lane, const nlohmann::json& laneGeo);
     int GetNearestPoint(const std::string& road, const std::string& lane, const Eigen::VectorXd& point);
     // cv::Mat GetPointsWithinRadius(Eigen::VectorXd& query_point, double radius);
     std::map<std::string, std::map<std::string, std::vector<Eigen::VectorXd>>> spline_map;
@@ -47,21 +47,21 @@ int LaneSpline::GetNearestPoint(const std::string& road, const std::string& lane
     return nearestPoint;
 }
 
-void LaneSpline::AddLane(const nlohmann::json& lane){
+void LaneSpline::AddLane(const nlohmann::json& lane, 
+        const nlohmann::json& laneGeo){
     std::string road = lane["road"].get<std::string>();
     std::vector<Eigen::VectorXd> points;
-    for(auto& point : lane["points"]){
+    for(int i = 0; i < laneGeo["coordinates"].size(); i++) {
         Eigen::VectorXd location(3);
-        location << point["location"]["x"].get<double>(),
-            point["location"]["y"].get<double>(),
-            point["location"]["z"].get<double>();
-        points.push_back(location);
+        location << laneGeo["coordinates"][i][0].get<double>(),
+            laneGeo["coordinates"][i][1].get<double>(), 
+            lane["z_values"][i];
+        points.emplace_back(location);
     }
     spline_map[road][lane["id"].get<std::string>()] = points;
 }
 
 LaneSpline::LaneSpline(const std::string& geoJsonFile){
-    std::cout << fs::current_path() << " " << geoJsonFile << std::endl;
     std::ifstream jsonFile(geoJsonFile);
     nlohmann::json geoJson;
     jsonFile >> geoJson;
@@ -79,7 +79,7 @@ void LaneSpline::ParseLaneSplines(const nlohmann::json& geoJson) {
             continue;
         }
         else if(feature["properties"]["feature_type"] == "lane"){
-            AddLane(feature["properties"]);
+            AddLane(feature["properties"], feature["geometry"]);
         }
     }
 

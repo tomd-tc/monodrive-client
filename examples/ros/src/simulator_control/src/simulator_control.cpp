@@ -18,7 +18,6 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-
 std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
 {
     std::vector<std::shared_ptr<Sensor>> sensors;
@@ -29,6 +28,19 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     vp_config.location.z = 200;
     vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
+
+    //CameraConfig cam_config;
+    //cam_config.server_ip = sim0.getServerIp();
+    //cam_config.server_port = sim0.getServerPort();
+    //cam_config.listen_port = 8100; // + i;
+    //cam_config.location.z = 225;
+    //cam_config.rotation.pitch = -5;
+    //cam_config.resolution = Resolution(1920, 1080);
+    //cam_config.ros.publish_to_ros = true;
+    //cam_config.ros.advertise = true;
+    //cam_config.ros.topic = "/monodrive/cam_config";
+    //cam_config.ros.message_type = "monodrive_msgs/StateSensor";
+    //sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(cam_config)));
 
     StateConfig state_config;
     state_config.server_ip = sim0.getServerIp();
@@ -58,18 +70,9 @@ void run_monodrive(float fps, Simulator& sim){
 
     ros::Rate rate(fps);
 
-    // Drive forward slowly
-    nlohmann::json ego_command;
-    ego_command["forward_amount"] =  0.1;
-    ego_command["right_amount"] =  0.0;
-    ego_command["brake_amount"] =  0.0;
-    ego_command["drive_mode"] =  1;
-
     while(ros::ok()){
-        // Control the vehicle
-        sim.send_command(ApiMessage(123, EgoControl_ID, true, ego_command));
         // Sample the sensors
-        sim.sample_all(sensors);
+        //sim.sample_all(sensors);
         rate.sleep();
     }
 }
