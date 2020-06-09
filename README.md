@@ -16,10 +16,10 @@ Collection of monoDrive client software for different languages.
 ### Windows Library Dependencies
 Note: Extract or install these libraries to **C:/local** for cmake can find them.
 
-- [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.65.1/boost_1_65_1-msvc-14.1-64.exe/download) Add `C:\local\boost_1_73_0\lib64-msvc-14.2` to your path.
+- [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.73.0/boost_1_73_0-msvc-14.2-64.exe/download) Add `C:\local\boost_1_73_0\lib64-msvc-14.2` to your path.
 
 To build the examples the following are required:
-- [OpenCV](https://github.com/opencv/opencv/releases/download/4.3.0/opencv-4.3.0-vc14_vc15.exe) Extract to `C:\local\opencv` and add `C:\local\opencv\build\x64\vc15\lib` to your path.
+- [OpenCV](https://github.com/opencv/opencv/releases/download/4.3.0/opencv-4.3.0-vc14_vc15.exe) Extract to `C:\local\opencv` and add `C:\local\opencv\build\x64\vc15\bin` to your path.
 - [Eigen](https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip) Extract to `C:\local\Eigen3` and add `C:\local\Eigen3` to your path.
 
  

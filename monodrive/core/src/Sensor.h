@@ -74,7 +74,7 @@ public:
 		return true;
 	}
 
-	bool close()
+	inline void close()
 	{
 		if (socket.is_open())
 		{

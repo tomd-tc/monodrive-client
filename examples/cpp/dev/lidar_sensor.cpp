@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     LidarConfig l_config;
     l_config.location.x = -10.f;
     l_config.location.z = 190.f;
-    l_config.horizontal_resolution = 0.4f;
+    l_config.horizontal_resolution = 0.1f;
     l_config.n_lasers = 16;
     l_config.server_ip = sim0.getServerIp();
     l_config.server_port = sim0.getServerPort();

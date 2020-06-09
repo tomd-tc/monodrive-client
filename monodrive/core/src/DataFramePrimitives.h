@@ -150,6 +150,3 @@ void MONODRIVECORE_API from_json(const nlohmann::json& j, UltrasonicTarget& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const CollisionTarget& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, CollisionTarget& v);
 
-
-
-
