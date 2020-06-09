@@ -59,7 +59,6 @@ void run_monodrive(float fps, Simulator& sim){
 
     while(ros::ok()){
         // Sample the sensors
-        //sim.sample_all(sensors);
         rate.sleep();
     }
 }
