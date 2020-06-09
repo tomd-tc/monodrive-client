@@ -42,7 +42,7 @@ bool Sensor::send_configure()
 	Simulator& sim = Simulator::getInstance(config->server_ip, config->server_port);
 	nlohmann::json msg = config->dump();
 	std::cout << msg << std::endl;
-	return sim.send_command(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));	
+	return sim.sendCommand(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));
 }
 
 bool Sensor::start_listening()
