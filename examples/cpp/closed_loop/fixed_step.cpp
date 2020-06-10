@@ -154,16 +154,11 @@ int main(int argc, char** argv)
     state_config.undesired_tags = {""};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));
 
-    // Send configurations to the simulator
+    // Send configurations to the simulator and start listening
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {
         sensor->configure();
-    }
-
-    // start sensor sample loops so they are ready to receive data from the simulator
-    for(auto& sensor : sensors){
-        sensor->startSampleLoop();
     }
 
     // Can register callbacks for sensors which trigger on the sensors thread

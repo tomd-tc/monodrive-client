@@ -61,10 +61,6 @@ int main(int argc, char** argv)
     /// initialize the vehicle, the first control command spawns the vehicle
     sim0.sendControl(0.0, 0.0, 0.0, 1);
 
-    for(auto& sensor : sensors) {
-        sensor->startSampleLoop();
-    }
-
     // define callback with forwarding to veloview
     boost::asio::io_service io_service;
     boost::asio::ip::udp::socket socket(io_service);

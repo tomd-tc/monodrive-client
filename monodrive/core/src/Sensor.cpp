@@ -33,17 +33,19 @@ Sensor::~Sensor()
 bool Sensor::configure()
 {
 	std::cout << "Configure " << name << std::endl;
-	bool success = sendConfigure();
-	if (!success)
+	if (!sendConfigure())
 	{
-		return success;
+		return false;
 	}
 	if (config->ros.publish_to_ros)
 	{
-		return success;
+		return true;
 	}
-	success = startListening();
-	return success;
+	if (!startListening())
+	{
+		return false;
+	}
+	return startSampleLoop();
 }
 bool Sensor::sendConfigure()
 {
@@ -57,7 +59,7 @@ bool Sensor::sendConfigure()
 bool Sensor::startListening()
 {
 	bool success = false;
-	if (config->listen_port !=0)
+	if (config->listen_port != 0)
 	{
 		success = listener->connect();
 	}

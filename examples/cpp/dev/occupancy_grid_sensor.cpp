@@ -125,11 +125,6 @@ int main(int argc, char **argv)
 
   DATA_SNAPSHOT.map_data = &ls;
 
-  for (auto &sensor : sensors)
-  {
-    sensor->startSampleLoop();
-  }
-
   std::cout << "Sampling sensor loop" << std::endl;
   while (true)
   {

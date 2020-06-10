@@ -63,10 +63,6 @@ int main(int argc, char** argv)
     /// initialize the vehicle, the first control command spawns the vehicle
     sim0.sendControl(0.1, 0, 0, 1);
 
-    for(auto& sensor : sensors){
-        sensor->startSampleLoop();
-    }
-
     sensors[0]->sampleCallback = [](DataFrame* frame){
         auto& stateFrame = *static_cast<StateFrame*>(frame);
         // std::cout << stateFrame.vehicles.size() << std::endl;

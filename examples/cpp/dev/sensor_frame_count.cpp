@@ -87,10 +87,6 @@ int main(int argc, char** argv)
     /// initialize the vehicle, the first control command spawns the vehicle
     sim0.sendControl(0, 0, 1, 1);
 
-    for(auto& sensor : sensors){
-        sensor->startSampleLoop();
-    }
-
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
     {	

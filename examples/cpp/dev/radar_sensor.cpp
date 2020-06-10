@@ -75,10 +75,6 @@ int main(int argc, char** argv)
     /// initialize the vehicle, the first control command spawns the vehicle
     sim0.sendControl(0.1, 0.0, 0.0, 1);
 
-    for(auto& sensor : sensors){
-        sensor->startSampleLoop();
-    }
-
     sensors[0]->sampleCallback = [](DataFrame* frame){
         auto& radarFrame = *static_cast<RadarFrame*>(frame);
         std::cout << nlohmann::json(radarFrame.radarTargetListFrame->targets).dump() << std::endl;

@@ -58,10 +58,6 @@ int main(int argc, char** argv)
         sensor->configure();
     }
 
-    for(auto& sensor : sensors){
-        sensor->startSampleLoop();
-    }
-    
     //Get number of steps in scenario and start timer
     int nSteps = (int)config.scenario.size();
     int idx = 0;

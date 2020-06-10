@@ -38,13 +38,10 @@ int main(int argc, char** argv)
 
     // Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors;
-    CameraConfig fc_config;// = *(new CameraConfig());
+    CameraConfig fc_config;
     fc_config.server_ip = server0_ip;
     fc_config.listen_port = 8103;
-    fc_config.location.z = 400;
-    fc_config.location.y = 500;
-    fc_config.rotation.yaw = -90;
-    fc_config.rotation.pitch = -45;
+    fc_config.location.z = 200;
     fc_config.resolution = Resolution(1920,1080);
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
@@ -55,9 +52,7 @@ int main(int argc, char** argv)
 
     ViewportCameraConfig vp_config;
     vp_config.location.z = 400;
-    vp_config.location.y = 500;
-    vp_config.rotation.yaw = -90;
-    vp_config.rotation.pitch = -45;
+    vp_config.location.x = -750;
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
@@ -90,10 +85,6 @@ int main(int argc, char** argv)
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
     };
 
-    for(auto& sensor : sensors){
-        sensor->startSampleLoop();
-    }
-    
     //Get number of steps in scenario and start timer
     int nSteps = (int)config.scenario.size();
     int idx = 0;

@@ -116,9 +116,6 @@ int main(int argc, char** argv)
     //Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors = create_sensors_for(server0_ip);
 
-    for(auto& sensor : sensors){
-        sensor->startSampleLoop();
-    }
     while(true){
         sim0.sampleAll(sensors);
         control_vehicle(sim0, *sensors[1]);
