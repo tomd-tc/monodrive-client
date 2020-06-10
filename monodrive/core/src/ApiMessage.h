@@ -1,5 +1,6 @@
 // Copyright 2017-2020 monoDrive, LLC. All Rights Reserved.
 #pragma once
+#include <iostream>
 #include <string>
 #include <cstring>
 #include <deque>

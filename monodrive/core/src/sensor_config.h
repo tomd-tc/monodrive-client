@@ -451,27 +451,6 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
 /// END Camera Config JSON Parsing
 
 /// Radar Config JSON Parsing
-void inline to_json(nlohmann::json& j, const RadarConfig& config)
-{
-    j = static_cast<SensorBaseConfig>(config);
-    j["paint_targets"] = config.paint_targets;
-    j["target_paint_lifetime"] = config.target_paint_lifetime;
-    j["nearest_target_label_radius"] = config.nearest_target_label_radius;
-    j["send_radar_cube"] = config.send_radar_cube;
-    j["gpu_number"] = config.gpu_number;
-    j["fs"] = config.fs;
-    j["fc"] = config.fc;
-    j["num_sweeps"] = config.num_sweeps;
-    j["num_samples_per_sweep"] = config.num_samples_per_sweep;
-    j["sweep_time"] = config.sweep_time;
-    j["bandwidth"] = config.bandwidth;
-    j["max_radar_returns"] = config.max_radar_returns;
-    j["elements"] = config.elements;
-    j["transmitter"] = config.transmitter;
-    j["receiver"] = config.receiver;
-    j["sbr"] = config.sbr;
-}
-
 void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
 {
     j = nlohmann::json{
@@ -552,6 +531,27 @@ void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
     json_get(j, "debug_frustum",           config.debug_frustum);
     json_get(j, "debug_scan",           config.debug_scan);
     json_get(j, "debug_rescan",           config.debug_rescan);
+}
+
+void inline to_json(nlohmann::json& j, const RadarConfig& config)
+{
+    j = static_cast<SensorBaseConfig>(config);
+    j["paint_targets"] = config.paint_targets;
+    j["target_paint_lifetime"] = config.target_paint_lifetime;
+    j["nearest_target_label_radius"] = config.nearest_target_label_radius;
+    j["send_radar_cube"] = config.send_radar_cube;
+    j["gpu_number"] = config.gpu_number;
+    j["fs"] = config.fs;
+    j["fc"] = config.fc;
+    j["num_sweeps"] = config.num_sweeps;
+    j["num_samples_per_sweep"] = config.num_samples_per_sweep;
+    j["sweep_time"] = config.sweep_time;
+    j["bandwidth"] = config.bandwidth;
+    j["max_radar_returns"] = config.max_radar_returns;
+    j["elements"] = config.elements;
+    j["transmitter"] = config.transmitter;
+    j["receiver"] = config.receiver;
+    j["sbr"] = config.sbr;
 }
 
 /// END Radar Config JSON Parsing
