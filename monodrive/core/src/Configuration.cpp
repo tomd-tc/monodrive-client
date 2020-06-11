@@ -7,9 +7,9 @@
 
 
 Configuration::Configuration(
-    const fs::path& simulatorConfigPath,
-    const fs::path& weatherConfigPath,
-    const fs::path& scenarioConfigPath
+    const std::string& simulatorConfigPath,
+    const std::string& weatherConfigPath,
+    const std::string& scenarioConfigPath
 ){
     if (!simulatorConfigPath.empty())
     {
@@ -71,10 +71,10 @@ Configuration::Configuration(
 //     scenario  = load(scenario_config_path);
 // }
 
-nlohmann::json Configuration::load(const fs::path& path)
+nlohmann::json Configuration::load(const std::string& path)
 {
     nlohmann::json j;
-    std::cout << path.string() << std::endl;
+    std::cout << path << std::endl;
     try
     {
         std::ifstream in(path, std::ifstream::in);
