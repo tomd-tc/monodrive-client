@@ -35,9 +35,9 @@ public:
 		auto header_length = DATA_FRAME_HEADER_SIZE;
 		boost::asio::read(socket, boost::asio::buffer(buffer.data(), buffer.available()));
 		auto packet_size = buffer.readInt();
-		auto time = buffer.readInt();
-		auto gameTime = buffer.readInt();
-		auto sampleCount = buffer.readInt();
+		buffer.readInt();  // time
+		buffer.readInt();  // gameTime
+		buffer.readInt();  // sampleCount
 		auto payloadSize = packet_size - header_length;
 		if (payloadSize > 0)
 		{
