@@ -3,9 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 project(monodrive)
 
 file(GLOB SOURCES "src/*.cpp")
+file(GLOB HEADERS "src/*.h" "src/*.hpp")
 
 add_library(${PROJECT_NAME} ${SOURCES})
- 
+
 #Bring the headers, into the project
 include_directories(src)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
@@ -34,3 +35,11 @@ if(LIBRT)
 	target_link_libraries(${PROJECT_NAME} ${LIBRT})
 endif(LIBRT)
 target_link_libraries (${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+
+# installation
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX /usr/local/monodrive/client CACHE PATH "monoDrive client install prefix" FORCE)
+endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(FILES ${HEADERS} DESTINATION include)
