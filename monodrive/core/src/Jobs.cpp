@@ -2,7 +2,11 @@
 
 #include "Jobs.h"
 #include <fstream>
-#include "cxxopts.hpp"
+
+#define GCC_VERSION __GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__
+#if GCC_VERSION >= 40900
+#include "cxxopts.hpp"  // requires regex
+#endif
 
 
 Job::Job(int argc, char** argv)
@@ -24,6 +28,7 @@ bool Job::setResult(const Result& result)
 
 void Job::parseArguments(int argc, char** argv)
 {
+#if GCC_VERSION >= 40900
     cxxopts::Options options("monoDrive Simulator Jobs interface");
     options.allow_unrecognised_options();
     options.add_options()
@@ -65,6 +70,9 @@ void Job::parseArguments(int argc, char** argv)
     {
         resultsPath = cla[Results_FLAG].as<std::string>();
     }
+#else
+    std::cout << "Warning unable to parse command line args with gcc < 4.9" << std::endl;
+#endif
 }
 
 nlohmann::json ResultMetric::dump() const
