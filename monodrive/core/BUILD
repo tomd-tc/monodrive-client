@@ -7,7 +7,7 @@ cc_library(
     includes = ["/usr/include/boost", "/usr/lib/x86_64-linux-gnu", "src"],
     linkopts = [
         "-L/usr/lib/x86_64-linux-gnu",
-        "-L/usr/lib/x86_64-linux-gnu/",
+        "-L/usr/local/apollo/boost/lib",
         "-lboost_system",
     ],
 )
