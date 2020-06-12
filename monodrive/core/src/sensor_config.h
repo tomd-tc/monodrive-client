@@ -297,7 +297,7 @@ public:
     }
     int wheelNumber = 0;
     virtual DataFrame* DataFrameFactory() override {
-        return new ImuFrame;
+        return new RPMFrame;
     }
 };
 
