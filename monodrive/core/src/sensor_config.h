@@ -288,6 +288,18 @@ public:
         return new ImuFrame;
     }
 };
+class RPMConfig : public SensorBaseConfig
+{
+public:
+    RPMConfig()
+    {
+        type = "RPM";
+    }
+    int wheelNumber = 0;
+    virtual DataFrame* DataFrameFactory() override {
+        return new ImuFrame;
+    }
+};
 
 class CollisionConfig : public SensorBaseConfig
 {
