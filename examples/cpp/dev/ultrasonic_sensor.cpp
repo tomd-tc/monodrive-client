@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     Configuration config(
         "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
-        "examples/config/scenario_config_single_vehicle.json"
+        "examples/config/scenario_multi_vehicle_straightaway.json"
     );
 
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);

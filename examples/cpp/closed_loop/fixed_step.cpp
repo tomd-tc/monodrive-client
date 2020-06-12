@@ -116,7 +116,7 @@ int main(int argc, char** argv)
     Configuration config(
         "examples/cpp/closed_loop/simulator_no_traffic_fixed_step.json",
         "examples/config/weather.json",
-        "examples/config/scenario_config_multi_vehicle.json"
+        "examples/config/scenario_multi_vehicle_almono.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 

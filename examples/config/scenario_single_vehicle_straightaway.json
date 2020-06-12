@@ -16,7 +16,7 @@
             "limit_speed_in_curves": true,
             "location": {
                 "x": 7210.0,
-                "y": 210.0,
+                "y": 150.0,
                 "z": 30.0
             },
             "obey_road_speed_limits": true,
