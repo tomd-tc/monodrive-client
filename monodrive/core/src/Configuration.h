@@ -6,10 +6,11 @@ class Configuration
 {
 public:
     // Configuration(int argc, char** argv);
+    Configuration() {};
     Configuration(
-        const std::string& simulatorConfigPath = {""},
-        const std::string& weatherConfigPath = {""},
-        const std::string& scenarioConfigPath = {""}
+        const std::string& simulatorConfigPath,
+        const std::string& weatherConfigPath,
+        const std::string& scenarioConfigPath
     );
     ~Configuration(){};
     nlohmann::json simulator;

@@ -2,12 +2,7 @@
 #pragma once
 
 #include "json.hpp"
-#include "cxxopts.hpp"
 #include "JsonHelpers.h"
-
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
 
 // flags
 #define AssetDir_FLAG "md_assets"
@@ -59,11 +54,11 @@ public:
 private:
     void parseArguments(int argc, char** argv);
 
-    fs::path assetDirPath;
-    fs::path simulatorPath;
-    fs::path scenarioPath;
-    fs::path weatherPath;
-    fs::path vehiclePath;
-    fs::path sensorsPath;
-    fs::path resultsPath;
+    std::string assetDirPath;
+    std::string simulatorPath;
+    std::string scenarioPath;
+    std::string weatherPath;
+    std::string vehiclePath;
+    std::string sensorsPath;
+    std::string resultsPath;
 };

@@ -2,6 +2,7 @@
 
 #include "Jobs.h"
 #include <fstream>
+#include "cxxopts.hpp"
 
 
 Job::Job(int argc, char** argv)
