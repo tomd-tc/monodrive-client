@@ -287,5 +287,5 @@ public:
     RPMFrame(int wheel_number) : wheel_number(wheel_number){
     }
     uint32_t wheel_number;
-    float speed;
-};
+    float speed; 
+ };

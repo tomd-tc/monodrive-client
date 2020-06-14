@@ -3,16 +3,8 @@
   "server_ip": "127.0.0.1",
   "server_port": 8999,
   "client_ip": "127.0.0.1",
-  "map": "Almono",
-  "ego_config":{
-    "vehicle_dynamics": "physx",
-    "body":{
-      "type": "Blueprint'/Game/Vehicles/crossover_monoDrive_01.crossover_monoDrive_01_C'",
-      "color": "CarPaint_White.CarPaint_White"
-    }
-  },
-  "simulation_mode": 3,
-  "time_step": 0.01,
+  "map": "Straightaway5k",
+  "simulation_mode": 0,
   "phys_materials": {
     "Aluminum": {
       "specular_exponent": 15.0,
