@@ -288,6 +288,7 @@ public:
         return new ImuFrame;
     }
 };
+
 class RPMConfig : public SensorBaseConfig
 {
 public:
@@ -295,9 +296,12 @@ public:
     {
         type = "RPM";
     }
-    int wheelNumber = 0;
+    int wheel_number = 0;
     virtual DataFrame* DataFrameFactory() override {
-        return new RPMFrame;
+        return new RPMFrame(wheel_number);
+    }
+    virtual nlohmann::json dump(){
+        return *this;
     }
 };
 
@@ -679,3 +683,16 @@ void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
     json_get(j, "follow_roll", config.follow_roll);
 }
 /// END Occupancy Grid Sensor JSON parsing
+
+/// RPM Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const RPMConfig& config) 
+{
+    j = static_cast<SensorBaseConfig>(config);
+    j["wheelNumber"] = config.wheel_number;
+}
+
+void inline from_json(const nlohmann::json& j, RPMConfig& config)
+{
+    json_get(j, "wheelNumber", config.wheel_number);
+}
+/// END RPM Sensor JSON parsing
