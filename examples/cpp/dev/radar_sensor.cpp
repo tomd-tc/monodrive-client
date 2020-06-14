@@ -22,9 +22,9 @@ int main(int argc, char** argv)
 
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/config/simulator_no_traffic.json",
+        "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
-        "examples/config/scenario_multi_vehicle_almono.json"
+        "examples/config/scenario_multi_vehicle_straightaway.json"
     );
     // config.simulator["map"] = "RadarCube";
     // config.scenario["frame"][0]["position"] = {0.f, 0.f, 20.f};

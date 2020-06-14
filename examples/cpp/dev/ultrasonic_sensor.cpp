@@ -62,9 +62,11 @@ int main(int argc, char** argv)
 
     sensors[0]->sampleCallback = [](DataFrame* frame){
         auto& ultrasonicFrame = *static_cast<UltrasonicFrame*>(frame);
-        std::cout << ultrasonicFrame.currentFrameIndex << std::endl;
         for(auto& target : ultrasonicFrame.ultrasonicTargetListFrame->targets) {
-            std::cout << "Target at:" << target.range << std::endl;
+            if (target.range != -1) {
+                std::cout << "Frame: " << ultrasonicFrame.currentFrameIndex
+                << ", target at: " << target.range << " cm" << std::endl;
+            }
         }
     };
 
