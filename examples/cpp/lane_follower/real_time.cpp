@@ -115,12 +115,15 @@ void perception(DataFrame* dataFrame) {
 
 int main(int argc, char** argv)
 {
-    //Read JSON files in cpp_client/config directory
+    // read JSON files from config directory
     Configuration config(
-        "examples/cpp/lane_follower/simulator_no_traffic.json",
+        "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
-        "examples/config/scenario_multi_vehicle_almono.json"
+        "examples/config/scenario_ego_on_shoulder_straightaway.json"
     );
+    // set to closed loop mode
+    config.simulator["simulation_mode"] = 0;
+
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     if(!sim0.configure()){

@@ -112,12 +112,16 @@ void perception(DataFrame* dataFrame) {
 
 int main(int argc, char** argv)
 {
-    //Read JSON files in cpp_client/config directory
+    // read JSON files from config directory
     Configuration config(
-        "examples/lane_follower/closed_loop/simulator_no_traffic_fixed_step.json",
+        "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
-        "examples/config/scenario_multi_vehicle_almono.json"
+        "examples/config/scenario_ego_on_shoulder_straightaway.json"
     );
+    // set to fixed timestep mode
+    config.simulator["simulation_mode"] = 3;
+    config.simulator["time_step"] = 0.01;
+
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     // configure the simulator with scenario, weather, and environment information
