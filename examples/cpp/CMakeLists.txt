@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.10)
+
+if(${MSVC})
+    SET(EIGEN3_INCLUDE_DIR "C:/local/Eigen3")
+else(${MSVC})
+    find_package(Eigen3)
+endif(${MSVC})
+
+find_package(OpenCV PATHS "C:/local/opencv/build" "C:/opencv/build")
+if(EIGEN3_INCLUDE_DIR)
+    if(${OPENCV_FOUND})
+        add_subdirectory(lane_follower)
+        add_subdirectory(dev)
+    else(${OPENCV_FOUND})
+        message("Warning, lane_follower and dev examples not built, missing Opencv.")
+    endif(${OPENCV_FOUND})
+endif()
+
+add_subdirectory(replay)
+add_subdirectory(replay_step)
