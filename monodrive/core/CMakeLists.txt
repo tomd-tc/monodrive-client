@@ -15,7 +15,10 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 include_directories(src)
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
-# include boost
+#include boost
+IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+	cmake_policy(SET CMP0074 NEW)
+ENDIF(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.65 REQUIRED COMPONENTS system)

@@ -21,9 +21,9 @@ int main(int argc, char** argv)
 
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/config/simulator.json",
+        "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
-        "examples/config/scenario.json"
+        "examples/config/scenario_multi_vehicle_straightaway.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
@@ -31,27 +31,22 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    // define desired sensors
+    // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
-    CameraConfig fc_config;
-    fc_config.server_ip = server0_ip;
-    fc_config.listen_port = 8103;
-    fc_config.location.z = 200;
-    fc_config.rotation.pitch = -5;
-    fc_config.resolution = Resolution(1920,1080);
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
-
-    IMUConfig imu_config;
-    imu_config.server_ip = server0_ip;
-    imu_config.listen_port = 8105;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
+    GPSConfig g_config;
+    g_config.server_ip = sim0.getServerIp();
+    g_config.server_port = sim0.getServerPort();
+    g_config.listen_port = 8102;
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(g_config)));
 
     ViewportCameraConfig vp_config;
-    vp_config.server_ip = server0_ip;
-    vp_config.location.x = -750;
-    vp_config.location.z = 400;
+    vp_config.server_ip = sim0.getServerIp();
+    vp_config.server_port = sim0.getServerPort();
+    vp_config.location.z = 200;
+    vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
+    // Send configurations to the simulator
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {
@@ -59,14 +54,24 @@ int main(int argc, char** argv)
     }
 
     //Get number of steps in scenario and start timer
-    int nSteps = (int)config.scenario.size();
-    int idx = 0;
+    mono::precise_stopwatch stopwatch;
 
-    //Step through scenario while reading sensor ouputs
-    std::cout << "Running scenario" << std::endl;
-    for(; idx < nSteps; idx++)
+    /// initialize the vehicle, the first control command spawns the vehicle
+    sim0.sendControl(0.1, 0, 0, 1);
+
+    sensors[0]->sampleCallback = [](DataFrame* frame){
+        auto& gpsFrame = *static_cast<GPSFrame*>(frame);
+        std::cout << gpsFrame.lattitude << " " 
+        << gpsFrame.longitude << " "
+        << gpsFrame.elevation << " "
+        << gpsFrame.yaw << std::endl;
+    };
+
+    std::cout << "Sampling sensor loop" << std::endl;
+    int count = 0;
+    while(true)
     {	
-        sim0.stepSampleAll(sensors, idx, 1);
+        sim0.sampleAll(sensors);
     }
     
     return 0;

@@ -8,54 +8,65 @@
 #include "Stopwatch.h"
 
 
-Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensor_config) : config(std::move(sensor_config))
+Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensorConfig) : config(std::move(sensorConfig))
 {
 	name = std::string(config->type) + std::string("_") + std::to_string(config->listen_port);
-    //VieportCamera doesn't need a connection 
-	if(config->listen_port != 0){
+	// ViewportCamera doesn't need a connection
+	if (config->listen_port != 0)
+	{
 		listener = new Connection(config->server_ip, config->listen_port);
 	} 
 	frame = config->DataFrameFactory();
-	sample_callback = [](DataFrame* frame){return;};
+	sampleCallback = [](DataFrame* frame){return;};
 }
 
 Sensor::~Sensor()
 {
-	stop_listening();
+	stopListening();
 	delete listener;
 	if(frame != nullptr)
+	{
 		delete frame;
+	}
 }
 
 bool Sensor::configure()
 {
 	std::cout << "Configure " << name << std::endl;
-	bool success = send_configure();
-	if(!config->ros.publish_to_ros){
-		success = start_listening();
+	if (!sendConfigure())
+	{
+		return false;
 	}
-	return success;
+	if (config->ros.publish_to_ros)
+	{
+		return true;
+	}
+	if (!startListening())
+	{
+		return false;
+	}
+	return startSampleLoop();
 }
-bool Sensor::send_configure()
+bool Sensor::sendConfigure()
 {
 	using namespace std;
 	Simulator& sim = Simulator::getInstance(config->server_ip, config->server_port);
 	nlohmann::json msg = config->dump();
 	std::cout << msg << std::endl;
-	return sim.send_command(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));	
+	return sim.sendCommand(ApiMessage(1001, REPLAY_ConfigureSensorsCommand_ID, true, msg));
 }
 
-bool Sensor::start_listening()
+bool Sensor::startListening()
 {
 	bool success = false;
-	if(config->listen_port !=0)
+	if (config->listen_port != 0)
 	{
-		success = listener->open_connection();
+		success = listener->connect();
 	}
 	return success;	
 }
 
-bool Sensor::stop_listening()
+bool Sensor::stopListening()
 {
 	bContinue = false;
 	if (listener == nullptr)
@@ -66,23 +77,24 @@ bool Sensor::stop_listening()
 	{
 		listener->close();
 	}
-	if (SampleThread.joinable())
+	if (sampleThread.joinable())
 	{
-		SampleThread.join();
+		sampleThread.join();
 	}
 	return true;
 }
 
-bool Sensor::StartSampleLoop()
+bool Sensor::startSampleLoop()
 {
-	SampleThread = std::thread([this]() {
+	sampleThread = std::thread([this]() {
 		while (bContinue) {
-			if (config->listen_port == 0)
+			if (config->listen_port == 0) {
 				return false;
+			}
 			recvBuffer.resize(header_length);
 			if (listener->socket.is_open()) {
 				try {
-					listener->read_sensor_packet(recvBuffer);
+					listener->readSensorPacket(recvBuffer);
 				}
 				catch (const std::exception& e) {
 					std::cout << e.what() << std::endl;
@@ -90,8 +102,8 @@ bool Sensor::StartSampleLoop()
 				}
 				parse();
 				if (frame->parse_complete()) {
-					if (sample_callback) {
-						sample_callback(frame);
+					if (sampleCallback) {
+						sampleCallback(frame);
 					}
 					sampleInProgress.store(false, std::memory_order::memory_order_relaxed);
 				}
@@ -109,7 +121,9 @@ bool Sensor::StartSampleLoop()
 bool Sensor::parse()
 {
 	if(frame == nullptr)
+	{
 		return false;
+	}
 	frame->parse_header(recvBuffer);
 	frame->parse(recvBuffer);
 	return true;

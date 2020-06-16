@@ -12,6 +12,11 @@
 #include "sensor_config.h"
 #include "Stopwatch.h"
 
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+
 
 int main(int argc, char** argv)
 {
@@ -31,13 +36,12 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    // define desired sensors
+    // Setup and Connect Sensors
     std::vector<std::shared_ptr<Sensor>> sensors;
     CameraConfig fc_config;
     fc_config.server_ip = server0_ip;
     fc_config.listen_port = 8103;
     fc_config.location.z = 200;
-    fc_config.rotation.pitch = -5;
     fc_config.resolution = Resolution(1920,1080);
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
@@ -47,9 +51,8 @@ int main(int argc, char** argv)
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
 
     ViewportCameraConfig vp_config;
-    vp_config.server_ip = server0_ip;
-    vp_config.location.x = -750;
     vp_config.location.z = 400;
+    vp_config.location.x = -750;
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;
@@ -57,6 +60,30 @@ int main(int argc, char** argv)
     {
         sensor->configure();
     }
+
+    // define callback for camera
+    sensors[0]->sampleCallback = [](DataFrame* frame) {
+      auto camFrame = static_cast<CameraFrame*>(frame);
+      auto imFrame = camFrame->imageFrame;
+      cv::Mat img;
+      if(imFrame->channels == 4) {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
+                      imFrame->pixels);
+      } else {
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
+                      imFrame->pixels);
+        cv::cvtColor(img, img, cv::COLOR_GRAY2BGRA);
+      }
+      for (auto& annotation : camFrame->annotationFrame->annotations) {
+        for (auto& bbox : annotation.second.bounding_boxes_2d)
+          cv::rectangle(img, cv::Point(int(bbox.xmin), int(bbox.ymin)),
+                        cv::Point(int(bbox.xmax), int(bbox.ymax)),
+                        cv::Scalar(0, 0, 255));
+      }
+      cv::imshow("monoDrive", img);
+      cv::waitKey(1);
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    };
 
     //Get number of steps in scenario and start timer
     int nSteps = (int)config.scenario.size();

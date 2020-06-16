@@ -12,85 +12,86 @@
 
 static std::mutex _mutex;
 
-std::map<const std::string, Simulator*> Simulator::sim_map;
+std::map<const std::string, Simulator*> Simulator::simMap;
 
-Simulator::Simulator(const Configuration& inConfig)
-	: config(inConfig)
+Simulator::Simulator(const Configuration& config)
+	: config(config)
 {
-	server_ip = config.simulator.at("server_ip").get<std::string>();
-	server_port = config.simulator.at("server_port").get<short>();
+	serverIp = config.simulator.at("server_ip").get<std::string>();
+	serverPort = config.simulator.at("server_port").get<short>();
 }
 
-Simulator::Simulator(const Configuration& inConfig, const std::string& inServer_ip, const short& inServer_port)
-	: config(inConfig), server_ip(inServer_ip), server_port(inServer_port)
-{
-
-}
+Simulator::Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort)
+	: config(config), serverIp(serverIp), serverPort(serverPort)
+{}
 
 Simulator::~Simulator()
 {
 	stop();
 }
 
-Simulator& Simulator::getInstance(const std::string& inServer_ip, const short& inServer_port)
+Simulator& Simulator::getInstance(const std::string& serverIp, const short& serverPort)
 {
 		std::lock_guard<std::mutex> simLock(_mutex);
-		const std::string sim_key = inServer_ip +":" + std::to_string(inServer_port);
-		return *sim_map[sim_key];
+		const std::string simKey = serverIp + ":" + std::to_string(serverPort);
+		return *simMap[simKey];
 } 
 
 
-Simulator& Simulator::getInstance(const Configuration& inConfig)
+Simulator& Simulator::getInstance(const Configuration& config)
 {
-		std::string ip_address = inConfig.simulator.at("server_ip").get<std::string>();
-		short port = inConfig.simulator.at("server_port").get<short>();
-		return getInstance(inConfig, ip_address, port);
+		std::string ip = config.simulator.at("server_ip").get<std::string>();
+		short port = config.simulator.at("server_port").get<short>();
+		return getInstance(config, ip, port);
 }
 
 Simulator& Simulator::getInstance(
-	const Configuration& inConfig,
-	const std::string& inServer_ip,
-	const short& inServer_port
+	const Configuration& config,
+	const std::string& serverIp,
+	const short& serverPort
 )
 {
 	std::lock_guard<std::mutex> simLock(_mutex);
-	const std::string sim_key = inServer_ip +":" + std::to_string(inServer_port);
-	if (sim_map[sim_key] == nullptr) {
-		sim_map[sim_key] = new Simulator(inConfig, inServer_ip, inServer_port);
+	const std::string simKey = serverIp + ":" + std::to_string(serverPort);
+	if (simMap[simKey] == nullptr) {
+		simMap[simKey] = new Simulator(config, serverIp, serverPort);
+		std::cout << "created new simulator:" << simKey << std::endl;
 	}
-	return *sim_map[sim_key];
+	return *simMap[simKey];
 }
 
 bool Simulator::deleteInstance(
-	const Configuration& inConfig,
-	const std::string& inServer_ip,
-	const short& inServer_port
+	const Configuration& config,
+	const std::string& serverIp,
+	const short& serverPort
 )
 {
 	std::lock_guard<std::mutex> simLock(_mutex);
-	const std::string sim_key = inServer_ip + ":" + std::to_string(inServer_port);
-	if (sim_map[sim_key] == nullptr)
+	const std::string simKey = serverIp + ":" + std::to_string(serverPort);
+	if (simMap[simKey] == nullptr)
 	{
 		return false;
 	}
-	delete sim_map[sim_key];
-	sim_map.erase(sim_key);
+	delete simMap[simKey];
+	simMap.erase(simKey);
 	return true;
 }
 
 void Simulator::clearInstances()
 {
 	std::lock_guard<std::mutex> simLock(_mutex);
-	for(auto& sim : sim_map){
+	for(auto& sim : simMap){
 		delete sim.second;
-		sim_map.erase(sim.first);
+		simMap.erase(sim.first);
 	}
 }
 
 void Simulator::connect()
 {
-	const auto ipaddress = boost::asio::ip::address::from_string(server_ip);
-	const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, server_port);
+	std::cout << "******Simulator Connect********" << std::endl;
+	const auto ipaddress = boost::asio::ip::address::from_string(serverIp);
+	const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, serverPort);
+	std::cout << endpoint << std::endl;
 	controlSocket.connect(endpoint);
 }
 
@@ -111,13 +112,14 @@ bool Simulator::configure()
 			connect();
 		}
 		catch (const std::exception& e){
+			std::cout << "Failed to connect to server. Is it running?" << std::endl;
 			std::cerr << e.what() << std::endl;
 			return false;
 		}
 	}
 
 	std::cout << "Send Simulator Config:   success = ";
-	std::cout << send_command(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
+	std::cout << sendCommand(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
 	int simulation_mode = 0;
 	json_get(config.simulator, "simulation_mode", simulation_mode);
@@ -126,55 +128,55 @@ bool Simulator::configure()
 		if (simulation_mode == 0 or simulation_mode == 3)
 		{
 			std::cout << "Send Closed Loop Config:    success = ";
-			std::cout << send_command(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
+			std::cout << sendCommand(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
 		}
 		else
 		{
 			std::cout << "Send Scenario Config:    success = ";
-			std::cout << send_command(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+			std::cout << sendCommand(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
 		}
 	}
 
 	if (!config.weather.empty())
 	{
 		std::cout << "Send Weather Config:     success = ";
-		std::cout << send_command(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;
+		std::cout << sendCommand(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;
 	}
 
 	return true;
 }
 
-bool Simulator::send_command(ApiMessage msg, nlohmann::json* resp_message)
+bool Simulator::sendCommand(ApiMessage message, nlohmann::json *response)
 {
-  msg.write(controlSocket);
-  ApiMessage response;
-  response.read(controlSocket);
-  if (resp_message != nullptr)
-  {
-	  *resp_message = response.get_message();
-  }
-  if (response.get_success())
-  {
-	  return true;
-  }
-  return false;
+	message.write(controlSocket);
+	ApiMessage res;
+	res.read(controlSocket);
+	if (response != nullptr)
+	{
+		*response = res.get_message();
+	}
+	if (res.get_success())
+	{
+		return true;
+	}
+	return false;
 }
 
-bool Simulator::step(int step_idx, int nsteps)
+bool Simulator::step(int stepIndex, int numSteps)
 {
-	nlohmann::json msg{{"amount", nsteps}};
-	ApiMessage step_message(step_idx, REPLAY_StepSimulationCommand_ID, true, msg);
-	return send_command(step_message);
+	nlohmann::json msg{{"amount", numSteps}};
+	ApiMessage message(stepIndex, REPLAY_StepSimulationCommand_ID, true, msg);
+	return sendCommand(message);
 }
 
-bool Simulator::state_step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state)
+bool Simulator::stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state)
 {
-	ApiMessage step_message(333, REPLAY_StateStepSimulationCommand_ID, true, state);	
+	ApiMessage message(333, REPLAY_StateStepSimulationCommand_ID, true, state);
 	for(auto& sensor : sensors)
     {
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
-	bool success = send_command(step_message);
+	bool success = sendCommand(message);
 	if(!success)
 		return success;
 	bool samplingInProgress = true;
@@ -190,13 +192,13 @@ bool Simulator::state_step_sample_all(std::vector<std::shared_ptr<Sensor>>& sens
 	return success;
 }
 
-void Simulator::step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, int step_idx, int nsteps)
+void Simulator::stepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, int stepIndex, int numSteps)
 {
 	for(auto& sensor : sensors)
     {
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
-	step(step_idx, nsteps);
+	step(stepIndex, numSteps);
 	bool samplingInProgress = true;
 	do{
 		samplingInProgress = false;
@@ -209,13 +211,13 @@ void Simulator::step_sample_all(std::vector<std::shared_ptr<Sensor>>& sensors, i
 	} while(samplingInProgress);
 }
 
-void Simulator::sample_all(std::vector<std::shared_ptr<Sensor>>& sensors)
+void Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
 	for(auto& sensor : sensors){
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
-	send_command(sampleMessage);
+	sendCommand(sampleMessage);
 	bool samplingInProgress = true;
 	do{
 		samplingInProgress = false;
@@ -235,5 +237,5 @@ bool Simulator::sendControl(float forward, float right, float brake, int mode)
     ego_msg["right_amount"] = right;
     ego_msg["brake_amount"] = brake;
     ego_msg["drive_mode"] = mode;
-    return send_command(ApiMessage(123, EgoControl_ID, true, ego_msg));
+    return sendCommand(ApiMessage(123, EgoControl_ID, true, ego_msg));
 }
