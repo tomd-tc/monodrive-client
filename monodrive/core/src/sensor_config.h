@@ -424,6 +424,9 @@ void inline to_json(nlohmann::json& j, const StateConfig& config){
 
 void inline from_json(const nlohmann::json& j, StateConfig& config)
 {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "include_obb", config.include_obb);
     json_get(j, "debug_drawing", config.debug_drawing);
     json_get(j, "desired_tags", config.desired_tags);
@@ -449,6 +452,9 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
 
 void inline from_json(const nlohmann::json& j, CameraConfig& config)
 {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "stream_dimensions", config.resolution),
     json_get(j, "max_distance", config.max_distance);
     json_get(j, "dynamic_range", config.dynamic_range);
@@ -483,6 +489,9 @@ void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
 }
 void inline from_json(const nlohmann::json& j, RadarConfig& config)
 {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "paint_targets", config.paint_targets);
     json_get(j, "target_paint_lifetime", config.target_paint_lifetime);
     json_get(j, "nearest_target_label_radius", config.nearest_target_label_radius);
@@ -603,6 +612,9 @@ void inline to_json(nlohmann::json& j, const UltrasonicConfig& config) {
     j["sbr"] = config.sbr;
 }
 void inline from_json(const nlohmann::json& j, UltrasonicConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "fc", config.fc);
     json_get(j, "pwm_factor", config.pwm_factor);
     json_get(j, "max_ultrasonic_returns", config.max_ultrasonic_returns);
@@ -624,6 +636,9 @@ void inline to_json(nlohmann::json& j, const LidarConfig& config)
 
 void inline from_json(const nlohmann::json& j, LidarConfig& config)
 {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "max_distance",         config.max_distance);
     json_get(j, "horizontal_resolution",config.horizontal_resolution);
     json_get(j, "rpms",                 config.rpms);
@@ -638,6 +653,12 @@ void inline from_json(const nlohmann::json& j, LidarConfig& config)
 void inline to_json(nlohmann::json& j, const GPSConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
+}
+
+void inline from_json(const nlohmann::json& j, GPSConfig& config)
+{
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
 }
 
 /// END GPS Config JSON Parsing
@@ -658,6 +679,9 @@ void inline to_json(nlohmann::json& j, const CollisionConfig& config)
 
 void inline from_json(const nlohmann::json& j, CollisionConfig& config)
 {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "desired_tags", config.desired_tags);
     json_get(j, "undesired_tags", config.undesired_tags);   
 }
@@ -675,6 +699,9 @@ void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
 }
 void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
 {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "stream_dimensions", config.resolution);
     json_get(j, "meters_per_pixel", config.meters_per_pixel);
     json_get(j, "follow_yaw", config.follow_yaw);
@@ -692,6 +719,9 @@ void inline to_json(nlohmann::json& j, const RPMConfig& config)
 
 void inline from_json(const nlohmann::json& j, RPMConfig& config)
 {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "wheelNumber", config.wheel_number);
 }
 /// END RPM Sensor JSON parsing
