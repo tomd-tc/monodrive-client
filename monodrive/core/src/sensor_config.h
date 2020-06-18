@@ -619,7 +619,7 @@ void inline from_json(const nlohmann::json& j, UltrasonicConfig& config) {
     json_get(j, "pwm_factor", config.pwm_factor);
     json_get(j, "max_ultrasonic_returns", config.max_ultrasonic_returns);
     json_get(j, "send_processed_data", config.send_processed_data);
-    from_json(j, config.sbr);
+    json_get(j, "sbr", config.sbr);
 }
 /// END Ultrasonic Config JSON Parsing
 
