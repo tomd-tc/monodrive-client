@@ -1,5 +1,4 @@
-// Copyright 2017-2020 monoDrive, LLC. All Rights Reserved.
-
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #include "Jobs.h"
 #include <fstream>
 
