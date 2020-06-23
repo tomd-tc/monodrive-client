@@ -76,6 +76,13 @@ void control_vehicle(){
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
     state_data = state_sensor_msg;
+    for(auto& vehicle : state_data.vehicles) {
+        for(auto& tag : vehicle.tags) {
+            if(tag == "ego") {
+                vehicle_name = vehicle.name;
+            }
+        }
+    }
 }
 
 int main(int argc, char** argv)
