@@ -45,6 +45,7 @@ target_link_libraries(sensor_frame_count_fixed monodrive)
 target_link_libraries(replay_step_dev monodrive)
 target_link_libraries(rpm_sensor monodrive)
 target_link_libraries(config_export monodrive)
+target_link_libraries(config_export -lstdc++fs)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 

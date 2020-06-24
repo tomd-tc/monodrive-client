@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_CXX_STANDARD 11)
-
 project(monodrive)
 
 # collect headers and source
@@ -10,6 +8,15 @@ file(GLOB HEADERS "src/*.h" "src/*.hpp")
 
 # define shared library
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
+
+# set c++ 11 standard
+set_target_properties(
+	${PROJECT_NAME}
+    PROPERTIES
+        CXX_STANDARD 11
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
 
 # bring src directory into the project
 include_directories(src)
