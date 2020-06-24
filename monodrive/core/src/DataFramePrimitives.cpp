@@ -1,3 +1,4 @@
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #include "DataFramePrimitives.h"
 
 void to_json(nlohmann::json& j, const Quat& v) {
