@@ -1,1 +1,1 @@
-workspace(name = "monodrive_client")
+workspace(name = "monodrive")
