@@ -29,7 +29,6 @@ Configuration::Configuration(
 nlohmann::json Configuration::load(const std::string& path)
 {
     nlohmann::json j;
-    std::cout << path << std::endl;
     try
     {
         std::ifstream in(path, std::ifstream::in);

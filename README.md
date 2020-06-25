@@ -96,14 +96,14 @@ using CMake
 mkdir build
 cd build
 cmake ..
-make -j8
+make
 sudo make install
 ```
 
 This will install the client library under the prefix `/usr/local/monodrive/client`.
-It can now be included or linked as needed. For example
+It can now be included or linked as needed.
 
-Compile your own executable with monoDrive client library
+For example, to compile your own executable with the monoDrive client library
 ```
 g++ main.cpp -I/usr/local/monodrive/client/include/ -L/usr/local/monodrive/client/lib -lboost_system -lmonodrive -o my_program
 ```
