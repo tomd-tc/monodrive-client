@@ -9,8 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(fixed_step fixed_step.cpp)
 add_executable(real_time real_time.cpp)
 
-target_link_libraries(fixed_step monodrive)
-target_link_libraries(real_time monodrive)
+target_link_libraries(fixed_step monodrive_static)
+target_link_libraries(real_time monodrive_static)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 
