@@ -14,9 +14,9 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 set_target_properties(
 	${PROJECT_NAME}
     PROPERTIES
-        CXX_STANDARD 11
-        CXX_STANDARD_REQUIRED YES
-        CXX_EXTENSIONS NO
+      CXX_STANDARD 11
+      CXX_STANDARD_REQUIRED YES
+      CXX_EXTENSIONS NO
 )
 
 # bring src directory into the project

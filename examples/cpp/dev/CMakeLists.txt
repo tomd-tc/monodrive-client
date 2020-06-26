@@ -87,3 +87,12 @@ target_link_libraries(sensor_frame_count_fixed ${OpenCV_LIBRARIES})
 target_include_directories(replay_step_dev PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
 target_link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
+
+# copy dll to runtime directory
+if(MSVC)
+  add_custom_command(TARGET camera_sensor POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:monodrive>
+      $<TARGET_FILE_DIR:camera_sensor>
+  )
+endif(MSVC)

@@ -24,3 +24,12 @@ target_link_libraries(fixed_step ${OpenCV_LIBRARIES})
 target_include_directories(real_time PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(real_time ${OpenCV_LIBRARIES})
 target_link_libraries(real_time ${OpenCV_LIBRARIES})
+
+# copy dll to runtime directory
+if(MSVC)
+  add_custom_command(TARGET fixed_step POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:monodrive>
+      $<TARGET_FILE_DIR:fixed_step>
+  )
+endif(MSVC)
