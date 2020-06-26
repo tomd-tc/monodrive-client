@@ -7,6 +7,7 @@ file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "src/*.h" "src/*.hpp")
 
 # define shared library
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 # set c++ 11 standard
