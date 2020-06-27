@@ -27,9 +27,12 @@ target_link_libraries(real_time ${OpenCV_LIBRARIES})
 
 # copy dll to runtime directory
 if(MSVC)
-  add_custom_command(TARGET fixed_step POST_BUILD
+  add_custom_target(monodrive_lib_copy_lanes)
+  add_custom_command(TARGET monodrive_lib_copy_lanes POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       $<TARGET_FILE:monodrive>
-      $<TARGET_FILE_DIR:fixed_step>
+      ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>
   )
+  add_dependencies(fixed_step monodrive_lib_copy_lanes)
+  add_dependencies(real_time monodrive_lib_copy_lanes)
 endif(MSVC)

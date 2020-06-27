@@ -26,6 +26,7 @@ add_executable(replay_step_dev replay_step.cpp)
 add_executable(rpm_sensor rpm_sensor.cpp)
 add_executable(config_export config_export.cpp)
 
+# link monodrive client
 target_link_libraries(camera_sensor monodrive)
 target_link_libraries(state_sensor monodrive)
 target_link_libraries(imu_sensor monodrive)
@@ -45,10 +46,40 @@ target_link_libraries(sensor_frame_count_fixed monodrive)
 target_link_libraries(replay_step_dev monodrive)
 target_link_libraries(rpm_sensor monodrive)
 target_link_libraries(config_export monodrive)
-target_link_libraries(config_export -lstdc++fs)
 
+# copy monodrive dll to runtime directory
+if(MSVC)
+  add_custom_target(monodrive_lib_copy_dev)
+  add_custom_command(TARGET monodrive_lib_copy_dev POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:monodrive>
+      ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>
+  )
+  add_dependencies(camera_sensor monodrive_lib_copy_dev)
+  add_dependencies(state_sensor monodrive_lib_copy_dev)
+  add_dependencies(imu_sensor monodrive_lib_copy_dev)
+  add_dependencies(gps_sensor monodrive_lib_copy_dev)
+  add_dependencies(radar_sensor monodrive_lib_copy_dev)
+  add_dependencies(lidar_sensor monodrive_lib_copy_dev)
+  add_dependencies(semantic_camera_sensor monodrive_lib_copy_dev)
+  add_dependencies(depth_camera_sensor monodrive_lib_copy_dev)
+  add_dependencies(scenario_file monodrive_lib_copy_dev)
+  add_dependencies(occupancy_grid_sensor monodrive_lib_copy_dev)
+  add_dependencies(semantic_lidar_sensor monodrive_lib_copy_dev)
+  add_dependencies(ultrasonic_sensor monodrive_lib_copy_dev)
+  add_dependencies(collision_sensor monodrive_lib_copy_dev)
+  add_dependencies(replay_dev monodrive_lib_copy_dev)
+  add_dependencies(sensor_frame_count monodrive_lib_copy_dev)
+  add_dependencies(sensor_frame_count_fixed monodrive_lib_copy_dev)
+  add_dependencies(replay_step_dev monodrive_lib_copy_dev)
+  add_dependencies(rpm_sensor monodrive_lib_copy_dev)
+  add_dependencies(config_export monodrive_lib_copy_dev)
+endif(MSVC)
+
+# eigen
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+# opencv
 find_package(OpenCV REQUIRED PATHS "C:/local/opencv/build" "C:/opencv/build")
 include_directories(${OpenCV_INCLUDE_DIRS})
 
@@ -88,11 +119,5 @@ target_include_directories(replay_step_dev PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
 target_link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
 
-# copy dll to runtime directory
-if(MSVC)
-  add_custom_command(TARGET camera_sensor POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      $<TARGET_FILE:monodrive>
-      $<TARGET_FILE_DIR:camera_sensor>
-  )
-endif(MSVC)
+# filesystem
+target_link_libraries(config_export -lstdc++fs)
