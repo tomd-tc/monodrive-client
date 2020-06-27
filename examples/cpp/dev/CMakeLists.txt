@@ -53,7 +53,7 @@ if(MSVC)
   add_custom_command(TARGET monodrive_lib_copy_dev POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       $<TARGET_FILE:monodrive>
-      ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>
+      ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/monodrive.dll
   )
   add_dependencies(camera_sensor monodrive_lib_copy_dev)
   add_dependencies(state_sensor monodrive_lib_copy_dev)

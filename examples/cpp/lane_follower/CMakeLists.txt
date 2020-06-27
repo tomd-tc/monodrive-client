@@ -31,7 +31,7 @@ if(MSVC)
   add_custom_command(TARGET monodrive_lib_copy_lanes POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       $<TARGET_FILE:monodrive>
-      ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>
+      ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/monodrive.dll
   )
   add_dependencies(fixed_step monodrive_lib_copy_lanes)
   add_dependencies(real_time monodrive_lib_copy_lanes)
