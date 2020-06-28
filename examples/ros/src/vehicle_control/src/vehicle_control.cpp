@@ -12,6 +12,8 @@
 #include "ros/package.h"
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
+#include <geometry_msgs/Twist.h>
+#include <sensor_msgs/Joy.h>
 
 using namespace lane_spline;
 LaneSpline lanespline;
@@ -25,8 +27,13 @@ std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
 ros::Subscriber state_sensor_sub;
+ros::Subscriber joy_sub_;
+
 
 monodrive_msgs::StateSensor state_data;
+std::vector<float> wheel_data = {0,0,0,0};
+
+
 
 void control_vehicle(){
     monodrive_msgs::VehicleState vs;
@@ -66,10 +73,11 @@ void control_vehicle(){
 
     monodrive_msgs::VehicleControl msg;
     msg.name = vehicle_name;
-    msg.throttle = 0.75f;
-    msg.brake = 0.f;
+    std::cout << "throttle: " <<wheel_data[0] <<"\t"<<"brake: " <<wheel_data[1] << "\t"<< "drive_mode: " <<wheel_data[3] <<std::endl;
+    msg.throttle = wheel_data[0];
+    msg.brake = wheel_data[1];
     msg.steer = angle;
-    msg.drive_mode = 1;
+    msg.drive_mode = wheel_data[3];
 
     vehicle_control_pub.publish(msg);
 }
@@ -83,6 +91,29 @@ void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
             }
         }
     }
+}
+
+void joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
+{
+//   std::cout<<"AXE[0]: "<< joy->axes[0] <<std::endl;
+  /*
+  0 - throttle
+  1 - brake
+  2 - steer
+  3 - drive_mode
+  */ 
+
+  float throttle =  (joy->axes[1] == -1) ? 0 : joy->axes[1];
+  float brake =  (joy->axes[2] == -1) ? 0 : joy->axes[2];
+  float steer =  float(joy->buttons[0]);
+  float drive_mode =  (joy->buttons[8]) == 0.0 ? 1.0 : -1.0;
+
+
+  wheel_data[0] = throttle;
+  wheel_data[1] = brake;
+  wheel_data[2] = steer;
+  wheel_data[3] = drive_mode;
+
 }
 
 int main(int argc, char** argv)
@@ -99,6 +130,7 @@ int main(int argc, char** argv)
     vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
     state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
         &state_sensor_callback);
+    joy_sub_ = node_handle->subscribe("/joy", 10, &joyCallback);
 
     ros::Rate rate(100);
 
