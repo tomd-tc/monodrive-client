@@ -82,15 +82,16 @@ source devel/setup.bash
 
 ```bash
 echo "source <path/to/monodrive/ros/devel/setup.bash>" >> ~/.bashrc
+```
 
-1. Execute the following to build the ROS packages: 
+3. Execute the following to build the ROS packages: 
 ```bash
 cd ./examples/ros
 catkin_make
 source devel/setup.bash
 ```
 
-1. Add the examples setup file to your .bashrc to add the packages to your ros path on terminal load:
+4. Add the examples setup file to your .bashrc to add the packages to your ros path on terminal load:
 ```bash
 echo "source <path/to/examples/ros/devel/setup.bash>" >> ~/.bashrc
 ```
