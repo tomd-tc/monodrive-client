@@ -7,9 +7,18 @@
 #include "JsonHelpers.h"
 #include "DataFrame.h"
 #include "config_types.h"
+#include "UECompatability.h"
 
-class SensorBaseConfig
+#ifdef UE_BUILD
+#include "CoreMinimal.h"
+#include "sensor_config.generated.h"
+#endif
+
+
+SENSOR_CONFIG
+class MONODRIVECORE_API SensorBaseConfig
 {
+    //GENERATED_BODY()
     public:
         SensorBaseConfig(){};
         virtual ~SensorBaseConfig(){};
@@ -44,15 +53,23 @@ class SensorBaseConfig
         };
 };
 
-class StateConfig : public SensorBaseConfig{
+SENSOR_CONFIG
+class StateConfig : public SensorBaseConfig {
 public: 
-    StateConfig(){
+    StateConfig()
+    {
         type = "State";
     }
-    std::vector<std::string> desired_tags{};
-    std::vector<std::string> undesired_tags{};
+
+    SENSOR_PROPERTY("Tag system")
+    VECTOR<NAME> desired_tags{};
+    SENSOR_PROPERTY("Tag system")
+    VECTOR<NAME> undesired_tags{};
+    SENSOR_PROPERTY("Sensor")
     bool debug_drawing{false};
+    SENSOR_PROPERTY("Sensor")
     bool include_obb{false};
+
     virtual DataFrame* DataFrameFactory() override{
         return new StateFrame;
     }
@@ -61,6 +78,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class LidarConfig : public SensorBaseConfig
 {
 public:
@@ -84,6 +102,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class SemanticLidarConfig : public LidarConfig {
 public:
     SemanticLidarConfig()
@@ -93,6 +112,7 @@ public:
 };
 
 // todo: make sure defaults are correct
+SENSOR_CONFIG
 class RadarConfig : public SensorBaseConfig
 {
 public:
@@ -148,6 +168,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class UltrasonicConfig : public SensorBaseConfig
 {
 public:
@@ -178,6 +199,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class CameraConfig : public SensorBaseConfig
 {
 public:
@@ -222,6 +244,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class SemanticCameraConfig : public CameraConfig
 {
 public:
@@ -232,6 +255,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class DepthCameraConfig : public CameraConfig
 {
 public:
@@ -243,6 +267,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class OccupancyGridConfig : public SensorBaseConfig
 {
 public:
@@ -265,6 +290,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class GPSConfig : public SensorBaseConfig
 {
 public:
@@ -277,6 +303,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class IMUConfig : public SensorBaseConfig
 {
 public:
@@ -289,6 +316,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class RPMConfig : public SensorBaseConfig
 {
 public:
@@ -305,6 +333,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class CollisionConfig : public SensorBaseConfig
 {
 public:
@@ -320,6 +349,7 @@ public:
     }
 };
 
+SENSOR_CONFIG
 class ViewportCameraConfig : public CameraConfig
 {
 public:

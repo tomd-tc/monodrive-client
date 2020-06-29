@@ -9,8 +9,10 @@
 #include <iostream>
 #include <string>
 
+#include "UECompatability.h"
 
-#if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
+
+#ifdef UE_BUILD
 #include "LogHelper.h"
 
 void MONODRIVECORE_API json_log(const FString& error_message);
