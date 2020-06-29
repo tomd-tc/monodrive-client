@@ -1,9 +1,9 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
+#include "Configuration.h"
+
 #include <fstream>
 #include <iostream>
 #include <string>
-
-#include "Configuration.h"
 
 
 Configuration::Configuration(

@@ -9,6 +9,7 @@
 #include "config_types.h"
 #include "UECompatability.h"
 
+
 #ifdef UE_BUILD
 #include "CoreMinimal.h"
 #include "sensor_config.generated.h"
@@ -16,12 +17,13 @@
 
 
 SENSOR_CONFIG
-class MONODRIVECORE_API SensorBaseConfig
+struct MONODRIVECORE_API SCCN(SensorBaseConfig)
 {
-    //GENERATED_BODY()
+    SENSOR_CONFIG_GEN_BODY
+
     public:
-        SensorBaseConfig(){};
-        virtual ~SensorBaseConfig(){};
+        SCCN(SensorBaseConfig)(){};
+        virtual ~SCCN(SensorBaseConfig)(){};
         std::string server_ip = "127.0.0.1";
         int server_port = 8999;
         std::string type = "None";
@@ -43,8 +45,8 @@ class MONODRIVECORE_API SensorBaseConfig
             bool send_tf{false};
             int queue_size{1};
         }ros;
-        friend void to_json(nlohmann::json& j,const SensorBaseConfig& config);
-        friend void from_json(const nlohmann::json& j, SensorBaseConfig& config);
+        friend void to_json(nlohmann::json& j, const SCCN(SensorBaseConfig)& config);
+        friend void from_json(const nlohmann::json& j, SCCN(SensorBaseConfig)& config);
         virtual nlohmann::json dump(){
             return *this;
         }
@@ -54,9 +56,12 @@ class MONODRIVECORE_API SensorBaseConfig
 };
 
 SENSOR_CONFIG
-class StateConfig : public SensorBaseConfig {
+struct MONODRIVECORE_API SCCN(StateConfig) : public SCCN(SensorBaseConfig)
+{
+	SENSOR_CONFIG_GEN_BODY
+
 public: 
-    StateConfig()
+    SCCN(StateConfig)()
     {
         type = "State";
     }
@@ -79,10 +84,12 @@ public:
 };
 
 SENSOR_CONFIG
-class LidarConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(LidarConfig) : public SCCN(SensorBaseConfig)
 {
+	SENSOR_CONFIG_GEN_BODY
+
 public:
-    LidarConfig() 
+    SCCN(LidarConfig)()
     {
         type = "Lidar";
     }
@@ -103,9 +110,12 @@ public:
 };
 
 SENSOR_CONFIG
-class SemanticLidarConfig : public LidarConfig {
+struct MONODRIVECORE_API SCCN(SemanticLidarConfig) : public SCCN(LidarConfig)
+{
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    SemanticLidarConfig()
+    SCCN(SemanticLidarConfig)()
     {
         type = "SemanticLidar";
     }
@@ -113,10 +123,12 @@ public:
 
 // todo: make sure defaults are correct
 SENSOR_CONFIG
-class RadarConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(RadarConfig) : public SCCN(SensorBaseConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    RadarConfig()
+    SCCN(RadarConfig)()
     {
         type = "Radar";
     }
@@ -169,10 +181,12 @@ public:
 };
 
 SENSOR_CONFIG
-class UltrasonicConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(UltrasonicConfig) : public SCCN(SensorBaseConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    UltrasonicConfig()
+    SCCN(UltrasonicConfig)()
     {
         type = "Ultrasonic";
     }
@@ -200,10 +214,12 @@ public:
 };
 
 SENSOR_CONFIG
-class CameraConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(CameraConfig) : public SCCN(SensorBaseConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    CameraConfig()
+    SCCN(CameraConfig)()
     {
         type = "Camera";
     }
@@ -245,10 +261,12 @@ public:
 };
 
 SENSOR_CONFIG
-class SemanticCameraConfig : public CameraConfig
+struct MONODRIVECORE_API SCCN(SemanticCameraConfig) : public SCCN(CameraConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    SemanticCameraConfig() : CameraConfig()
+    SCCN(SemanticCameraConfig)() : SCCN(CameraConfig)
     {
         type = "SemanticCamera";
         channels = "gray";
@@ -256,10 +274,12 @@ public:
 };
 
 SENSOR_CONFIG
-class DepthCameraConfig : public CameraConfig
+struct MONODRIVECORE_API SCCN(DepthCameraConfig) : public SCCN(CameraConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    DepthCameraConfig() : CameraConfig()
+    SCCN(DepthCameraConfig)()
     {
         type = "DepthCamera";
         channels = "gray";
@@ -268,10 +288,13 @@ public:
 };
 
 SENSOR_CONFIG
-class OccupancyGridConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(OccupancyGridConfig) : public SCCN(SensorBaseConfig)
 {
+	SENSOR_CONFIG_GEN_BODY
+
 public:
-    OccupancyGridConfig() {
+    SCCN(OccupancyGridConfig)()
+    {
         type= "OccupancyGrid";
     }
     Resolution resolution;
@@ -291,10 +314,12 @@ public:
 };
 
 SENSOR_CONFIG
-class GPSConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(GPSConfig) : public SCCN(SensorBaseConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    GPSConfig()
+    SCCN(GPSConfig)()
     {
         type = "GPS";
     }
@@ -304,10 +329,12 @@ public:
 };
 
 SENSOR_CONFIG
-class IMUConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(IMUConfig) : public SCCN(SensorBaseConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    IMUConfig()
+    SCCN(IMUConfig)()
     {
         type = "IMU";
     }
@@ -317,10 +344,12 @@ public:
 };
 
 SENSOR_CONFIG
-class RPMConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(RPMConfig) : public SCCN(SensorBaseConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    RPMConfig()
+    SCCN(RPMConfig)()
     {
         type = "RPM";
     }
@@ -334,10 +363,12 @@ public:
 };
 
 SENSOR_CONFIG
-class CollisionConfig : public SensorBaseConfig
+struct MONODRIVECORE_API SCCN(CollisionConfig) : public SCCN(SensorBaseConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
+
 public:
-    CollisionConfig()
+    SCCN(CollisionConfig)()
     {
         type = "Collision";
     }
@@ -350,10 +381,11 @@ public:
 };
 
 SENSOR_CONFIG
-class ViewportCameraConfig : public CameraConfig
+struct MONODRIVECORE_API SCCN(ViewportCameraConfig) : public SCCN(CameraConfig)
 {
+    SENSOR_CONFIG_GEN_BODY
 public:
-    ViewportCameraConfig()
+    SCCN(ViewportCameraConfig)()
     {
         type = "ViewportCamera";
     }
@@ -363,20 +395,20 @@ public:
 };
 
 /// SensorBaseConfig
-void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
+void inline to_json(nlohmann::json& j, const SCCN(SensorBaseConfig)::Rotation& rotation)
 {
     j = nlohmann::json{{"yaw", rotation.yaw},
                 {"pitch", rotation.pitch},
                 {"roll", rotation.roll}
                 };
 }
-void inline from_json(const nlohmann::json& j, SensorBaseConfig::Rotation& rotation)
+void inline from_json(const nlohmann::json& j, SCCN(SensorBaseConfig)::Rotation& rotation)
 {
     json_get(j,"yaw", rotation.yaw);
     json_get(j,"pitch", rotation.pitch);
     json_get(j, "roll", rotation.roll);
 }
-void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
+void inline to_json(nlohmann::json& j, const SCCN(SensorBaseConfig)::ROS& ros)
 {
     j = nlohmann::json{   
         {"publish_to_ros", ros.publish_to_ros},
@@ -387,7 +419,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
         {"queue_size", ros.queue_size}
     };
 }
-void inline from_json(const nlohmann::json& j, SensorBaseConfig::ROS& ros)
+void inline from_json(const nlohmann::json& j, SCCN(SensorBaseConfig)::ROS& ros)
 {
     json_get(j,"publis_to_ross", ros.publish_to_ros);
     json_get(j,"advertise", ros.advertise);
@@ -396,7 +428,7 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig::ROS& ros)
     json_get(j,"send_tf", ros.send_tf);
     json_get(j, "queue_size", ros.queue_size);
 }
-void inline to_json(nlohmann::json& j, const SensorBaseConfig& config)
+void inline to_json(nlohmann::json& j, const SCCN(SensorBaseConfig)& config)
 {
     j = nlohmann::json{
         {"type", config.type},
@@ -408,7 +440,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig& config)
         {"ros", config.ros},
     };
 };
-void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(SensorBaseConfig)& config)
 {
     json_get(j, "type", config.type);
     json_get(j, "description", config.description);
@@ -420,7 +452,7 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
 }
 /// End SensorBaseConfig JSON Parsing
 
-void inline to_json(nlohmann::json& j, const CameraConfig::Annotation& annotation){
+void inline to_json(nlohmann::json& j, const SCCN(CameraConfig)::Annotation& annotation){
     j = nlohmann::json{
         {"include_annotation", annotation.include_annotation},
         {"far_plane", annotation.far_plane},
@@ -432,7 +464,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig::Annotation& annotatio
     };
 }
 
-void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotation)
+void inline from_json(const nlohmann::json& j, SCCN(CameraConfig)::Annotation& annotation)
 {
     json_get(j, "include_annotation", annotation.include_annotation);
     json_get(j, "far_plane", annotation.far_plane);
@@ -445,17 +477,17 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
 
 
 /// Camera Config JSON Parsing
-void inline to_json(nlohmann::json& j, const StateConfig& config){
-    j = static_cast<SensorBaseConfig>(config);
+void inline to_json(nlohmann::json& j, const SCCN(StateConfig)& config){
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     j["desired_tags"] = config.desired_tags;
     j["undesired_tags"] = config.undesired_tags;
     j["debug_drawing"] = config.debug_drawing;
     j["include_obb"] = config.include_obb;
 }
 
-void inline from_json(const nlohmann::json& j, StateConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(StateConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "include_obb", config.include_obb);
@@ -464,9 +496,9 @@ void inline from_json(const nlohmann::json& j, StateConfig& config)
     json_get(j, "undesired_tags", config.undesired_tags);
 }
 
-void inline to_json(nlohmann::json& j, const CameraConfig& config)
+void inline to_json(nlohmann::json& j, const SCCN(CameraConfig)& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     j["stream_dimensions"] = config.resolution;
     j["max_distance"] = config.max_distance;
     j["dynamic_range"] = config.dynamic_range;
@@ -481,9 +513,9 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["annotation"] = config.annotation;
 }
 
-void inline from_json(const nlohmann::json& j, CameraConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(CameraConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "stream_dimensions", config.resolution),
@@ -503,7 +535,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
 /// END Camera Config JSON Parsing
 
 /// Radar Config JSON Parsing
-void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
+void inline to_json(nlohmann::json& j, const SCCN(RadarConfig)::SBR& config)
 {
     j = nlohmann::json{
         {"long_range_scan_distance", config.long_range_scan_distance},
@@ -518,9 +550,9 @@ void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
         {"debug_rescan", config.debug_rescan}
       };
 }
-void inline from_json(const nlohmann::json& j, RadarConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(RadarConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "paint_targets", config.paint_targets);
@@ -540,13 +572,13 @@ void inline from_json(const nlohmann::json& j, RadarConfig& config)
     json_get(j, "sbr", config.sbr);
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter config)
+void inline from_json(const nlohmann::json& j, SCCN(RadarConfig)::Transmitter config)
 {
     json_get(j, "peak_power", config.peak_power);
     json_get(j, "aperture", config.aperture);
     json_get(j, "gain", config.gain);
 }
-void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
+void inline to_json(nlohmann::json& j, const SCCN(RadarConfig)::Transmitter& config)
 {
      j = nlohmann::json{
         {"peak_power", config.peak_power},
@@ -555,7 +587,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
      };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
+void inline from_json(const nlohmann::json& j, SCCN(RadarConfig)::Receiver config)
 {
     json_get(j, "gain", config.gain);
     json_get(j, "aperture", config.aperture);
@@ -563,7 +595,7 @@ void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
     json_get(j, "noise_temp", config.noise_temp);
     json_get(j, "nb", config.nb);
 }
-void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
+void inline to_json(nlohmann::json& j, const SCCN(RadarConfig)::Receiver& config)
 {
     j = nlohmann::json{
         {"gain", config.gain},
@@ -574,7 +606,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
     };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
+void inline from_json(const nlohmann::json& j, SCCN(RadarConfig)::SBR config)
 {
     json_get(j, "long_range_scan_distance", config.long_range_scan_distance);
     json_get(j, "short_range_scan_distance",config.short_range_scan_distance);
@@ -588,9 +620,9 @@ void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
     json_get(j, "debug_rescan",           config.debug_rescan);
 }
 
-void inline to_json(nlohmann::json& j, const RadarConfig& config)
+void inline to_json(nlohmann::json& j, const SCCN(RadarConfig)& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     j["paint_targets"] = config.paint_targets;
     j["target_paint_lifetime"] = config.target_paint_lifetime;
     j["nearest_target_label_radius"] = config.nearest_target_label_radius;
@@ -612,7 +644,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig& config)
 /// END Radar Config JSON Parsing
 
 /// Ultrasonic Config JSON Parsing
-void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
+void inline to_json(nlohmann::json& j, const SCCN(UltrasonicConfig)::SBR config) {
     j = nlohmann::json{
         {"scan_distance", config.scan_distance},
         {"azimuth_fov", config.azimuth_fov},
@@ -624,7 +656,7 @@ void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
         {"debug_rescan", config.debug_rescan}
     };
 }
-void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR config) {
+void inline from_json(const nlohmann::json& j, SCCN(UltrasonicConfig)::SBR config) {
     json_get(j, "scan_distance", config.scan_distance);
     json_get(j, "azimuth_fov", config.azimuth_fov);
     json_get(j, "elevation_fov", config.elevation_fov);
@@ -634,16 +666,16 @@ void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR config) {
     json_get(j, "debug_scan", config.debug_scan);
     json_get(j, "debug_rescan", config.debug_rescan);
 }
-void inline to_json(nlohmann::json& j, const UltrasonicConfig& config) {
-    j = static_cast<SensorBaseConfig>(config);
+void inline to_json(nlohmann::json& j, const SCCN(UltrasonicConfig)& config) {
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     j["fc"] = config.fc;
     j["pwm_factor"] = config.pwm_factor;
     j["max_ultrasonic_returns"]  = config.max_ultrasonic_returns;
     j["send_processed_data"]  = config.send_processed_data;
     j["sbr"] = config.sbr;
 }
-void inline from_json(const nlohmann::json& j, UltrasonicConfig& config) {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+void inline from_json(const nlohmann::json& j, SCCN(UltrasonicConfig)& config) {
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "fc", config.fc);
@@ -655,9 +687,9 @@ void inline from_json(const nlohmann::json& j, UltrasonicConfig& config) {
 /// END Ultrasonic Config JSON Parsing
 
 /// Lidar Config JSON Parsing
-void inline to_json(nlohmann::json& j, const LidarConfig& config)
+void inline to_json(nlohmann::json& j, const SCCN(LidarConfig)& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     j["max_distance"] =          config.max_distance;
     j["horizontal_resolution"] = config.horizontal_resolution;
     j["rpms"] =                  config.rpms;
@@ -665,9 +697,9 @@ void inline to_json(nlohmann::json& j, const LidarConfig& config)
     j["reset_angle"] =           config.reset_angle;
 }
 
-void inline from_json(const nlohmann::json& j, LidarConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(LidarConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "max_distance",         config.max_distance);
@@ -681,23 +713,23 @@ void inline from_json(const nlohmann::json& j, LidarConfig& config)
 
 /// GPS Config JSON Parsing
 
-void inline to_json(nlohmann::json& j, const GPSConfig& config)
+void inline to_json(nlohmann::json& j, const SCCN(GPSConfig)& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
 }
 
-void inline from_json(const nlohmann::json& j, GPSConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(GPSConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 }
 
 /// END GPS Config JSON Parsing
 
 /// Collision Config JSON Parsing
-void inline to_json(nlohmann::json& j, const CollisionConfig& config)
+void inline to_json(nlohmann::json& j, const SCCN(CollisionConfig)& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     for (auto iter = config.desired_tags.begin(); iter != config.desired_tags.end(); ++iter)
     {
         j["desired_tags"].push_back(*iter);
@@ -708,9 +740,9 @@ void inline to_json(nlohmann::json& j, const CollisionConfig& config)
     }
 }
 
-void inline from_json(const nlohmann::json& j, CollisionConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(CollisionConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "desired_tags", config.desired_tags);
@@ -719,18 +751,18 @@ void inline from_json(const nlohmann::json& j, CollisionConfig& config)
 /// END Collision Config JSON Parsing
 
 /// Occupancy Grid Sensor JSON parsing
-void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
+void inline to_json(nlohmann::json& j, const SCCN(OccupancyGridConfig)& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     j["stream_dimensions"] = config.resolution;
     j["meters_per_pixel"] = config.meters_per_pixel;
     j["follow_yaw"] = config.follow_yaw;
     j["follow_pitch"] = config.follow_pitch;
     j["follow_roll"] = config.follow_roll;
 }
-void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(OccupancyGridConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "stream_dimensions", config.resolution);
@@ -742,15 +774,15 @@ void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
 /// END Occupancy Grid Sensor JSON parsing
 
 /// RPM Sensor JSON parsing
-void inline to_json(nlohmann::json& j, const RPMConfig& config) 
+void inline to_json(nlohmann::json& j, const SCCN(RPMConfig)& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SCCN(SensorBaseConfig)>(config);
     j["wheelNumber"] = config.wheel_number;
 }
 
-void inline from_json(const nlohmann::json& j, RPMConfig& config)
+void inline from_json(const nlohmann::json& j, SCCN(RPMConfig)& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SCCN(SensorBaseConfig)* base = static_cast<SCCN(SensorBaseConfig)*>(&config);
     from_json(j, *base);
 
     json_get(j, "wheelNumber", config.wheel_number);

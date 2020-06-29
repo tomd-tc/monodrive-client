@@ -1,10 +1,11 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
+#include "Sensor.h"
+
 #include <iostream>
 #include <thread>
 #include <string>
 #include <memory>
 
-#include "Sensor.h"
 #include "Simulator.h"
 #include "Stopwatch.h"
 

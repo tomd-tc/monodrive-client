@@ -1,13 +1,13 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
+#include "Simulator.h"
+
 #include <future>
 #include <thread>
-
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <exception>
 
-#include "Simulator.h"
 #include "ApiMessage.h"
 #include "SimulatorCommands.h"
 
