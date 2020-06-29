@@ -142,50 +142,80 @@ If you are running the simulator and client on separate machines the following n
 
 ### Using the G920 Logitech wheel
 
-4. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
-    1. Launch rosbridge, you can leave this running: 
-    ```bash
-    roslaunch rosbridge_server rosbridge_tcp.launch bson_only_mode:=True
-    ```
-    2. Start the wheel vehicle control node which will subscribe to the state sensor topic and publish vehicle controls (the simulator does not need to be running)
-    ```bash
-    rosrun wheel_vehicle_control node
-    ```
-    *Note: The vehicle_control example only requires the monodrive_msgs package and provides an example of how to connect your code to monoDrive through ROS messages.*
+#### Configuring the Joystick
+1. Connect your joystick to your computer. Check if Linux recognized your joystick.
+ ```bash
+    ls /dev/input/
+ ```
+ From the list you should see something like this:
+ ```
+ by-id    event0  event2  event4  event6  event8  mouse0  mouse2  uinput
+by-path  event1  event3  event5  event7  js0     mice    mouse1
+```
 
-    3. Make sure the monoDrive simulator is running since the next command will connect to and start the simulator scenario running.
-    ```bash
-    rosrun simulator_control node
-    ```
+2. Make the joystick accessible to the ROS joy node. Where `jsX` is `js0` from the example above.
+```bash
+sudo chmod a+rw /dev/input/jsX
+```
+
+3. Setup your the jostick device to use on the joy node . Assumig your jostick is `js0`
+```bash
+rosparam set joy_node/dev "/dev/input/js0"
+```
+*Optional: You can also specify the deadzone as a parameter*
+```bash
+rosparam set joy_node/deadzone 0.05
+```
+
+#### Launching the example 
+
+To launch the monoDrive examples create 4 tabs and run each command in a separate terminal:   
+
+1. Launch rosbridge, you can leave this running: 
+```bash
+roslaunch rosbridge_server rosbridge_tcp.launch bson_only_mode:=True
+```
+2. Start the joy_node.
+```
+rosrun joy joy_node
+```
+3. Start the wheel vehicle control node which will subscribe to the state sensor topic and publish vehicle controls (the simulator does not need to be running)
+```bash
+rosrun wheel_vehicle_control node
+```
+*Note: The vehicle_control example only requires the monodrive_msgs package and provides an example of how to connect your code to monoDrive through ROS messages.*
+
+4. Make sure the monoDrive simulator is running since the next command will connect to and start the simulator scenario running.
+```bash
+rosrun simulator_control node
+```
     
-    **Note:** The following table show how the buttons in the G920 wheel map to the ROS message.   
-
-    | Button   |      ROS message      |
-    |----------|:-------------:|
-    | A |joy->buttons[0] |
-    | B |joy->buttons[1] |
-    | X | joy->buttons[2]|
-    | Y | joy->buttons[3]|
-    | RB | joy->buttons[4]|
-    | LB | joy->buttons[5]|
-    | Menu button| joy->buttons[6]|
-    | View button  | joy->buttons[7]|
-    | RSB | joy->buttons[8]|
-    | LSB | joy->buttons[9]|
-    | Xbox button | joy->buttons[10]|   
     
+**Note:** The following table show how the buttons in the G920 wheel map to the ROS message.   
 
-    | Function   |      ROS message      |
-    |----------|:-------------:|
-    | Steering |joy->axes[0] |
-    | Throttle |joy->axes[1] |
-    | Brake | joy->axes[2]|
-    | Clutch | joy->axes[3]|
-    | Directional pad RIGHT | joy->axes[4]|
-    | Directional pad LEFT | joy->axes[4]|
-    | Directional pad UP| joy->axes[5]|
-    | Directional pad DOWN  | joy->axes[5]|
+| Function   |      ROS message      |
+|----------|:-------------:|
+| Steering |joy->axes[0] |
+| Throttle |joy->axes[1] |
+| Brake | joy->axes[2]|
+| Clutch | joy->axes[3]|
+| Directional pad RIGHT | joy->axes[4]|
+| Directional pad LEFT | joy->axes[4]|
+| Directional pad UP| joy->axes[5]|
+| Directional pad DOWN  | joy->axes[5]|
 
 
-
-
+| Button   |      ROS message      |
+|----------|:-------------:|
+| A |joy->buttons[0] |
+| B |joy->buttons[1] |
+| X | joy->buttons[2]|
+| Y | joy->buttons[3]|
+| RB | joy->buttons[4]|
+| LB | joy->buttons[5]|
+| Menu button| joy->buttons[6]|
+| View button  | joy->buttons[7]|
+| RSB | joy->buttons[8]|
+| LSB | joy->buttons[9]|
+| Xbox button | joy->buttons[10]|   
+    
