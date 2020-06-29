@@ -25,10 +25,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
     vp_config.server_port = sim0.getServerPort();
-    vp_config.location.x = 25.0;
-    vp_config.location.y = -35.0;
-    vp_config.location.z = 125.0;
-    vp_config.rotation.pitch = 0.0;
+    vp_config.location.z = 200;
     vp_config.resolution = Resolution(256,256);
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
