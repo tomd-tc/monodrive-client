@@ -193,6 +193,10 @@ rosrun simulator_control node
     
 **Note:** The following table show how the buttons in the G920 wheel map to the ROS message.   
 
+<table>
+<tr><th>  AXES  </th><th>  BUTTONS  </th></tr>
+<tr><td>
+
 | Function   |      ROS message      |
 |----------|:-------------:|
 | Steering |joy->axes[0] |
@@ -204,6 +208,8 @@ rosrun simulator_control node
 | Directional pad UP| joy->axes[5]|
 | Directional pad DOWN  | joy->axes[5]|
 
+
+</td><td>
 
 | Button   |      ROS message      |
 |----------|:-------------:|
@@ -218,4 +224,10 @@ rosrun simulator_control node
 | RSB | joy->buttons[8]|
 | LSB | joy->buttons[9]|
 | Xbox button | joy->buttons[10]|   
+</td></tr> </table>
+
+
+
+
+
     
