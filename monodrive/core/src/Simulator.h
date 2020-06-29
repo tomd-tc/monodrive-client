@@ -29,7 +29,7 @@ public:
 	static bool deleteInstance(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	static void clearInstances();
 	
-	void connect();
+	bool connect();
 	bool configure();
 	void disconnect();
 	void stop();
@@ -49,6 +49,7 @@ public:
 	const short& getServerPort() const{return serverPort;}
 private:
 	Simulator(const Configuration& config);
+	Simulator(const std::string& serverIp, const short& serverPort);
 	Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	Simulator(const Simulator&)= delete;
   	Simulator& operator=(const Simulator&)= delete;

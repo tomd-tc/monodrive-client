@@ -26,6 +26,10 @@ Simulator::Simulator(const Configuration& config, const std::string& serverIp, c
 	: config(config), serverIp(serverIp), serverPort(serverPort)
 {}
 
+Simulator::Simulator(const std::string& serverIp, const short& serverPort)
+	: serverIp(serverIp), serverPort(serverPort)
+{}
+
 Simulator::~Simulator()
 {
 	stop();
@@ -33,9 +37,14 @@ Simulator::~Simulator()
 
 Simulator& Simulator::getInstance(const std::string& serverIp, const short& serverPort)
 {
-		std::lock_guard<std::mutex> simLock(_mutex);
-		const std::string simKey = serverIp + ":" + std::to_string(serverPort);
-		return *simMap[simKey];
+	std::lock_guard<std::mutex> simLock(_mutex);
+	const std::string simKey = serverIp + ":" + std::to_string(serverPort);
+	if (simMap[simKey] == nullptr) {
+		simMap[simKey] = new Simulator(serverIp, serverPort);
+		std::cout << "created new simulator:" << simKey << std::endl;
+	}
+	simMap[simKey]->connect();
+	return *simMap[simKey];
 } 
 
 
@@ -58,6 +67,7 @@ Simulator& Simulator::getInstance(
 		simMap[simKey] = new Simulator(config, serverIp, serverPort);
 		std::cout << "created new simulator:" << simKey << std::endl;
 	}
+	simMap[simKey]->connect();
 	return *simMap[simKey];
 }
 
@@ -87,13 +97,24 @@ void Simulator::clearInstances()
 	}
 }
 
-void Simulator::connect()
+bool Simulator::connect()
 {
-	std::cout << "******Simulator Connect********" << std::endl;
-	const auto ipaddress = boost::asio::ip::address::from_string(serverIp);
-	const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, serverPort);
-	std::cout << endpoint << std::endl;
-	controlSocket.connect(endpoint);
+	if(!controlSocket.is_open())
+	{
+		std::cout << "******Simulator Connect********" << std::endl;
+		try{
+		const auto ipaddress = boost::asio::ip::address::from_string(serverIp);
+		const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, serverPort);
+		std::cout << endpoint << std::endl;
+		controlSocket.connect(endpoint);
+		}
+		catch (const std::exception& e){
+			std::cout << "Failed to connect to server. Is it running?" << std::endl;
+			std::cerr << e.what() << std::endl;
+			return false;
+		}
+	}
+	return true;
 }
 
 void Simulator::stop()
@@ -107,38 +128,41 @@ void Simulator::stop()
 bool Simulator::configure()
 {
 	using namespace std;
-	if(!controlSocket.is_open())
+	if(!connect())
+		return false;
+
+	if(config.simulator.empty())
 	{
-		try{
-			connect();
-		}
-		catch (const std::exception& e){
-			std::cout << "Failed to connect to server. Is it running?" << std::endl;
-			std::cerr << e.what() << std::endl;
-			return false;
+		std::cout << "Skipping Simulator and Scenario Config, no simulator config set." << std::endl;
+	}
+	else
+	{
+		std::cout << "Send Simulator Config:   success = ";
+		std::cout << sendCommand(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
+
+		int simulation_mode = 0;
+		json_get(config.simulator, "simulation_mode", simulation_mode);
+		if (!config.scenario.empty())
+		{
+			if (simulation_mode == 0 or simulation_mode == 3)
+			{
+				std::cout << "Send Closed Loop Config:    success = ";
+				std::cout << sendCommand(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
+			}
+			else
+			{
+				std::cout << "Send Scenario Config:    success = ";
+				std::cout << sendCommand(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
+			}
 		}
 	}
 
-	std::cout << "Send Simulator Config:   success = ";
-	std::cout << sendCommand(ApiMessage(1000, SimulatorConfig_ID, true, config.simulator)) << std::endl;
 
-	int simulation_mode = 0;
-	json_get(config.simulator, "simulation_mode", simulation_mode);
-	if (!config.scenario.empty())
+	if (config.weather.empty())
 	{
-		if (simulation_mode == 0 or simulation_mode == 3)
-		{
-			std::cout << "Send Closed Loop Config:    success = ";
-			std::cout << sendCommand(ApiMessage(1001, ClosedLoopConfigCommand_ID, true, config.scenario)) << std::endl;
-		}
-		else
-		{
-			std::cout << "Send Scenario Config:    success = ";
-			std::cout << sendCommand(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
-		}
+		std::cout << "Skipping Weather Config, no weather config set." << std::endl;
 	}
-
-	if (!config.weather.empty())
+	else
 	{
 		std::cout << "Send Weather Config:     success = ";
 		std::cout << sendCommand(ApiMessage(1002, WeatherConfigCommand_ID, true, config.weather)) << std::endl;
