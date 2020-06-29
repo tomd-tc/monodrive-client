@@ -36,41 +36,7 @@ std::vector<float> wheel_data = {0,0,0,0};
 
 
 void control_vehicle(){
-    monodrive_msgs::VehicleState vs;
-    for(auto& vehicle : state_data.vehicles){
-        if(vehicle.name == vehicle_name) {
-            vs = vehicle;
-        }
-    }
-    Eigen::VectorXd position(3);
-    position << vs.odometry.pose.pose.position.x,
-        vs.odometry.pose.pose.position.y,
-        vs.odometry.pose.pose.position.z;
-    Eigen::Quaternion<double> orientation(
-        vs.odometry.pose.pose.orientation.w,
-        vs.odometry.pose.pose.orientation.x,
-        vs.odometry.pose.pose.orientation.y,
-        vs.odometry.pose.pose.orientation.z
-    );
-
-    auto nearestIndex = lanespline.GetNearestPoint("road_0", "lane_2", position);
-    auto& lane_points = lanespline.spline_map["road_0"]["lane_2"];
-    int nextPointIndex = nearestIndex;
-    if(nearestIndex >= lane_points.size()-4){
-        nextPointIndex = lane_points.size()-1;
-    }
-    else{
-        nextPointIndex += 3;
-    }
-    Eigen::VectorXd forwardVector(3);
-    forwardVector << 1, 0, 0;
-    forwardVector = orientation * forwardVector;
-    auto nextPoint = lane_points[nextPointIndex];
-    Eigen::VectorXd dirToNextPoint = nextPoint - position;
-    dirToNextPoint.normalize();
-
-    double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
-
+   
     monodrive_msgs::VehicleControl msg;
     msg.name = vehicle_name;
     std::cout << "throttle: " <<wheel_data[0] <<"\t"<<"brake: " <<wheel_data[1] << "\t"<< "steer: " <<wheel_data[2] << "\t" <<  "drive_mode: " << wheel_data[3] <<std::endl;
