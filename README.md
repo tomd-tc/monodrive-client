@@ -64,7 +64,10 @@ To build the examples the following are required:
 ```bash 
 sudo apt-get install ros-melodic-rosbridge-suite
 ````
-
+- ROS Joy
+```bash 
+sudo apt-get install ros-melodic-joy
+````
 ### monoDrive ROS Packages and example build
 
 1. Execute the following to build the monoDrive ROS library with:
@@ -120,7 +123,7 @@ If you are running the simulator and client on separate machines the following n
 
 ### Launching the example
 
-4. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
+3. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
     1. Launch rosbridge, you can leave this running: 
     ```bash
     roslaunch rosbridge_server rosbridge_tcp.launch bson_only_mode:=True
@@ -135,4 +138,53 @@ If you are running the simulator and client on separate machines the following n
     ```bash
     rosrun simulator_control node
     ```
+
+### Using the G920 Logitech wheel
+
+4. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
+    1. Launch rosbridge, you can leave this running: 
+    ```bash
+    roslaunch rosbridge_server rosbridge_tcp.launch bson_only_mode:=True
+    ```
+    2. Start the wheel vehicle control node which will subscribe to the state sensor topic and publish vehicle controls (the simulator does not need to be running)
+    ```bash
+    rosrun wheel_vehicle_control node
+    ```
+    *Note: The vehicle_control example only requires the monodrive_msgs package and provides an example of how to connect your code to monoDrive through ROS messages.*
+
+    3. Make sure the monoDrive simulator is running since the next command will connect to and start the simulator scenario running.
+    ```bash
+    rosrun simulator_control node
+    ```
+    
+    **Note:** The following table show how the buttons in the G920 wheel map to the ROS message.   
+
+    | Button   |      ROS message      |
+    |----------|:-------------:|
+    | A |joy->buttons[0] |
+    | B |joy->buttons[1] |
+    | X | joy->buttons[2]|
+    | Y | joy->buttons[3]|
+    | RB | joy->buttons[4]|
+    | LB | joy->buttons[5]|
+    | Menu button| joy->buttons[6]|
+    | View button  | joy->buttons[7]|
+    | RSB | joy->buttons[8]|
+    | LSB | joy->buttons[9]|
+    | Xbox button | joy->buttons[10]|   
+    
+
+    | Function   |      ROS message      |
+    |----------|:-------------:|
+    | Steering |joy->axes[0] |
+    | Throttle |joy->axes[1] |
+    | Brake | joy->axes[2]|
+    | Clutch | joy->axes[3]|
+    | Directional pad RIGHT | joy->axes[4]|
+    | Directional pad LEFT | joy->axes[4]|
+    | Directional pad UP| joy->axes[5]|
+    | Directional pad DOWN  | joy->axes[5]|
+
+
+
 
