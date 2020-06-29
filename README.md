@@ -64,7 +64,7 @@ To build the examples the following are required:
 ```bash 
 sudo apt-get install ros-melodic-rosbridge-suite
 ````
-- ROS Joy
+- ROS Joy:
 ```bash 
 sudo apt-get install ros-melodic-joy
 ````
