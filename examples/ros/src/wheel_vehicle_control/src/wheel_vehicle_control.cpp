@@ -31,7 +31,6 @@ std::vector<float> wheel_data = {0,0,0,0};
 
 
 void control_vehicle(){
-   
     monodrive_msgs::VehicleControl msg;
     msg.name = vehicle_name;
     msg.throttle = wheel_data[0];
@@ -53,14 +52,11 @@ void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
     }
 }
 
-void joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
-{
-
+void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
   wheel_data[0] = (joy->axes[1] == -1) ? 0 : joy->axes[1]; //throttle
   wheel_data[1] = (joy->axes[2] == -1) ? 0 : joy->axes[2]; //brake
   wheel_data[2] = -1.0 * joy->axes[0]; // steering - Need to inverse to match movement
   wheel_data[3] =  (joy->buttons[8]) == 0.0 ? 1.0 : -1.0; //drive_mode
-
 }
 
 int main(int argc, char** argv)
