@@ -2,7 +2,7 @@
   "vehicles": [
     {
     "body_color": "Carpaint_White",
-    "class_path": "/Game/Vehicles/subcompact_monoDrive_01.subcompact_monoDrive_01_C",
+    "class_path": "/Game/Vehicles/crossover_monoDrive_01.crossover_monoDrive_01_C",
     "delayed_start": 0.0,
     "desired_speed": 0.0,
     "destroy_on_collision": false,
@@ -41,7 +41,7 @@
       "car",
       "ego"
     ],
-    "name": "subcompact_monoDrive_01"
+    "name": "crossover_monoDrive_01"
     }
   ]
 }

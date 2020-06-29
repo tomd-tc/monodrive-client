@@ -22,7 +22,7 @@ LaneSpline lanespline;
 namespace fs = std::experimental::filesystem;
 
 // LaneSpline lanespline;
-std::string vehicle_name = "subcompact_monoDrive_01";
+std::string vehicle_name = "crossover_monoDrive_01";
 std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
@@ -73,10 +73,10 @@ void control_vehicle(){
 
     monodrive_msgs::VehicleControl msg;
     msg.name = vehicle_name;
-    std::cout << "throttle: " <<wheel_data[0] <<"\t"<<"brake: " <<wheel_data[1] << "\t"<< "drive_mode: " <<wheel_data[3] <<std::endl;
+    std::cout << "throttle: " <<wheel_data[0] <<"\t"<<"brake: " <<wheel_data[1] << "\t"<< "steer: " <<wheel_data[2] << "\t" <<  "drive_mode: " << wheel_data[3] <<std::endl;
     msg.throttle = wheel_data[0];
     msg.brake = wheel_data[1];
-    msg.steer = angle;
+    msg.steer = wheel_data[2];
     msg.drive_mode = wheel_data[3];
 
     vehicle_control_pub.publish(msg);
@@ -105,14 +105,16 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
   float throttle =  (joy->axes[1] == -1) ? 0 : joy->axes[1];
   float brake =  (joy->axes[2] == -1) ? 0 : joy->axes[2];
-  float steer =  float(joy->buttons[0]);
+  float steer =  float(joy->axes[0]);
   float drive_mode =  (joy->buttons[8]) == 0.0 ? 1.0 : -1.0;
 
 
   wheel_data[0] = throttle;
   wheel_data[1] = brake;
-  wheel_data[2] = steer;
+  wheel_data[2] = -1.0*steer;
   wheel_data[3] = drive_mode;
+//   std::cout << "throttle: " <<wheel_data[0] <<"\t"<<"brake: " <<wheel_data[1] << "\t"<< "steer: " <<wheel_data[2] << "\t" <<  "drive_mode: " << wheel_data[3] <<std::endl;
+
 
 }
 
