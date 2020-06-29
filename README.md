@@ -147,11 +147,7 @@ If you are running the simulator and client on separate machines the following n
  ```bash
     ls /dev/input/
  ```
- From the list you should see something like this:
- ```
- by-id    event0  event2  event4  event6  event8  mouse0  mouse2  uinput
-by-path  event1  event3  event5  event7  js0     mice    mouse1
-```
+ From the list verify that you can see `jx0` or `jsX` in the list, this will mean Linux recognize your joystick.
 
 2. Make the joystick accessible to the ROS joy node. Where `jsX` is `js0` from the example above.
 ```bash
