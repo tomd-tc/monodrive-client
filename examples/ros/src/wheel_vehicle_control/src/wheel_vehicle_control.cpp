@@ -66,7 +66,6 @@ void joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "wheel_vehicle_control");
-    std::cout << "wheel_vehicle_control! " << std::endl;
 
     fs::path path(ros::package::getPath("wheel_vehicle_control"));
     fs::path configPath = path / "config";
