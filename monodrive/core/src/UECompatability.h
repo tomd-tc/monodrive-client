@@ -1,6 +1,9 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
 
+#include <string>
+#include <vector>
+
 #if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
 #define UE_BUILD
 #endif
@@ -18,11 +21,11 @@
 #endif
 
 #ifdef UE_BUILD
-#define STRING FString
-#define NAME FName
-#define VECTOR TArray
+#define STRING_CLS FString
+#define NAME_CLS FName
+#define VECTOR_CLS TArray
 #else
-#define STRING std::string
-#define NAME std::string
-#define VECTOR std::vector
+#define STRING_CLS std::string
+#define NAME_CLS std::string
+#define VECTOR_CLS std::vector
 #endif

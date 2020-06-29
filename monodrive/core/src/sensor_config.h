@@ -62,9 +62,9 @@ public:
     }
 
     SENSOR_PROPERTY("Tag system")
-    VECTOR<NAME> desired_tags{};
+    VECTOR_CLS<NAME_CLS> desired_tags{};
     SENSOR_PROPERTY("Tag system")
-    VECTOR<NAME> undesired_tags{};
+    VECTOR_CLS<NAME_CLS> undesired_tags{};
     SENSOR_PROPERTY("Sensor")
     bool debug_drawing{false};
     SENSOR_PROPERTY("Sensor")
