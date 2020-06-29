@@ -255,6 +255,29 @@ void Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 	} while(samplingInProgress);
 }
 
+void Simulator::sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
+{
+	std::vector<int> ports;
+	for(auto& sensor : sensors){
+		ports.push_back(sensor->config->listen_port);
+	}
+	ApiMessage sampleMessage(999, SampleSensorCommand_ID, true, ports);
+	for(auto& sensor : sensors){
+		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+	}
+	sendCommand(sampleMessage);
+	bool samplingInProgress = true;
+	do{
+		samplingInProgress = false;
+		for(auto& sensor : sensors){
+			if(sensor->sampleInProgress.load(std::memory_order::memory_order_relaxed)){
+				samplingInProgress = true;
+				break;
+			}
+		}
+	} while(samplingInProgress);
+}
+
 bool Simulator::sendControl(float forward, float right, float brake, int mode)
 {
     nlohmann::json ego_msg;

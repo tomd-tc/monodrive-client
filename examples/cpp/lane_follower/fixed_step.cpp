@@ -116,7 +116,7 @@ int main(int argc, char** argv)
     Configuration config(
         "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
-        "examples/config/scenario_ego_on_shoulder_straightaway.json"
+        "examples/config/scenario_multi_vehicle_straightaway.json"
     );
     // set to fixed timestep mode
     config.simulator["simulation_mode"] = 3;
@@ -150,7 +150,8 @@ int main(int argc, char** argv)
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
-    state_config.desired_tags = {"ego"};
+    state_config.desired_tags = {"ego", "vehicle"};
+    state_config.undesired_tags = {"static"};
     state_config.server_ip = sim0.getServerIp();
     state_config.server_port = sim0.getServerPort();
     state_config.listen_port = 8101;

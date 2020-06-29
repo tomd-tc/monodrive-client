@@ -54,6 +54,7 @@
  */
 #define EgoControl_ID				"EgoControl_ID" 
 #define SampleSensorsCommand_ID "SampleSensorsCommand_ID"
+#define SampleSensorCommand_ID "SampleSensorsCommand_ID"
 /*
  * Activate license command
  */
