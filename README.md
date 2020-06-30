@@ -154,7 +154,7 @@ If you are running the simulator and client on separate machines the following n
 sudo chmod a+rw /dev/input/jsX
 ```
 
-3. Setup your the joystick device to use on the joy node . Assumig your jostick is `js0`
+3. Setup your the joystick device to use on the joy node . Assumig your joystick is `js0`
 ```bash
 rosparam set joy_node/dev "/dev/input/js0"
 ```
