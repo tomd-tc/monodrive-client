@@ -40,8 +40,11 @@ public:
 	}
 	bool stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state);
 	void stepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, int stepIndex, int numSteps);
-	void sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors);
-	void sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors);
+	// samples all sensors on the server (even those not in the list)
+	// faster but make sure you know what you're doing
+	bool sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors);
+	// samples sensors in the list, if any are not connected returns an error
+	bool sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors);
 	bool sendControl(float forward, float right, float brake, int mode);
 
 	static std::map<const std::string, Simulator*> simMap;
@@ -53,6 +56,7 @@ private:
 	Simulator(const std::string& serverIp, const short& serverPort);
 	Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	Simulator(const Simulator&)= delete;
+	void WaitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors);
   	Simulator& operator=(const Simulator&)= delete;
 
 	boost::asio::io_service ioService;

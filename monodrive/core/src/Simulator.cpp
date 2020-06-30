@@ -184,6 +184,7 @@ bool Simulator::sendCommand(ApiMessage message, nlohmann::json *response)
 	{
 		return true;
 	}
+	std::cerr << res.get_message().dump() << std::endl;
 	return false;
 }
 
@@ -236,26 +237,23 @@ void Simulator::stepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, int
 	} while(samplingInProgress);
 }
 
-void Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
+bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
 	for(auto& sensor : sensors){
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
-	sendCommand(sampleMessage);
-	bool samplingInProgress = true;
-	do{
-		samplingInProgress = false;
-		for(auto& sensor : sensors){
-			if(sensor->sampleInProgress.load(std::memory_order::memory_order_relaxed)){
-				samplingInProgress = true;
-				break;
-			}
-		}
-	} while(samplingInProgress);
+	if(sendCommand(sampleMessage)){
+		WaitForSamples(sensors);
+	}
+	else{
+		std::cerr << "Failed to sample sensors." << std::endl;
+		return false;
+	}
+	return true;
 }
 
-void Simulator::sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
+bool Simulator::sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	std::vector<int> ports;
 	for(auto& sensor : sensors){
@@ -265,7 +263,18 @@ void Simulator::sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
 	for(auto& sensor : sensors){
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
-	sendCommand(sampleMessage);
+	if(sendCommand(sampleMessage)){
+		WaitForSamples(sensors);
+	}
+	else{
+		std::cerr << "Failed to sample sensors." << std::endl;
+		return false;
+	}
+	return true;
+}
+
+void Simulator::WaitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors)
+{
 	bool samplingInProgress = true;
 	do{
 		samplingInProgress = false;
