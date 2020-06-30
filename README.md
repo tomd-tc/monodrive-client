@@ -58,14 +58,14 @@ To build the examples the following are required:
 # monoDrive ROS Client
 
 ## Ubuntu 18.04 Prerequisites
-- [monoDrive c++ client](https://github.com/monoDriveIO/monodrive-client/blob/master/cpp-client/README.md#monodrive-c++-client)
+- [monoDrive c++ client](https://github.com/monoDriveIO/monodrive-client/blob/master/README.md#monodrive-c++-client)
 - [ROS](http://wiki.ros.org/melodic/Installation/Ubuntu) *Note: Tested with melodic*
 - ROS Bridge: 
 ```bash 
 sudo apt-get install ros-melodic-rosbridge-suite
 ````
 - ROS Joy:
-```bash 
+```bash
 sudo apt-get install ros-melodic-joy
 ````
 ### monoDrive ROS Packages and example build
@@ -154,7 +154,7 @@ If you are running the simulator and client on separate machines the following n
 sudo chmod a+rw /dev/input/jsX
 ```
 
-3. Setup your the jostick device to use on the joy node . Assumig your jostick is `js0`
+3. Setup your the joystick device to use on the joy node . Assumig your jostick is `js0`
 ```bash
 rosparam set joy_node/dev "/dev/input/js0"
 ```
