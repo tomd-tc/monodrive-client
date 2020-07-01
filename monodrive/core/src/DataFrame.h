@@ -104,6 +104,14 @@ public:
     int time_of_week;
 };
 
+class MONODRIVECORE_API WaypointFrame : public DataFrame {
+public:
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+
+    float dummy;
+};
+
 class MONODRIVECORE_API GPSFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;

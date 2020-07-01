@@ -290,6 +290,18 @@ public:
     }
 };
 
+class WaypointConfig : public SensorBaseConfig
+{
+public:
+    WaypointConfig()
+    {
+        type = "Waypoint";
+    }
+    virtual DataFrame* DataFrameFactory() override {
+        return new WaypointFrame;
+    }
+};
+
 class RPMConfig : public SensorBaseConfig
 {
 public:

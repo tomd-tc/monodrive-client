@@ -176,6 +176,17 @@ void ImuFrame::parse(ByteBuffer& buffer){
     time_of_week = buffer.readInt();
 }
 
+ByteBuffer WaypointFrame::write() const{
+    ByteBuffer buffer(sizeof(float), DATA_FRAME_HEADER_SIZE);
+    buffer.writeFloat(dummy);
+    write_mono_header(buffer);
+    return buffer;
+}
+void WaypointFrame::parse(ByteBuffer& buffer) {
+    uint8_t packet_size = buffer.readByte();
+    //dummy = buffer.readFloat();
+}
+
 void GPSFrame::parse(ByteBuffer& buffer){
     preamble = buffer.readByte();
     MSG_POS_LLH = buffer.readShort();
