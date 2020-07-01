@@ -6,6 +6,7 @@
 #include "json.hpp"
 #pragma warning(pop)
 
+#include <iostream>
 #include <string>
 
 

@@ -163,7 +163,7 @@ ByteBuffer ImuFrame::write() const{
 }
 void ImuFrame::parse(ByteBuffer& buffer){
     // packet_size not needed, old artifact of some specific hardware
-    uint8_t packet_size = buffer.readByte();
+    buffer.readByte();  // packet size
     acceleration.x = buffer.readFloat();
     acceleration.y = buffer.readFloat();
     acceleration.z = buffer.readFloat();
