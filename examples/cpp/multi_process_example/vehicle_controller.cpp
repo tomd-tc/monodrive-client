@@ -106,7 +106,7 @@ int main(int argc, char** argv)
     {
         mono::precise_stopwatch watch;
         // perception
-        sim0.sampleSensors(sensors);
+        sim0.sampleSensorList(sensors);
         // planning
         EgoControlConfig egoControl = planning(sensors[0]->frame);
         // control

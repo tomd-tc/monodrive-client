@@ -253,13 +253,13 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 	return true;
 }
 
-bool Simulator::sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
+bool Simulator::sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	std::vector<int> ports;
 	for(auto& sensor : sensors){
 		ports.push_back(sensor->config->listen_port);
 	}
-	ApiMessage sampleMessage(999, SampleSensorCommand_ID, true, ports);
+	ApiMessage sampleMessage(999, SampleSensorListCommand_ID, true, {{"ports", ports}});
 	for(auto& sensor : sensors){
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}

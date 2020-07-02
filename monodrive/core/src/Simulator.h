@@ -44,7 +44,7 @@ public:
 	// faster but make sure you know what you're doing
 	bool sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors);
 	// samples sensors in the list, if any are not connected returns an error
-	bool sampleSensors(std::vector<std::shared_ptr<Sensor>>& sensors);
+	bool sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors);
 	bool sendControl(float forward, float right, float brake, int mode);
 
 	static std::map<const std::string, Simulator*> simMap;
