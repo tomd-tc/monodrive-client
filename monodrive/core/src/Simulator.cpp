@@ -41,7 +41,6 @@ Simulator& Simulator::getInstance(const std::string& serverIp, const short& serv
 	const std::string simKey = serverIp + ":" + std::to_string(serverPort);
 	if (simMap[simKey] == nullptr) {
 		simMap[simKey] = new Simulator(serverIp, serverPort);
-		std::cout << "created new simulator:" << simKey << std::endl;
 	}
 	simMap[simKey]->connect();
 	return *simMap[simKey];

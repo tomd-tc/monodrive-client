@@ -40,8 +40,10 @@ public:
 	}
 	bool stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state);
 	void stepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, int stepIndex, int numSteps);
-	// samples all sensors on the server (even those not in the list)
-	// faster but make sure you know what you're doing
+
+	// triggers every sensor on the server to send it's data frame
+	// the sensors in the list will go into a read state
+	// this should only be called when the sensors in the list count for all the sensors on the server
 	bool sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors);
 	// samples sensors in the list, if any are not connected returns an error
 	bool sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors);
