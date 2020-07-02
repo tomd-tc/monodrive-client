@@ -91,7 +91,7 @@ int main(int argc, char** argv)
     while(true)
     {
         // perception
-        sim0.sampleSensors(sensors);
+        sim0.sampleSensorList(sensors);
     }
     
     return 0;

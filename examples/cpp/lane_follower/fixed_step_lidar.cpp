@@ -199,7 +199,7 @@ int main(int argc, char** argv)
         // step the simulation one simulation frame
         ClosedLoopStepCommandConfig stepCommand;
         stepCommand.time_step = 0.016;
-        sim0.sendCommand(ApiMessage(1234, ClosedLoopStepCommand_ID, true, stepCommand.dump()));
+        sim0.sendCommand(stepCommand.message());
         // perception
         // tell simulator to send all sensor data frames to client sensors
         sim0.sampleAll(sensors);

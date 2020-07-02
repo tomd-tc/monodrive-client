@@ -26,8 +26,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    while(true)
-    {
+    while(true){
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     
     return 0;
