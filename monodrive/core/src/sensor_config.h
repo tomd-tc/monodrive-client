@@ -327,8 +327,12 @@ public:
     {
         type = "ViewportCamera";
     }
-    virtual DataFrame* DataFrameFactory() override{
+    bool use_vehicle_hud = false;
+    virtual DataFrame* DataFrameFactory() override {
         return nullptr;
+    }
+    virtual nlohmann::json dump() {
+        return *this;
     }
 };
 
@@ -468,6 +472,21 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "channels", config.channels);         
     json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
+}
+
+void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
+{
+    j = static_cast<CameraConfig>(config);
+    j["use_vehicle_hud"] = config.use_vehicle_hud;
+}
+
+
+void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
+{
+    SensorBaseConfig* base = static_cast<CameraConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "use_vehicle_hud", config.use_vehicle_hud);
 }
 
 /// END Camera Config JSON Parsing
