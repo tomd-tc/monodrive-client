@@ -300,6 +300,9 @@ public:
     virtual DataFrame* DataFrameFactory() override {
         return new WaypointFrame;
     }
+
+    float distance = 1000.0;
+    float frequency = 100.0;
 };
 
 class RPMConfig : public SensorBaseConfig
@@ -709,3 +712,16 @@ void inline from_json(const nlohmann::json& j, RPMConfig& config)
     json_get(j, "wheelNumber", config.wheel_number);
 }
 /// END RPM Sensor JSON parsing
+
+/// Waypoint Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const WaypointConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["distance"] = config.distance;
+    j["frequency"] = config.frequency;
+
+}
+void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
+    json_get(j, "distance", config.distance);
+    json_get(j, "frequency", config.frequency);
+}
+/// END Waypoint Sensor JSON parsing

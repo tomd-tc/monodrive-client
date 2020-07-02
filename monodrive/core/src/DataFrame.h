@@ -109,6 +109,9 @@ public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
     std::vector<ActorWaypoints> actor_waypoints;
+    float game_time;
+    int time;
+	int sample_count;
 };
 
 class MONODRIVECORE_API GPSFrame : public DataFrame{

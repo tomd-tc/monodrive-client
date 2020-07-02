@@ -177,21 +177,29 @@ void ImuFrame::parse(ByteBuffer& buffer){
 }
 
 ByteBuffer WaypointFrame::write() const{
-    ByteBuffer buffer(sizeof(float), DATA_FRAME_HEADER_SIZE);
-    nlohmann::json j;
+    nlohmann::json j = {
+        {"time", time},
+        {"game_time", game_time},
+        {"sample_count", sample_count},
+    };
     j["waypoints"] = nlohmann::json::array();
     for(auto& awp : actor_waypoints) {
         nlohmann::json awp_json;
         to_json(awp_json, awp);
         j["waypoints"].push_back(awp_json);
     }
+
+    ByteBuffer buffer = ByteBuffer::JsonToBuffer(j);
     write_mono_header(buffer);
     return buffer;
 }
 void WaypointFrame::parse(ByteBuffer& buffer) {
     actor_waypoints.clear();
     auto data = buffer.BufferToJson();
-    for(auto& actor_wp : data) {
+    json_get(data, "time", time);
+    json_get(data, "game_time", game_time);
+    json_get(data, "sample_count", sample_count);
+    for(auto& actor_wp : data["waypoints"]) {
         ActorWaypoints awp;
         from_json(actor_wp, awp);
         actor_waypoints.emplace_back(awp);

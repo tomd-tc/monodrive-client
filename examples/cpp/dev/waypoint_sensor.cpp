@@ -51,6 +51,10 @@ int main(int argc, char** argv)
 
     sensors[0]->sampleCallback = [](DataFrame* frame){
         auto& wpFrame = *static_cast<WaypointFrame*>(frame);
+        for(const auto& actor : wpFrame.actor_waypoints) {
+            std::cout << "Actor: " << actor.actor_id << " has " 
+                << actor.waypoints.size() << " waypoints." << std::endl;
+        }
     };
 
     std::cout << "Sampling sensor loop" << std::endl;
