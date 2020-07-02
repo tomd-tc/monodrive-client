@@ -178,13 +178,24 @@ void ImuFrame::parse(ByteBuffer& buffer){
 
 ByteBuffer WaypointFrame::write() const{
     ByteBuffer buffer(sizeof(float), DATA_FRAME_HEADER_SIZE);
-    buffer.writeFloat(dummy);
+    nlohmann::json j;
+    j["waypoints"] = nlohmann::json::array();
+    for(auto& awp : actor_waypoints) {
+        nlohmann::json awp_json;
+        to_json(awp_json, awp);
+        j["waypoints"].push_back(awp_json);
+    }
     write_mono_header(buffer);
     return buffer;
 }
 void WaypointFrame::parse(ByteBuffer& buffer) {
-    uint8_t packet_size = buffer.readByte();
-    //dummy = buffer.readFloat();
+    actor_waypoints.clear();
+    auto data = buffer.BufferToJson();
+    for(auto& actor_wp : data) {
+        ActorWaypoints awp;
+        from_json(actor_wp, awp);
+        actor_waypoints.emplace_back(awp);
+    }
 }
 
 void GPSFrame::parse(ByteBuffer& buffer){

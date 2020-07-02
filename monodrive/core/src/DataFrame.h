@@ -108,8 +108,7 @@ class MONODRIVECORE_API WaypointFrame : public DataFrame {
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
-
-    float dummy;
+    std::vector<ActorWaypoints> actor_waypoints;
 };
 
 class MONODRIVECORE_API GPSFrame : public DataFrame{
