@@ -297,8 +297,13 @@ public:
     {
         type = "Waypoint";
     }
-    virtual DataFrame* DataFrameFactory() override {
+    virtual DataFrame* DataFrameFactory() override 
+    {
         return new WaypointFrame;
+    }
+    virtual nlohmann::json dump()
+    {
+        return *this;
     }
 
     float distance = 1000.0;
