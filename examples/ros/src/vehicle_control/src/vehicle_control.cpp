@@ -78,7 +78,6 @@ void control_vehicle(){
 }
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
-    std::cout << "State.." << std::endl;
     state_data = state_sensor_msg;
     for(auto& vehicle : state_data.vehicles) {
         for(auto& tag : vehicle.tags) {
@@ -91,7 +90,6 @@ void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
 
 void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
     waypoint_data = waypoint_sensor_msg;
-    std::cout << "Hello there!" << std::endl;
 }
 
 int main(int argc, char** argv)
