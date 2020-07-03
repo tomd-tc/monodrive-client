@@ -29,7 +29,7 @@ public:
 	static bool deleteInstance(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	static void clearInstances();
 	
-	void connect();
+	bool connect();
 	bool configure();
 	void disconnect();
 	void stop();
@@ -40,7 +40,13 @@ public:
 	}
 	bool stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state);
 	void stepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, int stepIndex, int numSteps);
-	void sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors);
+
+	// triggers every sensor on the server to send it's data frame
+	// the sensors in the list will go into a read state
+	// this should only be called when the sensors in the list count for all the sensors on the server
+	bool sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors);
+	// samples sensors in the list, if any are not connected returns an error
+	bool sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors);
 	bool sendControl(float forward, float right, float brake, int mode);
 
 	static std::map<const std::string, Simulator*> simMap;
@@ -49,8 +55,10 @@ public:
 	const short& getServerPort() const{return serverPort;}
 private:
 	Simulator(const Configuration& config);
+	Simulator(const std::string& serverIp, const short& serverPort);
 	Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	Simulator(const Simulator&)= delete;
+	void waitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors);
   	Simulator& operator=(const Simulator&)= delete;
 
 	boost::asio::io_service ioService;
