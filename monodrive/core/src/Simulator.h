@@ -58,7 +58,7 @@ private:
 	Simulator(const std::string& serverIp, const short& serverPort);
 	Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	Simulator(const Simulator&)= delete;
-	void WaitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors);
+	void waitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors);
   	Simulator& operator=(const Simulator&)= delete;
 
 	boost::asio::io_service ioService;

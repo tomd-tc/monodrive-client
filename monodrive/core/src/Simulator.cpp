@@ -243,7 +243,7 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	if(sendCommand(sampleMessage)){
-		WaitForSamples(sensors);
+		waitForSamples(sensors);
 	}
 	else{
 		std::cerr << "Failed to sample sensors." << std::endl;
@@ -263,7 +263,7 @@ bool Simulator::sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors)
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	if(sendCommand(sampleMessage)){
-		WaitForSamples(sensors);
+		waitForSamples(sensors);
 	}
 	else{
 		std::cerr << "Failed to sample sensors." << std::endl;
@@ -272,7 +272,7 @@ bool Simulator::sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors)
 	return true;
 }
 
-void Simulator::WaitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors)
+void Simulator::waitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	bool samplingInProgress = true;
 	do{
