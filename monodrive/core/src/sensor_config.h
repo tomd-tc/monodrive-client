@@ -347,7 +347,7 @@ public:
     {
         type = "ViewportCamera";
     }
-    bool use_vehicle_hud = false;
+    bool enable_hud = false;
     virtual DataFrame* DataFrameFactory() override {
         return nullptr;
     }
@@ -359,10 +359,11 @@ public:
 /// SensorBaseConfig
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
 {
-    j = nlohmann::json{{"yaw", rotation.yaw},
-                {"pitch", rotation.pitch},
-                {"roll", rotation.roll}
-                };
+    j = nlohmann::json{
+        {"yaw", rotation.yaw},
+        {"pitch", rotation.pitch},
+        {"roll", rotation.roll}
+    };
 }
 void inline from_json(const nlohmann::json& j, SensorBaseConfig::Rotation& rotation)
 {
@@ -497,7 +498,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
 void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
 {
     j = static_cast<CameraConfig>(config);
-    j["use_vehicle_hud"] = config.use_vehicle_hud;
+    j["use_vehicle_hud"] = config.enable_hud;
 }
 
 
@@ -506,7 +507,7 @@ void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
     SensorBaseConfig* base = static_cast<CameraConfig*>(&config);
     from_json(j, *base);
 
-    json_get(j, "use_vehicle_hud", config.use_vehicle_hud);
+    json_get(j, "use_vehicle_hud", config.enable_hud);
 }
 
 /// END Camera Config JSON Parsing
