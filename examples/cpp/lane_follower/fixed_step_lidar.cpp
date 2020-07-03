@@ -142,6 +142,13 @@ int main(int argc, char** argv)
     fc_config.annotation.desired_tags = {"traffic_sign"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
+    LidarConfig ld_config;
+    ld_config.server_ip = sim0.getServerIp();
+    ld_config.server_port = sim0.getServerPort();
+    ld_config.listen_port = 8300;
+    ld_config.location.z = 250;
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<LidarConfig>(ld_config)));
+
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
     vp_config.server_port = sim0.getServerPort();
@@ -150,8 +157,7 @@ int main(int argc, char** argv)
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
-    state_config.desired_tags = {"ego", "vehicle"};
-    state_config.undesired_tags = {"static"};
+    state_config.desired_tags = {"ego"};
     state_config.server_ip = sim0.getServerIp();
     state_config.server_port = sim0.getServerPort();
     state_config.listen_port = 8101;
@@ -170,20 +176,36 @@ int main(int argc, char** argv)
     // during sampling
     sensors[0]->sampleCallback = perception;
 
+    // define callback with forwarding to veloview
+    boost::asio::io_service io_service;
+    boost::asio::ip::udp::socket socket(io_service);
+    boost::asio::ip::udp::endpoint remote_endpoint;
+    socket.open(boost::asio::ip::udp::v4());
+    remote_endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 2368);
+    sensors[1]->sampleCallback = [&remote_endpoint, &socket](DataFrame* frame){
+        auto& lidarFrame = *static_cast<LidarFrame*>(frame);
+        int count = 0;
+        for(auto& packet : lidarFrame.packets){
+            boost::system::error_code err;
+            socket.send_to(boost::asio::buffer(&packet, sizeof(LidarPacket)), remote_endpoint, 0, err);
+            // std::this_thread::sleep_for(std::chrono::microseconds(1327));
+        }
+    };
+
     // start our main perception planning and control loop
     std::cout << "Sampling sensor loop" << std::endl;
     while(true)
     {
         // step the simulation one simulation frame
         ClosedLoopStepCommandConfig stepCommand;
-        stepCommand.time_step = 0.01f;
-        sim0.sendCommand(ApiMessage(1234, ClosedLoopStepCommand_ID, true, stepCommand.dump()));
+        stepCommand.time_step = 0.016;
+        sim0.sendCommand(stepCommand.message());
         // perception
         // tell simulator to send all sensor data frames to client sensors
         sim0.sampleAll(sensors);
         // planning
         // besides callbacks can always access the latest data frame on the sensor
-        EgoControlConfig egoControl = planning(sensors[1]->frame);
+        EgoControlConfig egoControl = planning(sensors[2]->frame);
         // control
         // send ego control message calculated from our planning and control
         sim0.sendCommand(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
