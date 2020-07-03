@@ -24,6 +24,7 @@ add_executable(sensor_frame_count sensor_frame_count.cpp)
 add_executable(sensor_frame_count_fixed sensor_frame_count_fixed.cpp)
 add_executable(replay_step_dev replay_step.cpp)
 add_executable(rpm_sensor rpm_sensor.cpp)
+add_executable(waypoint_sensor waypoint_sensor.cpp)
 add_executable(config_export config_export.cpp)
 
 # link monodrive client
@@ -45,6 +46,7 @@ target_link_libraries(sensor_frame_count monodrive)
 target_link_libraries(sensor_frame_count_fixed monodrive)
 target_link_libraries(replay_step_dev monodrive)
 target_link_libraries(rpm_sensor monodrive)
+target_link_libraries(waypoint_sensor monodrive)
 target_link_libraries(config_export monodrive)
 
 # copy monodrive dll to runtime directory
