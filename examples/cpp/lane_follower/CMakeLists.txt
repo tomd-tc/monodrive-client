@@ -40,5 +40,6 @@ if(MSVC)
       ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/monodrive.dll
   )
   add_dependencies(fixed_step monodrive_lib_copy_lanes)
+  add_dependencies(fixed_step_lidar monodrive_lib_copy_lanes)
   add_dependencies(real_time monodrive_lib_copy_lanes)
 endif(MSVC)
