@@ -151,10 +151,11 @@ int main(int argc, char** argv)
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
-    state_config.desired_tags = {"ego"};
+    state_config.desired_tags = {"vehicle"};
+    state_config.undesired_tags = {"static"};
     state_config.server_ip = sim0.getServerIp();
     state_config.server_port = sim0.getServerPort();
-    state_config.listen_port = 8101;
+    state_config.listen_port = 8200;
     state_config.debug_drawing = true;
     state_config.undesired_tags = {""};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));

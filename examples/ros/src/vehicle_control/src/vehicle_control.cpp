@@ -12,6 +12,7 @@
 #include "ros/package.h"
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
+#include "monodrive_msgs/WaypointSensor.h"
 
 using namespace lane_spline;
 LaneSpline lanespline;
@@ -25,8 +26,10 @@ std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
 ros::Subscriber state_sensor_sub;
+ros::Subscriber wp_sensor_sub;
 
 monodrive_msgs::StateSensor state_data;
+monodrive_msgs::WaypointSensor waypoint_data;
 
 void control_vehicle(){
     monodrive_msgs::VehicleState vs;
@@ -85,6 +88,10 @@ void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
     }
 }
 
+void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
+    waypoint_data = waypoint_sensor_msg;
+}
+
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "vehicle_control");
@@ -99,6 +106,8 @@ int main(int argc, char** argv)
     vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
     state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
         &state_sensor_callback);
+    wp_sensor_sub = node_handle->subscribe("/monodrive/waypoint_sensor", 1, 
+        &waypoint_sensor_callback);
 
     ros::Rate rate(100);
 

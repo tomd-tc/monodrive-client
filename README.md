@@ -55,6 +55,72 @@ To build the examples the following are required:
     
         <img src="doc/cpp-client/setup/images/build.png" width="250">
 
+
+## Installation with CMake
+You can include the monoDrive Simulator client in your existing CMake project
+by adding the following lines to your `CMakeLists.txt`
+```cmake
+# add monodrive client library from local repo
+add_subdirectory(path/to/monodrive-client/monodrive mdclient)
+
+# link targets as needed
+target_link_libraries(<mytarget> monodrive)
+```
+
+
+## Installation with Bazel
+You can include the monoDrive Simulator client in your existing Bazel project
+by adding the following lines to your `WORKSPACE` file
+```
+local_repository(
+    name = "monodrive",
+    path = "path/to/monodrive-client"
+)
+```
+and the following to your `BUILD` files as needed
+```
+cc_library(
+    name = "my_lib",
+    srcs = [...],
+    hdrs = [...],
+    deps = [
+        ...,
+        "@monodrive//monodrive/core:monodrive"
+    ]
+)
+```
+
+
+## Installation to system on Ubuntu
+You can build and install the monoDrive Simulator client to your Ubuntu system
+using CMake
+```
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+```
+
+This will install the client library under the prefix `/usr/local/monodrive/client`.
+It can now be included or linked as needed.
+
+For example, to compile your own executable with the monoDrive client library
+```
+g++ main.cpp -I/usr/local/monodrive/client/include/ -L/usr/local/monodrive/client/lib -lboost_system -lmonodrive -o my_program
+```
+
+Make library available for dynamic loading
+```
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/monodrive/client/lib
+```
+
+Finally run
+```
+./my_program
+```
+
+
 # monoDrive ROS Client
 
 ## Ubuntu 18.04 Prerequisites

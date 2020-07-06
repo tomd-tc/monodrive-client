@@ -163,7 +163,7 @@ ByteBuffer ImuFrame::write() const{
 }
 void ImuFrame::parse(ByteBuffer& buffer){
     // packet_size not needed, old artifact of some specific hardware
-    uint8_t packet_size = buffer.readByte();
+    buffer.readByte();  // packet size
     acceleration.x = buffer.readFloat();
     acceleration.y = buffer.readFloat();
     acceleration.z = buffer.readFloat();
@@ -174,6 +174,36 @@ void ImuFrame::parse(ByteBuffer& buffer){
     timer = buffer.readInt();
     checksum = buffer.readShort();
     time_of_week = buffer.readInt();
+}
+
+ByteBuffer WaypointFrame::write() const{
+    nlohmann::json j = {
+        {"time", time},
+        {"game_time", game_time},
+        {"sample_count", sample_count},
+    };
+    j["waypoints"] = nlohmann::json::array();
+    for(auto& awp : actor_waypoints) {
+        nlohmann::json awp_json;
+        to_json(awp_json, awp);
+        j["waypoints"].push_back(awp_json);
+    }
+
+    ByteBuffer buffer = ByteBuffer::JsonToBuffer(j);
+    write_mono_header(buffer);
+    return buffer;
+}
+void WaypointFrame::parse(ByteBuffer& buffer) {
+    actor_waypoints.clear();
+    auto data = buffer.BufferToJson();
+    json_get(data, "time", time);
+    json_get(data, "game_time", game_time);
+    json_get(data, "sample_count", sample_count);
+    for(auto& actor_wp : data["waypoints"]) {
+        ActorWaypoints awp;
+        from_json(actor_wp, awp);
+        actor_waypoints.emplace_back(awp);
+    }
 }
 
 void GPSFrame::parse(ByteBuffer& buffer){

@@ -124,6 +124,27 @@ struct UltrasonicTarget{
     float range;
 };
 
+enum LaneChange {
+	NONE = 0,
+	Right = 1,
+	Left = 2,
+	Both = 3
+};
+
+struct Waypoint {
+    Vec3f location;
+    Vec3f rotation;
+    int road_id;
+    int lane_id;
+    float distance;
+    int lane_change;
+};
+
+struct ActorWaypoints {
+    std::string actor_id;
+    std::vector<Waypoint> waypoints;
+};
+
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, Quat& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Vec3f& v);
@@ -150,4 +171,8 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const UltrasonicTarget& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, UltrasonicTarget& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const CollisionTarget& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, CollisionTarget& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const Waypoint& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, Waypoint& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const ActorWaypoints& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, ActorWaypoints& v);
 
