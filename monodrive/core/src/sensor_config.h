@@ -19,6 +19,7 @@ class SensorBaseConfig
         std::string description;
         int listen_port = 0;
         bool wait_for_fresh_frame = true;
+        bool enable_streaming = true;
         Location location;
         struct Rotation
         {
@@ -346,6 +347,7 @@ public:
     ViewportCameraConfig()
     {
         type = "ViewportCamera";
+        enable_streaming = false;
     }
     bool enable_hud = false;
     int viewport_number = 0;
@@ -401,6 +403,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig& config)
         {"location", config.location},
         {"rotation", config.rotation},
         {"wait_for_fresh_frame", config.wait_for_fresh_frame},
+        {"enable_streaming", config.enable_streaming},
         {"ros", config.ros},
     };
 };
@@ -412,6 +415,7 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
     json_get(j, "location", config.location);
     json_get(j, "rotation", config.rotation);
     json_get(j, "wait_for_fresh_frame", config.wait_for_fresh_frame);
+    json_get(j, "enable_streaming", config.enable_streaming);
     json_get(j, "ros", config.ros);
 }
 /// End SensorBaseConfig JSON Parsing
@@ -500,6 +504,7 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
 {
     j = static_cast<CameraConfig>(config);
     j["use_vehicle_hud"] = config.enable_hud;
+    j["enable_streaming"] = config.enable_streaming;
     j["viewport_number"] = config.viewport_number;
 }
 
@@ -510,6 +515,7 @@ void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
     from_json(j, *base);
 
     json_get(j, "use_vehicle_hud", config.enable_hud);
+    json_get(j, "enable_streaming", config.enable_streaming);
     json_get(j, "viewport_number", config.viewport_number);
 }
 
