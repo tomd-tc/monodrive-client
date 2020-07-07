@@ -53,19 +53,22 @@ int main(int argc, char** argv)
         auto& wpFrame = *static_cast<WaypointFrame*>(frame);
         for(const auto& actor : wpFrame.actor_waypoints) {
             std::cout << "Actor: " << actor.actor_id << " has " 
-                << actor.lanes.size() << " lanes." << std::endl;
+                << actor.lanes.size() << " lane(s)." << std::endl;
+            std::cout << "\tActor road: " << actor.actor_road_id 
+                        << " Actor lane: " << actor.actor_lane_id  << " - "
+                        << actor.actor_waypoint.distance << ", " 
+                        << actor.actor_waypoint.location.x << ", " 
+                        << actor.actor_waypoint.location.y << ", " 
+                        << actor.actor_waypoint.location.z << std::endl;
             for(const auto& lane : actor.lanes) {
                 if(lane.waypoints.size() >= 2) {
-                    std::cout << "WP 0: " 
-                        << lane.road_id << ", " 
-                        << lane.lane_id << ", "
+                    std::cout << "\tLane waypoints: " << lane.road_id << " - " << lane.lane_id << " Count: " << lane.waypoints.size() << std::endl;
+                    std::cout << "\t\tWP 0: " 
                         << lane.waypoints[0].distance << ", " 
                         << lane.waypoints[0].location.x << ", " 
                         << lane.waypoints[0].location.y << ", " 
                         << lane.waypoints[0].location.z << std::endl;
-                    std::cout << "WP 1: "
-                        << lane.road_id << ", " 
-                        << lane.lane_id << ", "
+                    std::cout << "\t\tWP 1: "
                         << lane.waypoints[1].distance << ", " 
                         << lane.waypoints[1].location.x << ", " 
                         << lane.waypoints[1].location.y << ", " 
