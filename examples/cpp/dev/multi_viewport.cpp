@@ -30,7 +30,6 @@ int main(int argc, char** argv)
     // configure viewport cameras
     ViewportCameraConfig vp1;
     vp1.listen_port = 1;
-    vp1.viewport_number = 1;
     vp1.location.z = 200;
     vp1.rotation.yaw = -15;
     vp1.resolution = Resolution(1980, 1024);
@@ -39,7 +38,6 @@ int main(int argc, char** argv)
 
     ViewportCameraConfig vp2;
     vp2.listen_port = 2;
-    vp2.viewport_number = 2;
     vp2.location.z = 200;
     vp2.rotation.yaw = 15;
     vp2.resolution = Resolution(1980, 1024);

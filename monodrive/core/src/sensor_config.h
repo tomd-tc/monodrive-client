@@ -350,7 +350,6 @@ public:
         enable_streaming = false;
     }
     bool enable_hud = false;
-    int viewport_number = 0;
     virtual DataFrame* DataFrameFactory() override {
         return nullptr;
     }
@@ -505,7 +504,6 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
     j = static_cast<CameraConfig>(config);
     j["use_vehicle_hud"] = config.enable_hud;
     j["enable_streaming"] = config.enable_streaming;
-    j["viewport_number"] = config.viewport_number;
 }
 
 
@@ -516,7 +514,6 @@ void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
 
     json_get(j, "use_vehicle_hud", config.enable_hud);
     json_get(j, "enable_streaming", config.enable_streaming);
-    json_get(j, "viewport_number", config.viewport_number);
 }
 
 /// END Camera Config JSON Parsing
