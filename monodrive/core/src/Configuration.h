@@ -1,25 +1,23 @@
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
 #include "json.hpp"
-
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
 
 
 class Configuration
 {
 public:
     // Configuration(int argc, char** argv);
+    Configuration() {};
     Configuration(
-        const fs::path& simulatorConfigPath = {"config/simulator.json"},
-        const fs::path& weatherConfigPath = {"config/weather.json"},
-        const fs::path& scenarioConfigPath = {"config/scenario.json"}
+        const std::string& simulatorConfigPath,
+        const std::string& weatherConfigPath,
+        const std::string& scenarioConfigPath
     );
     ~Configuration(){};
     nlohmann::json simulator;
     nlohmann::json weather;
     nlohmann::json scenario;
 private:
-    nlohmann::json load(const fs::path& path);
+    nlohmann::json load(const std::string& path);
 
 };

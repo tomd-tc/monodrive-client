@@ -1,0 +1,174 @@
+{
+  "trigger_boxes": [],
+  "vehicles": [
+    {
+      "body_color": "Carpaint_OliveGreen",
+      "class_path": "/Game/Vehicles/minivan_monoDrive_01.minivan_monoDrive_01_C",
+      "delayed_start": 0.0,
+      "desired_speed": 0.0,
+      "destroy_on_collision": false,
+      "distance_to_stop_sign": 400.0,
+      "ignore_lane_change_boxes": false,
+      "ignore_other_vehicles": false,
+      "ignore_traffic_signals": false,
+      "initial_speed": 0.0,
+      "lane_offset": 0.0,
+      "limit_speed_in_curves": true,
+      "location": {
+        "x": 9060.0,
+        "y": 420.0,
+        "z": 10.0
+      },
+      "name": "minivan_monoDrive_01_4",
+      "obey_road_speed_limits": true,
+      "overtake_slower_vehicles": false,
+      "randomize_turn_preferences": true,
+      "rolling_stop_speed": 0.00100000004749745,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "search_forward_distance": 10000.0,
+      "snap_to_lane": true,
+      "steer_forward_distance": 550.0,
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "car"
+      ]
+    },
+    {
+      "body_color": "Carpaint_Silver",
+      "class_path": "/Game/Vehicles/sedan_monoDrive_01.sedan_monoDrive_01_C",
+      "delayed_start": 0.0,
+      "desired_speed": 0.0,
+      "destroy_on_collision": false,
+      "distance_to_stop_sign": 400.0,
+      "ignore_lane_change_boxes": false,
+      "ignore_other_vehicles": false,
+      "ignore_traffic_signals": false,
+      "initial_speed": 0.0,
+      "lane_offset": 0.0,
+      "limit_speed_in_curves": true,
+      "location": {
+        "x": 9990.0,
+        "y": 980.0,
+        "z": 10.0
+      },
+      "name": "sedan_monoDrive_01_2",
+      "obey_road_speed_limits": true,
+      "overtake_slower_vehicles": false,
+      "randomize_turn_preferences": true,
+      "rolling_stop_speed": 0.00100000004749745,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "search_forward_distance": 10000.0,
+      "snap_to_lane": true,
+      "steer_forward_distance": 550.0,
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "car"
+      ]
+    },
+    {
+      "body_color": "Carpaint_Gold",
+      "class_path": "/Game/Vehicles/subcompact_monoDrive_01.subcompact_monoDrive_01_C",
+      "delayed_start": 0.0,
+      "desired_speed": 0.0,
+      "destroy_on_collision": false,
+      "distance_to_stop_sign": 400.0,
+      "ignore_lane_change_boxes": false,
+      "ignore_other_vehicles": false,
+      "ignore_traffic_signals": false,
+      "initial_speed": 0.0,
+      "lane_offset": 0.0,
+      "limit_speed_in_curves": true,
+      "location": {
+        "x": 6360.0,
+        "y": 360.0,
+        "z": 10.0
+      },
+      "name": "subcompact_monoDrive_01_2",
+      "obey_road_speed_limits": true,
+      "overtake_slower_vehicles": false,
+      "randomize_turn_preferences": true,
+      "rolling_stop_speed": 0.00100000004749745,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "search_forward_distance": 10000.0,
+      "snap_to_lane": true,
+      "steer_forward_distance": 550.0,
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "car",
+        "ego"
+      ]
+    },
+    {
+      "body_color": "Carpaint_Red",
+      "class_path": "/Game/Vehicles/truck_monoDrive_01.truck_monoDrive_01_C",
+      "delayed_start": 0.0,
+      "desired_speed": 0.0,
+      "destroy_on_collision": false,
+      "distance_to_stop_sign": 400.0,
+      "ignore_lane_change_boxes": false,
+      "ignore_other_vehicles": false,
+      "ignore_traffic_signals": false,
+      "initial_speed": 0.0,
+      "lane_offset": 0.0,
+      "limit_speed_in_curves": true,
+      "location": {
+        "x": 11370.0,
+        "y": 450.0,
+        "z": 10.0
+      },
+      "name": "truck_monoDrive_01_2",
+      "obey_road_speed_limits": true,
+      "overtake_slower_vehicles": false,
+      "randomize_turn_preferences": true,
+      "rolling_stop_speed": 0.00100000004749745,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "search_forward_distance": 10000.0,
+      "snap_to_lane": true,
+      "steer_forward_distance": 550.0,
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "truck"
+      ]
+    }
+  ]
+}

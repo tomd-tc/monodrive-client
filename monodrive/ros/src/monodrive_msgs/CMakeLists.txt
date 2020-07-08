@@ -56,6 +56,10 @@ add_message_files(
   OOBB.msg
   VehicleControl.msg
   StateSensor.msg
+  ActorLane.msg
+  ActorWaypoints.msg
+  Waypoint.msg
+  WaypointSensor.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -1,3 +1,4 @@
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
 
 #include "JsonHelpers.h"
@@ -123,6 +124,36 @@ struct UltrasonicTarget{
     float range;
 };
 
+enum LaneChange {
+	NONE = 0,
+	Right = 1,
+	Left = 2,
+	Both = 3
+};
+
+struct Waypoint {
+    Vec3f location;
+    Vec3f rotation;
+    float distance;
+    int lane_change;
+};
+
+struct ActorLane {
+    std::string road_id;
+    int lane_id;
+    std::vector<Waypoint> waypoints;
+};
+
+struct ActorWaypoints {
+    std::string actor_id;
+    std::string actor_road_id;
+    int actor_lane_id;
+    Waypoint actor_waypoint;
+    std::vector<ActorLane> lanes;
+    std::vector<ActorLane> left_lanes;
+    std::vector<ActorLane> right_lanes;
+};
+
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, Quat& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Vec3f& v);
@@ -149,7 +180,10 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const UltrasonicTarget& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, UltrasonicTarget& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const CollisionTarget& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, CollisionTarget& v);
-
-
-
+void MONODRIVECORE_API to_json(nlohmann::json& j, const Waypoint& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, Waypoint& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const ActorWaypoints& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, ActorWaypoints& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const ActorLane& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, ActorLane& v);
 
