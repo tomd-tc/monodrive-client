@@ -349,10 +349,11 @@ public:
         type = "ViewportCamera";
         enable_streaming = false;
     }
-    bool enable_hud = false;
-    Resolution window_size;
-    bool fullscreen = false;
-    int monitor_number = 0;
+    bool enable_hud{false};
+    Resolution window_size{0, 0};
+    Resolution window_offset{0, 0};
+    bool fullscreen{false};
+    int monitor_number{0};
     virtual DataFrame* DataFrameFactory() override {
         return nullptr;
     }
@@ -507,6 +508,7 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
     j = static_cast<CameraConfig>(config);
     j["use_vehicle_hud"] = config.enable_hud;
     j["window_size"] = config.window_size;
+    j["window_offset"] = config.window_offset;
     j["fullscreen"] = config.fullscreen;
     j["monitor_number"] = config.monitor_number;
 }
@@ -519,6 +521,7 @@ void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
 
     json_get(j, "use_vehicle_hud", config.enable_hud);
     json_get(j, "window_size", config.window_size);
+    json_get(j, "window_offset", config.window_offset);
     json_get(j, "fullscreen", config.fullscreen);
     json_get(j, "monitor_number", config.monitor_number);
 }
