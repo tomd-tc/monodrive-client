@@ -10,6 +10,7 @@
 #include "ros/ros.h"
 #include "ros/package.h"
 #include "monodrive_msgs/VehicleControl.h"
+#include "monodrive_msgs/StateSensor.h"
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Joy.h>
 
@@ -17,13 +18,15 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-std::string vehicle_name = "subcompact_monoDrive_01";
+std::string vehicle_name = "crossover_monoDrive_01";
 std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
+ros::Subscriber state_sensor_sub;
 ros::Subscriber joy_sub_;
 
 
+monodrive_msgs::StateSensor state_data;
 std::vector<float> wheel_data = {0,0,0,0};
 
 
@@ -38,7 +41,16 @@ void control_vehicle(){
     vehicle_control_pub.publish(msg);
 }
 
-
+void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
+    state_data = state_sensor_msg;
+    for(auto& vehicle : state_data.vehicles) {
+        for(auto& tag : vehicle.tags) {
+            if(tag == "ego") {
+                vehicle_name = vehicle.name;
+            }
+        }
+    }
+}
 
 void joyCallback(const sensor_msgs::Joy::ConstPtr& joy){
   wheel_data[0] = (joy->axes[1] == -1) ? 0 : joy->axes[1]; //throttle
@@ -57,6 +69,8 @@ int main(int argc, char** argv)
     // create vehicle controller publisher and sensor subscriber
     node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
     vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
+    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
+        &state_sensor_callback);
     joy_sub_ = node_handle->subscribe("/joy", 1, &joyCallback);
 
     ros::Rate rate(100);
