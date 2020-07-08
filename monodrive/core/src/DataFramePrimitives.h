@@ -150,6 +150,8 @@ struct ActorWaypoints {
     int actor_lane_id;
     Waypoint actor_waypoint;
     std::vector<ActorLane> lanes;
+    std::vector<ActorLane> left_lanes;
+    std::vector<ActorLane> right_lanes;
 };
 
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);

@@ -234,7 +234,9 @@ void to_json(nlohmann::json& j, const ActorWaypoints& w){
 		{"actor_road_id", w.actor_road_id},
 		{"actor_lane_id", w.actor_lane_id},
 		{"actor_waypoint", w.actor_waypoint},
-		{"lanes", w.lanes}
+		{"lanes", w.lanes},
+		{"left_lanes", w.left_lanes},
+		{"right_lanes", w.right_lanes}
 	};
 }
 void from_json(const nlohmann::json& j, ActorWaypoints& w){
@@ -243,6 +245,8 @@ void from_json(const nlohmann::json& j, ActorWaypoints& w){
     json_get(j, "actor_lane_id", w.actor_lane_id); 
     json_get(j, "actor_waypoint", w.actor_waypoint); 
     json_get(j, "lanes", w.lanes); 
+    json_get(j, "left_lanes", w.left_lanes); 
+    json_get(j, "right_lanes", w.right_lanes); 
 }
 
 void to_json(nlohmann::json& j, const ActorLane& l){
