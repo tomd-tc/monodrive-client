@@ -93,6 +93,20 @@ void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
 
 void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
     waypoint_data = waypoint_sensor_msg;
+    for(auto& actor : waypoint_data.actor_waypoints) {
+        std::cout << "Vehicle: " << actor.actor_id << " has " << 
+            actor.lanes.size() << " lanes" << std::endl;
+        for(auto& lane : actor.lanes) {
+            std::cout << "WP 0: " << lane.waypoints[0].distance << ", " << 
+                lane.waypoints[0].location.x << ", " << 
+                lane.waypoints[0].location.y << ", " << 
+                lane.waypoints[0].location.z << std::endl;
+            std::cout << "WP 1: " << lane.waypoints[1].distance << ", " << 
+                lane.waypoints[1].location.x << ", " << 
+                lane.waypoints[1].location.y << ", " << 
+                lane.waypoints[1].location.z << std::endl;
+        }
+    }
 }
 
 void imu_sensor_callback(const sensor_msgs::Imu &imu_sensor_msg) {
