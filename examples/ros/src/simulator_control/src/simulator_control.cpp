@@ -54,16 +54,6 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     waypoint_config.ros.message_type = "monodrive_msgs/WaypointSensor";
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<WaypointConfig>(waypoint_config)));
 
-    IMUConfig imu_config;
-    imu_config.server_ip = sim0.getServerIp();
-    imu_config.server_port = sim0.getServerPort();
-    imu_config.listen_port = 8102;
-    imu_config.ros.publish_to_ros = true;
-    imu_config.ros.advertise = true;
-    imu_config.ros.topic = "/monodrive/imu_sensor";
-    imu_config.ros.message_type = "sensor_msgs/Imu";
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
-
     std::cout<<"***********ALL SENSOR CONFIGS*******"<<std::endl;
     for (auto& sensor : sensors)
     {

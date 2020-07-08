@@ -10,7 +10,6 @@
 
 #include "ros/ros.h"
 #include "ros/package.h"
-#include "sensor_msgs/Imu.h"
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
 #include "monodrive_msgs/WaypointSensor.h"
@@ -28,11 +27,9 @@ std::shared_ptr<ros::NodeHandle> node_handle;
 ros::Publisher vehicle_control_pub;
 ros::Subscriber state_sensor_sub;
 ros::Subscriber wp_sensor_sub;
-ros::Subscriber imu_sensor_sub;
 
 monodrive_msgs::StateSensor state_data;
 monodrive_msgs::WaypointSensor waypoint_data;
-sensor_msgs::Imu imu_data;
 
 void control_vehicle(){
     monodrive_msgs::VehicleState vs;
@@ -42,14 +39,14 @@ void control_vehicle(){
         }
     }
     Eigen::VectorXd position(3);
-    position << vs.pose.pose.position.x,
-        vs.pose.pose.position.y,
-        vs.pose.pose.position.z;
+    position << vs.odometry.pose.pose.position.x,
+        vs.odometry.pose.pose.position.y,
+        vs.odometry.pose.pose.position.z;
     Eigen::Quaternion<double> orientation(
-        vs.pose.pose.orientation.w,
-        vs.pose.pose.orientation.x,
-        vs.pose.pose.orientation.y,
-        vs.pose.pose.orientation.z
+        vs.odometry.pose.pose.orientation.w,
+        vs.odometry.pose.pose.orientation.x,
+        vs.odometry.pose.pose.orientation.y,
+        vs.odometry.pose.pose.orientation.z
     );
 
     auto nearestIndex = lanespline.GetNearestPoint("road_0", "lane_2", position);
@@ -93,24 +90,6 @@ void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
 
 void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
     waypoint_data = waypoint_sensor_msg;
-    for(auto& actor : waypoint_data.actor_waypoints) {
-        std::cout << "Vehicle: " << actor.actor_id << " has " << 
-            actor.lanes.size() << " lanes" << std::endl;
-        for(auto& lane : actor.lanes) {
-            std::cout << "WP 0: " << lane.waypoints[0].distance << ", " << 
-                lane.waypoints[0].location.x << ", " << 
-                lane.waypoints[0].location.y << ", " << 
-                lane.waypoints[0].location.z << std::endl;
-            std::cout << "WP 1: " << lane.waypoints[1].distance << ", " << 
-                lane.waypoints[1].location.x << ", " << 
-                lane.waypoints[1].location.y << ", " << 
-                lane.waypoints[1].location.z << std::endl;
-        }
-    }
-}
-
-void imu_sensor_callback(const sensor_msgs::Imu &imu_sensor_msg) {
-    imu_data = imu_sensor_msg;
 }
 
 int main(int argc, char** argv)
@@ -129,8 +108,6 @@ int main(int argc, char** argv)
         &state_sensor_callback);
     wp_sensor_sub = node_handle->subscribe("/monodrive/waypoint_sensor", 1, 
         &waypoint_sensor_callback);
-    imu_sensor_sub = node_handle->subscribe("/monodrive/imu_sensor", 1, 
-        &imu_sensor_callback);
 
     ros::Rate rate(100);
 

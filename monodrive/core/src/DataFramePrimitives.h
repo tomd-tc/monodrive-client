@@ -134,24 +134,15 @@ enum LaneChange {
 struct Waypoint {
     Vec3f location;
     Vec3f rotation;
+    int road_id;
+    int lane_id;
     float distance;
     int lane_change;
 };
 
-struct ActorLane {
-    std::string road_id;
-    int lane_id;
-    std::vector<Waypoint> waypoints;
-};
-
 struct ActorWaypoints {
     std::string actor_id;
-    std::string actor_road_id;
-    int actor_lane_id;
-    Waypoint actor_waypoint;
-    std::vector<ActorLane> lanes;
-    std::vector<ActorLane> left_lanes;
-    std::vector<ActorLane> right_lanes;
+    std::vector<Waypoint> waypoints;
 };
 
 void MONODRIVECORE_API to_json(nlohmann::json& j, const Quat& v);
@@ -184,6 +175,4 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const Waypoint& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, Waypoint& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const ActorWaypoints& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, ActorWaypoints& v);
-void MONODRIVECORE_API to_json(nlohmann::json& j, const ActorLane& v);
-void MONODRIVECORE_API from_json(const nlohmann::json& j, ActorLane& v);
 

@@ -76,7 +76,6 @@ if(MSVC)
   add_dependencies(replay_step_dev monodrive_lib_copy_dev)
   add_dependencies(rpm_sensor monodrive_lib_copy_dev)
   add_dependencies(config_export monodrive_lib_copy_dev)
-  add_dependencies(waypoint_sensor monodrive_lib_copy_dev)
 endif(MSVC)
 
 # eigen
