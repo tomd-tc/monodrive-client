@@ -218,27 +218,46 @@ void to_json(nlohmann::json& j, const Waypoint& w){
 	j = {
 		{"location", w.location},
 		{"rotation", w.rotation},
-		{"road_id", w.road_id},
-		{"lane_id", w.lane_id},
 		{"distance", w.distance},
 		{"lane_change", w.lane_change}};
 }
 void from_json(const nlohmann::json& j, Waypoint& w){
     json_get(j, "location", w.location); 
     json_get(j, "rotation", w.rotation); 
-    json_get(j, "road_id", w.road_id); 
-    json_get(j, "lane_id", w.lane_id); 
     json_get(j, "distance", w.distance); 
     json_get(j, "lane_change", w.lane_change); 
 }
 
 void to_json(nlohmann::json& j, const ActorWaypoints& w){
 	j = {
-		{"id", w.actor_id},
-		{"waypoints", w.waypoints}
+		{"actor_id", w.actor_id},
+		{"actor_road_id", w.actor_road_id},
+		{"actor_lane_id", w.actor_lane_id},
+		{"actor_waypoint", w.actor_waypoint},
+		{"lanes", w.lanes},
+		{"left_lanes", w.left_lanes},
+		{"right_lanes", w.right_lanes}
 	};
 }
 void from_json(const nlohmann::json& j, ActorWaypoints& w){
-    json_get(j, "id", w.actor_id); 
-    json_get(j, "waypoints", w.waypoints); 
+    json_get(j, "actor_id", w.actor_id); 
+    json_get(j, "actor_road_id", w.actor_road_id); 
+    json_get(j, "actor_lane_id", w.actor_lane_id); 
+    json_get(j, "actor_waypoint", w.actor_waypoint); 
+    json_get(j, "lanes", w.lanes); 
+    json_get(j, "left_lanes", w.left_lanes); 
+    json_get(j, "right_lanes", w.right_lanes); 
+}
+
+void to_json(nlohmann::json& j, const ActorLane& l){
+	j = {
+		{"road_id", l.road_id},
+		{"lane_id", l.lane_id},
+		{"waypoints", l.waypoints}
+	};
+}
+void from_json(const nlohmann::json& j, ActorLane& l){
+    json_get(j, "road_id", l.road_id); 
+    json_get(j, "lane_id", l.lane_id); 
+    json_get(j, "waypoints", l.waypoints); 
 }
