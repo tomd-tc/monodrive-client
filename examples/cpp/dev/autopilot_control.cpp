@@ -49,6 +49,10 @@ int main(int argc, char** argv)
     apc_config.headway = 1000.0; // Amount of headway to allow between vehicles in centimeters
     apc_config.lane_change = 2; // Request to change lanes (2 - both ways)
     apc_config.autopilot_engaged = true; // Autopilot control is allowed
+    apc_config.gear = "D1"; // Gear indicator
+    apc_config.left_lane_change = false; // Left lane change indicator
+    apc_config.right_lane_change = true; // Right lane change indicator
+    apc_config.manual_override = false; // Manual override indicator
     sim0.sendCommand(apc_config.message());
 
     std::cout << "Sampling sensor loop" << std::endl;

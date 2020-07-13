@@ -85,6 +85,11 @@ public:
     float headway = 0.0;
     int lane_change = 0;
     bool autopilot_engaged = false;
+    std::string gear;
+    bool left_lane_change = false;
+    bool right_lane_change = false;
+    std::string drive_mode;
+    bool manual_override = false;
     virtual nlohmann::json dump(){
         return *this;
     }
@@ -135,6 +140,11 @@ void inline to_json(nlohmann::json& j, const AutopilotControlConfig& config) {
     j["headway"] = config.headway;
     j["lane_change"] = config.lane_change;
     j["autopilot_engaged"] = config.autopilot_engaged;
+    j["gear"] = config.gear;
+    j["left_lane_change"] = config.left_lane_change;
+    j["right_lane_change"] = config.right_lane_change;
+    j["drive_mode"] = config.drive_mode;
+    bool manual_override = false;
 }
 void inline from_json(const nlohmann::json& j, AutopilotControlConfig& config) {
     json_get(j, "set_speed", config.set_speed);
@@ -142,6 +152,10 @@ void inline from_json(const nlohmann::json& j, AutopilotControlConfig& config) {
     json_get(j, "headway", config.headway);
     json_get(j, "lane_change", config.lane_change);
     json_get(j, "autopilot_engaged", config.autopilot_engaged);
+    json_get(j, "gear", config.autopilot_engaged);
+    json_get(j, "left_lane_change", config.autopilot_engaged);
+    json_get(j, "right_lane_change", config.autopilot_engaged);
+    json_get(j, "drive_mode", config.autopilot_engaged);
 }
 
 void inline to_json(nlohmann::json& j, const ClosedLoopStepCommandConfig& config){
