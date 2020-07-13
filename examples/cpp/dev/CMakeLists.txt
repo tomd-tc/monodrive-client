@@ -24,7 +24,10 @@ add_executable(sensor_frame_count sensor_frame_count.cpp)
 add_executable(sensor_frame_count_fixed sensor_frame_count_fixed.cpp)
 add_executable(replay_step_dev replay_step.cpp)
 add_executable(rpm_sensor rpm_sensor.cpp)
+add_executable(waypoint_sensor waypoint_sensor.cpp)
+add_executable(multi_viewport multi_viewport.cpp)
 add_executable(config_export config_export.cpp)
+add_executable(autopilot_control autopilot_control.cpp)
 
 # link monodrive client
 target_link_libraries(camera_sensor monodrive)
@@ -45,7 +48,10 @@ target_link_libraries(sensor_frame_count monodrive)
 target_link_libraries(sensor_frame_count_fixed monodrive)
 target_link_libraries(replay_step_dev monodrive)
 target_link_libraries(rpm_sensor monodrive)
+target_link_libraries(waypoint_sensor monodrive)
+target_link_libraries(multi_viewport monodrive)
 target_link_libraries(config_export monodrive)
+target_link_libraries(autopilot_control monodrive)
 
 # copy monodrive dll to runtime directory
 if(MSVC)
@@ -73,7 +79,11 @@ if(MSVC)
   add_dependencies(sensor_frame_count_fixed monodrive_lib_copy_dev)
   add_dependencies(replay_step_dev monodrive_lib_copy_dev)
   add_dependencies(rpm_sensor monodrive_lib_copy_dev)
+  add_dependencies(waypoint_sensor monodrive_lib_copy_dev)
+  add_dependencies(multi_viewport monodrive_lib_copy_dev)
   add_dependencies(config_export monodrive_lib_copy_dev)
+  add_dependencies(autopilot_control monodrive_lib_copy_dev)
+  add_dependencies(waypoint_sensor monodrive_lib_copy_dev)
 endif(MSVC)
 
 # eigen

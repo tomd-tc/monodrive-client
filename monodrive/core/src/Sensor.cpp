@@ -61,7 +61,7 @@ bool Sensor::sendConfigure()
 bool Sensor::startListening()
 {
 	bool success = false;
-	if (config->listen_port != 0)
+	if (config->enable_streaming)
 	{
 		success = listener->connect();
 	}

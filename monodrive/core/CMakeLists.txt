@@ -7,7 +7,6 @@ file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "src/*.h" "src/*.hpp")
 
 # define shared library
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 # set c++ 11 standard
@@ -18,6 +17,11 @@ set_target_properties(
       CXX_STANDARD_REQUIRED YES
       CXX_EXTENSIONS NO
 )
+
+# need to export all symbols from .dll on windows
+if(MSVC)
+  set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif(MSVC)
 
 # bring src directory into the project
 include_directories(src)

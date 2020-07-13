@@ -19,6 +19,7 @@ class SensorBaseConfig
         std::string description;
         int listen_port = 0;
         bool wait_for_fresh_frame = true;
+        bool enable_streaming = true;
         Location location;
         struct Rotation
         {
@@ -289,6 +290,26 @@ public:
     }
 };
 
+class WaypointConfig : public SensorBaseConfig
+{
+public:
+    WaypointConfig()
+    {
+        type = "Waypoint";
+    }
+    virtual DataFrame* DataFrameFactory() override 
+    {
+        return new WaypointFrame;
+    }
+    virtual nlohmann::json dump()
+    {
+        return *this;
+    }
+
+    float distance = 1000.0;
+    float frequency = 100.0;
+};
+
 class RPMConfig : public SensorBaseConfig
 {
 public:
@@ -326,19 +347,29 @@ public:
     ViewportCameraConfig()
     {
         type = "ViewportCamera";
+        enable_streaming = false;
     }
-    virtual DataFrame* DataFrameFactory() override{
+    bool enable_hud{false};
+    Resolution window_size{0, 0};
+    Resolution window_offset{0, 0};
+    bool fullscreen{false};
+    int monitor_number{0};
+    virtual DataFrame* DataFrameFactory() override {
         return nullptr;
+    }
+    virtual nlohmann::json dump() {
+        return *this;
     }
 };
 
 /// SensorBaseConfig
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
 {
-    j = nlohmann::json{{"yaw", rotation.yaw},
-                {"pitch", rotation.pitch},
-                {"roll", rotation.roll}
-                };
+    j = nlohmann::json{
+        {"yaw", rotation.yaw},
+        {"pitch", rotation.pitch},
+        {"roll", rotation.roll}
+    };
 }
 void inline from_json(const nlohmann::json& j, SensorBaseConfig::Rotation& rotation)
 {
@@ -375,6 +406,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig& config)
         {"location", config.location},
         {"rotation", config.rotation},
         {"wait_for_fresh_frame", config.wait_for_fresh_frame},
+        {"enable_streaming", config.enable_streaming},
         {"ros", config.ros},
     };
 };
@@ -386,6 +418,7 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
     json_get(j, "location", config.location);
     json_get(j, "rotation", config.rotation);
     json_get(j, "wait_for_fresh_frame", config.wait_for_fresh_frame);
+    json_get(j, "enable_streaming", config.enable_streaming);
     json_get(j, "ros", config.ros);
 }
 /// End SensorBaseConfig JSON Parsing
@@ -468,6 +501,29 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "channels", config.channels);         
     json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
+}
+
+void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
+{
+    j = static_cast<CameraConfig>(config);
+    j["use_vehicle_hud"] = config.enable_hud;
+    j["window_size"] = config.window_size;
+    j["window_offset"] = config.window_offset;
+    j["fullscreen"] = config.fullscreen;
+    j["monitor_number"] = config.monitor_number;
+}
+
+
+void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
+{
+    SensorBaseConfig* base = static_cast<CameraConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "use_vehicle_hud", config.enable_hud);
+    json_get(j, "window_size", config.window_size);
+    json_get(j, "window_offset", config.window_offset);
+    json_get(j, "fullscreen", config.fullscreen);
+    json_get(j, "monitor_number", config.monitor_number);
 }
 
 /// END Camera Config JSON Parsing
@@ -726,3 +782,16 @@ void inline from_json(const nlohmann::json& j, RPMConfig& config)
     json_get(j, "wheelNumber", config.wheel_number);
 }
 /// END RPM Sensor JSON parsing
+
+/// Waypoint Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const WaypointConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["distance"] = config.distance;
+    j["frequency"] = config.frequency;
+
+}
+void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
+    json_get(j, "distance", config.distance);
+    json_get(j, "frequency", config.frequency);
+}
+/// END Waypoint Sensor JSON parsing
