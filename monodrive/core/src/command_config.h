@@ -152,10 +152,10 @@ void inline from_json(const nlohmann::json& j, AutopilotControlConfig& config) {
     json_get(j, "headway", config.headway);
     json_get(j, "lane_change", config.lane_change);
     json_get(j, "autopilot_engaged", config.autopilot_engaged);
-    json_get(j, "gear", config.autopilot_engaged);
-    json_get(j, "left_lane_change", config.autopilot_engaged);
-    json_get(j, "right_lane_change", config.autopilot_engaged);
-    json_get(j, "drive_mode", config.autopilot_engaged);
+    json_get(j, "gear", config.gear);
+    json_get(j, "left_lane_change", config.left_lane_change);
+    json_get(j, "right_lane_change", config.right_lane_change);
+    json_get(j, "drive_mode", config.drive_mode);
 }
 
 void inline to_json(nlohmann::json& j, const ClosedLoopStepCommandConfig& config){
