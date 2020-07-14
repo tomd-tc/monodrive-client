@@ -94,8 +94,11 @@
   *		"set_speed": (float),	        // set speed for vehicle, in cm/s
   *		"negotiated_speed": (float),	// temporary negotiated speed change cm/s
   *		"lane_change": (int),	        // lane change request (1- passing lane, 0 - no change, -1 slower lane)
-  *		"headway": (float),			    // desired headway to front vehicle (cm)
-  *     "autopilot_engaged": (bool)     // true if autopilot is engaged, false otherwise
+  *		"headway": (float),			      // desired headway to front vehicle (cm)
+  *   "autopilot_engaged": (bool),  // true if autopilot is engaged, false otherwise
+  *   "gear": (string),             // the current gear
+  *   "drive_mode": (string),       // driving mode (e.g. "HWA", "Driver")
+  *   "manual_override": (bool)     // whether the system is under manual override
   *	}
   */
 #define AutopilotControlCommand_ID              "AutopilotControl"
