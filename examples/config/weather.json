@@ -61,6 +61,67 @@
         "AutoExposureMaxBrightness": 5,
         "AutoExposureBias": -3.5
       }
+    },
+    {
+      "id": "MidRainyNoon",
+      "SunPolarAngle": 44.586,
+      "SunAzimuthAngle": 174,
+      "SunBrightness": 0,
+      "SunDirectionalLightIntensity": 1.33,
+      "SunDirectionalLightColor": {
+        "R": 255.000000,
+        "G": 239.000000,
+        "B": 194.000000,
+        "A": 1.0
+      },
+      "SunIndirectLightIntensity": 6,
+      "CloudOpacity": 18.431,
+      "HorizontFalloff": 3,
+      "ZenithColor": {
+        "R": 0.370000,
+        "G": 0.370000,
+        "B": 0.370000,
+        "A": 1.0
+      },
+      "HorizonColor": {
+        "R": 0.169000,
+        "G": 0.187443,
+        "B": 0.200000,
+        "A": 1.0
+      },
+      "CloudColor": {
+        "R": 0.042789,
+        "G": 0.045950,
+        "B": 0.050000,
+        "A": 1.0
+      },
+      "OverallSkyColor": {
+        "R": 1.0,
+        "G": 1.0,
+        "B": 1.0,
+        "A": 1.0
+      },
+      "SkyLightIntensity": 21.147,
+      "SkyLightColor": {
+        "R": 0.119882,
+        "G": 0.121557,
+        "B": 0.170000,
+        "A": 0.000000
+      },
+      "bPrecipitation": true,
+      "PrecipitationType": "Rain",
+      "PrecipitationAmount": 40,
+      "PrecipitationAccumulation": 50,
+      "bWind": false,
+      "WindIntensity": 40,
+      "WindAngle": 0,
+      "bOverrideCameraPostProcessParameters": true,
+      "CameraPostProcessParameters": {
+        "AutoExposureMethod": "Histogram",
+        "AutoExposureMinBrightness": 0.27,
+        "AutoExposureMaxBrightness": 5,
+        "AutoExposureBias": -3.5
+      }
     }
   ]
 }
