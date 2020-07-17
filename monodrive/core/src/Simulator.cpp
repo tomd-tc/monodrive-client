@@ -108,7 +108,7 @@ bool Simulator::connect()
 		controlSocket.connect(endpoint);
 		}
 		catch (const std::exception& e){
-			std::cout << "Failed to connect to server. Is it running?" << std::endl;
+			std::cerr << "ERROR! Failed to connect to server. Is it running?" << std::endl;
 			std::cerr << e.what() << std::endl;
 			return false;
 		}
@@ -132,7 +132,7 @@ bool Simulator::configure()
 
 	if(config.simulator.empty())
 	{
-		std::cout << "Skipping Simulator and Scenario Config, no simulator config set." << std::endl;
+		std::cerr << "WARNING! Skipping Simulator and Scenario Config, no simulator config set." << std::endl;
 	}
 	else
 	{
@@ -159,7 +159,7 @@ bool Simulator::configure()
 
 	if (config.weather.empty())
 	{
-		std::cout << "Skipping Weather Config, no weather config set." << std::endl;
+		std::cerr << "WARNING! Skipping Weather Config, no weather config set." << std::endl;
 	}
 	else
 	{
@@ -246,7 +246,7 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 		waitForSamples(sensors);
 	}
 	else{
-		std::cerr << "Failed to sample sensors." << std::endl;
+		std::cerr << "ERROR! Failed to sample sensors." << std::endl;
 		return false;
 	}
 	return true;
@@ -266,7 +266,7 @@ bool Simulator::sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors)
 		waitForSamples(sensors);
 	}
 	else{
-		std::cerr << "Failed to sample sensors." << std::endl;
+		std::cerr << "ERROR! Failed to sample sensors." << std::endl;
 		return false;
 	}
 	return true;

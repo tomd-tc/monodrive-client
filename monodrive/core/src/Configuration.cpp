@@ -32,12 +32,18 @@ nlohmann::json Configuration::load(const std::string& path)
     try
     {
         std::ifstream in(path, std::ifstream::in);
-        in >> j;
-        in.close();
+        if(in.is_open()) {
+            in >> j;
+            in.close();
+        } else {
+            std::cerr << "WARNING! Unable to read configuration file at: " 
+                << path << std::endl;
+        }
     }
     catch(std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cerr << "WARNING! Exception thrown when parsing file: " << path << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 	
 	return j;
