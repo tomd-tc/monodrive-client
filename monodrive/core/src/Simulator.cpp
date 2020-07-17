@@ -132,7 +132,7 @@ bool Simulator::configure()
 
 	if(config.simulator.empty())
 	{
-		std::cout << "WARNING! Skipping Simulator and Scenario Config, no simulator config set." << std::endl;
+		std::cout << "Skipping Simulator and Scenario Config, no simulator config set." << std::endl;
 	}
 	else
 	{
@@ -159,7 +159,7 @@ bool Simulator::configure()
 
 	if (config.weather.empty())
 	{
-		std::cout << "WARNING! Skipping Weather Config, no weather config set." << std::endl;
+		std::cout << "Skipping Weather Config, no weather config set." << std::endl;
 	}
 	else
 	{
