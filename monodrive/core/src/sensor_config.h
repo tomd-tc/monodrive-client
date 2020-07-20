@@ -308,6 +308,8 @@ public:
 
     float distance = 1000.0;
     float frequency = 100.0;
+    bool draw_debug = false;
+    std::vector<std::string> debug_tags{};
 };
 
 class RPMConfig : public SensorBaseConfig
@@ -788,10 +790,14 @@ void inline to_json(nlohmann::json& j, const WaypointConfig& config) {
     j = static_cast<SensorBaseConfig>(config);
     j["distance"] = config.distance;
     j["frequency"] = config.frequency;
+    j["draw_debug"] = config.draw_debug;
+    j["debug_tags"] = config.debug_tags;
 
 }
 void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
     json_get(j, "distance", config.distance);
     json_get(j, "frequency", config.frequency);
+    json_get(j, "draw_debug", config.draw_debug);
+    json_get(j, "debug_tags", config.debug_tags);
 }
 /// END Waypoint Sensor JSON parsing

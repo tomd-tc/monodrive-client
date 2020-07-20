@@ -32,6 +32,8 @@ int main(int argc, char** argv)
     wp_config.listen_port = 8102;
     wp_config.distance = 10000;
     wp_config.frequency = 100;
+    wp_config.draw_debug = true;
+    wp_config.debug_tags = {"ego"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<WaypointConfig>(wp_config)));
 
     ViewportCameraConfig vp_config;
@@ -52,6 +54,7 @@ int main(int argc, char** argv)
     sim0.sendControl(0.1, 0.0, 0.0, 1);
 
     sensors[0]->sampleCallback = [](DataFrame* frame){
+        return;
         auto& wpFrame = *static_cast<WaypointFrame*>(frame);
         for(const auto& actor : wpFrame.actor_waypoints) {
             std::cout << "Actor: " << actor.actor_id << " has " 
