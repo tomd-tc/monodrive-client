@@ -28,6 +28,7 @@ add_executable(waypoint_sensor waypoint_sensor.cpp)
 add_executable(multi_viewport multi_viewport.cpp)
 add_executable(config_export config_export.cpp)
 add_executable(autopilot_control autopilot_control.cpp)
+add_executable(camera_360 camera_360.cpp)
 
 # link monodrive client
 target_link_libraries(camera_sensor monodrive)
@@ -52,6 +53,7 @@ target_link_libraries(waypoint_sensor monodrive)
 target_link_libraries(multi_viewport monodrive)
 target_link_libraries(config_export monodrive)
 target_link_libraries(autopilot_control monodrive)
+target_link_libraries(camera_360 monodrive)
 
 # copy monodrive dll to runtime directory
 if(MSVC)
@@ -84,6 +86,7 @@ if(MSVC)
   add_dependencies(config_export monodrive_lib_copy_dev)
   add_dependencies(autopilot_control monodrive_lib_copy_dev)
   add_dependencies(waypoint_sensor monodrive_lib_copy_dev)
+  add_dependencies(camera_360 monodrive_lib_copy_dev)
 endif(MSVC)
 
 # eigen
@@ -128,6 +131,10 @@ target_link_libraries(sensor_frame_count_fixed ${OpenCV_LIBRARIES})
 target_include_directories(replay_step_dev PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
 target_link_libraries(replay_step_dev ${OpenCV_LIBRARIES})
+
+target_include_directories(camera_360 PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(camera_360 ${OpenCV_LIBRARIES})
+target_link_libraries(camera_360 ${OpenCV_LIBRARIES})
 
 # filesystem
 target_link_libraries(config_export -lstdc++fs)

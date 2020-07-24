@@ -223,6 +223,18 @@ public:
     }
 };
 
+class Camera360Config : public CameraConfig
+{
+public:
+    Camera360Config()
+    {
+        type = "Camera360";
+    }
+    virtual DataFrame* DataFrameFactory() override{
+        return new CubeCameraFrame(resolution.x);
+    }
+};
+
 class SemanticCameraConfig : public CameraConfig
 {
 public:
