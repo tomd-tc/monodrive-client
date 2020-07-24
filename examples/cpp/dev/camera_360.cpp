@@ -20,7 +20,7 @@
 // #define IMG_WIDTH 4096
 // #define IMG_HEIGHT 2160
 
-#define IMG_WIDTH 1024
+#define IMG_WIDTH 2048
 #define IMG_HEIGHT 1024
 
 
@@ -52,7 +52,8 @@ int main(int argc, char** argv)
     fc_config.listen_port = 8100;// + i;
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
-    fc_config.resolution = Resolution(IMG_WIDTH,IMG_WIDTH);
+    fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
+    fc_config.face_size = IMG_WIDTH/4;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<Camera360Config>(fc_config)));
 
     ViewportCameraConfig vp_config;

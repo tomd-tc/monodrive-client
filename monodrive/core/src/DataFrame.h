@@ -228,22 +228,9 @@ public:
 
 class MONODRIVECORE_API CubeCameraFrame : public CameraFrame{
 public:
-    CubeCameraFrame(int width) : CameraFrame(width*2, width,4,1,false)
+    CubeCameraFrame(int width, int height) : CameraFrame(width, height, 4, 1, false)
     {
     }
-};
-
-
-class MONODRIVECORE_API CubeFrame : public ImageFrame
-{
-public:
-    CubeFrame(int width) : ImageFrame(width * 3, width * 2, 4, 1)
-    {
-    }
-    inline int size() const{
-        return width * 6 * 4;
-    }
-    int width;
 };
 
 class MONODRIVECORE_API LidarFrame : public DataFrame {
