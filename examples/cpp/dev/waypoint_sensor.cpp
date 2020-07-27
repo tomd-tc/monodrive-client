@@ -32,6 +32,8 @@ int main(int argc, char** argv)
     wp_config.listen_port = 8102;
     wp_config.distance = 10000;
     wp_config.frequency = 100;
+    wp_config.draw_debug = true;
+    wp_config.debug_tags = {"ego"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<WaypointConfig>(wp_config)));
 
     ViewportCameraConfig vp_config;
