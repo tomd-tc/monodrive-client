@@ -54,7 +54,6 @@ int main(int argc, char** argv)
     sim0.sendControl(0.1, 0.0, 0.0, 1);
 
     sensors[0]->sampleCallback = [](DataFrame* frame){
-        return;
         auto& wpFrame = *static_cast<WaypointFrame*>(frame);
         for(const auto& actor : wpFrame.actor_waypoints) {
             std::cout << "Actor: " << actor.actor_id << " has " 
