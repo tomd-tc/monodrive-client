@@ -226,7 +226,7 @@ public:
 class Camera360Config : public CameraConfig
 {
 public:
-    Camera360Config()
+    Camera360Config() : CameraConfig()
     {
         type = "Camera360";
     }
@@ -236,6 +236,16 @@ public:
     }
     virtual nlohmann::json dump() {
         return *this;
+    }
+};
+
+class FisheyeCameraConfig : public Camera360Config
+{
+public:
+    FisheyeCameraConfig() : Camera360Config()
+    {
+        type = "FisheyeCamera";
+        fov = 180.f;
     }
 };
 
