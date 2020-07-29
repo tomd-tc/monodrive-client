@@ -244,13 +244,18 @@ public:
     }
 };
 
-class OccupancyGridConfig : public SensorBaseConfig
+class OccupancyGridConfig : public CameraConfig
 {
 public:
-    OccupancyGridConfig() {
-        type= "OccupancyGrid";
+    OccupancyGridConfig()
+    {
+        type = "OccupancyGrid";
+        channels = "gray";
+        rotation.pitch = -90.0;
+        rotation.roll = 0.0;
+        rotation.yaw = 0.0;
+        location = Location(0.0, 0.0, 0.0);
     }
-    Resolution resolution;
     double meters_per_pixel = 0.1;
     bool follow_yaw = false;
     bool follow_pitch = false;
