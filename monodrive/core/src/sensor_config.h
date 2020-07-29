@@ -21,12 +21,7 @@ class SensorBaseConfig
         bool wait_for_fresh_frame = true;
         bool enable_streaming = true;
         Location location;
-        struct Rotation
-        {
-            float yaw{0.0f};
-            float pitch{0.0f};
-            float roll{0.0f};
-        }rotation;
+        Rotation rotation;
         struct ROS{
             bool publish_to_ros{false};
             bool advertise{true};
@@ -251,9 +246,7 @@ public:
     {
         type = "OccupancyGrid";
         channels = "gray";
-        rotation.pitch = -90.0;
-        rotation.roll = 0.0;
-        rotation.yaw = 0.0;
+        rotation = Rotation(0.0, -90.0, 0.0);
         location = Location(0.0, 0.0, 0.0);
     }
     double meters_per_pixel = 0.1;
@@ -370,20 +363,6 @@ public:
 };
 
 /// SensorBaseConfig
-void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
-{
-    j = nlohmann::json{
-        {"yaw", rotation.yaw},
-        {"pitch", rotation.pitch},
-        {"roll", rotation.roll}
-    };
-}
-void inline from_json(const nlohmann::json& j, SensorBaseConfig::Rotation& rotation)
-{
-    json_get(j,"yaw", rotation.yaw);
-    json_get(j,"pitch", rotation.pitch);
-    json_get(j, "roll", rotation.roll);
-}
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 {
     j = nlohmann::json{   

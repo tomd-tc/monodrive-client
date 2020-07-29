@@ -18,11 +18,20 @@ struct Location {
     float z{0.0f};
 };
 
+struct Rotation {
+    Rotation() {}
+    Rotation(float yaw, float pitch, float roll) : yaw(yaw), pitch(pitch), roll(roll) {}
+    float yaw{0.0f};
+    float pitch{0.0f};
+    float roll{0.0f};
+};
+
 void inline to_json(nlohmann::json& j, const Location& location)
 {
-    j = nlohmann::json{{"x", location.x},
-                {"y", location.y},
-                {"z", location.z}
+    j = nlohmann::json{
+        {"x", location.x},
+        {"y", location.y},
+        {"z", location.z}
     };
 }
 void inline from_json(const nlohmann::json& j, Location& location)
@@ -31,6 +40,22 @@ void inline from_json(const nlohmann::json& j, Location& location)
     json_get(j, "y", location.y);
     json_get(j, "z", location.z);
 }
+
+void inline to_json(nlohmann::json& j, const Rotation& rotation)
+{
+    j = nlohmann::json{
+        {"yaw", rotation.yaw},
+        {"pitch", rotation.pitch},
+        {"roll", rotation.roll}
+    };
+}
+void inline from_json(const nlohmann::json& j, Rotation& rotation)
+{
+    json_get(j,"yaw", rotation.yaw);
+    json_get(j,"pitch", rotation.pitch);
+    json_get(j, "roll", rotation.roll);
+}
+
 void inline to_json(nlohmann::json& j, const Resolution& resolution)
 {
     j = nlohmann::json{
