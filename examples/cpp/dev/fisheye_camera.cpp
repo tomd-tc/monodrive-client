@@ -51,9 +51,9 @@ int main(int argc, char** argv)
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;// + i;
     fc_config.location.z = 225;
-    fc_config.rotation.pitch = -5;
     fc_config.resolution = Resolution(IMG_WIDTH,IMG_WIDTH);
     fc_config.fov = 180.f;
+    fc_config.rotation.yaw = 90.f;
     fc_config.face_size = 1024;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<FisheyeCameraConfig>(fc_config)));
 
@@ -78,7 +78,6 @@ int main(int argc, char** argv)
     sim0.sendControl(0, 0, 1, 1);
 
     sensors[0]->sampleCallback = [](DataFrame *frame) {
-        // std::cout << "display" << std::endl;
         auto camFrame = static_cast<CubeCameraFrame *>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
@@ -87,7 +86,7 @@ int main(int argc, char** argv)
             img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
                           imFrame->pixels);
         }
-        cv::imshow("monoDrive", img);
+        cv::imshow("monoDrive 0", img);
         cv::waitKey(1);
     };
 
