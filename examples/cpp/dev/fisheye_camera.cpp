@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     fc_config.location.z = 225;
     fc_config.resolution = Resolution(IMG_WIDTH,IMG_WIDTH);
     fc_config.fov = 180.f;
-    fc_config.rotation.yaw = 90.f;
+    fc_config.rotation.yaw = -90.f;
     fc_config.face_size = 1024;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<FisheyeCameraConfig>(fc_config)));
 
