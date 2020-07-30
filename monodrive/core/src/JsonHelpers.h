@@ -25,6 +25,8 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const FRotator& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FRotator& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FQuat& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FQuat& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FIntPoint& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FIntPoint& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FVector& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FVector& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FVector2D& v);

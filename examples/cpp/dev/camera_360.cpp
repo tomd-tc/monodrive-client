@@ -10,19 +10,14 @@
 #include "Configuration.h"  // holder for sensor, simulator, scenario, weather, and vehicle configurations
 #include "Sensor.h"
 #include "sensor_config.h"
-#include "Stopwatch.h"
 
 #include "opencv2/core.hpp"
 #include "opencv2/core/utility.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-// #define IMG_WIDTH 4096
-// #define IMG_HEIGHT 2160
-
 #define IMG_WIDTH 2048
 #define IMG_HEIGHT 1024
-
 
 int main(int argc, char** argv)
 {
@@ -30,7 +25,6 @@ int main(int argc, char** argv)
     std::string server0_ip = "127.0.0.1";
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
 
-    //Read JSON files in cpp_client/config directory
     Configuration config(
         "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
@@ -49,11 +43,13 @@ int main(int argc, char** argv)
     Camera360Config fc_config;
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
-    fc_config.listen_port = 8100;// + i;
+    fc_config.listen_port = 8100;
     fc_config.location.z = 225;
     fc_config.rotation.pitch = -5;
     fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
-    fc_config.face_size = IMG_WIDTH/4;
+    // face_size should be smaller than the largest resolution
+    // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
+    fc_config.face_size = IMG_WIDTH/2;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<Camera360Config>(fc_config)));
 
     ViewportCameraConfig vp_config;
@@ -70,14 +66,7 @@ int main(int argc, char** argv)
         sensor->configure();
     }
 
-    //Get number of steps in scenario and start timer
-    mono::precise_stopwatch stopwatch;
-
-    /// initialize the vehicle, the first control command spawns the vehicle
-    sim0.sendControl(0, 0, 1, 1);
-
     sensors[0]->sampleCallback = [](DataFrame *frame) {
-        // std::cout << "display" << std::endl;
         auto camFrame = static_cast<CubeCameraFrame *>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
