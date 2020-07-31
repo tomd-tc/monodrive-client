@@ -223,6 +223,32 @@ public:
     }
 };
 
+class Camera360Config : public CameraConfig
+{
+public:
+    Camera360Config() : CameraConfig()
+    {
+        type = "Camera360";
+    }
+    int face_size{512};
+    virtual DataFrame* DataFrameFactory() override{
+        return new CubeCameraFrame(resolution.x, resolution.y);
+    }
+    virtual nlohmann::json dump() {
+        return *this;
+    }
+};
+
+class FisheyeCameraConfig : public Camera360Config
+{
+public:
+    FisheyeCameraConfig() : Camera360Config()
+    {
+        type = "FisheyeCamera";
+        fov = 180.f;
+    }
+};
+
 class SemanticCameraConfig : public CameraConfig
 {
 public:
@@ -363,7 +389,6 @@ public:
         return *this;
     }
 };
-
 /// SensorBaseConfig
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
 {
@@ -469,6 +494,11 @@ void inline from_json(const nlohmann::json& j, StateConfig& config)
     json_get(j, "undesired_tags", config.undesired_tags);
 }
 
+void inline to_json(nlohmann::json& j, const Camera360Config& config){
+    j = static_cast<CameraConfig>(config);
+    j["face_size"] = config.face_size;
+}
+
 void inline to_json(nlohmann::json& j, const CameraConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
@@ -503,6 +533,14 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "channels", config.channels);         
     json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
+}
+
+void inline from_json(const nlohmann::json& j, Camera360Config& config)
+{
+    CameraConfig* base = static_cast<CameraConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "face_size", config.face_size);
 }
 
 void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)

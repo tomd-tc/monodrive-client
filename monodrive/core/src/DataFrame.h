@@ -226,6 +226,13 @@ public:
     int currentFrameIndex;
 };
 
+class MONODRIVECORE_API CubeCameraFrame : public CameraFrame{
+public:
+    CubeCameraFrame(int width, int height) : CameraFrame(width, height, 4, 1, false)
+    {
+    }
+};
+
 class MONODRIVECORE_API LidarFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
