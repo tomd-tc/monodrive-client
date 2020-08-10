@@ -1,107 +1,75 @@
+#include <chrono>
 #include <iostream>
 #include <string>
-#include <vector>
 #include <utility>
-#include <chrono>
+#include <vector>
 
-#include "Simulator.h"
 #include "Configuration.h"
 #include "Sensor.h"
+#include "Simulator.h"
+#include "Stopwatch.h"
+#include "distributed_server.h"
 #include "sensor_config.h"
 
-
-nlohmann::json CURRENT_STATE_FRAME = nullptr;
-bool NEW_STATE_DATA_AVAILABLE = false;
-
-void stateCallback(DataFrame* frame) {
-    auto& state_frame = *static_cast<StateFrame*>(frame);
-    CURRENT_STATE_FRAME = {
-        {"frame", 
-            {
-                {"vehicles", state_frame.vehicles}, 
-                {"objects", state_frame.objects}
-            }
-        }
-    };
-    NEW_STATE_DATA_AVAILABLE = true;
-};
-
-typedef std::vector<std::shared_ptr<Sensor>> sensor_vec;
+namespace ds = distributed_server;
 
 int main(int argc, char** argv) {
-    // Read in JSON files for simulator configuration
-    Configuration config(
-        "examples/config/simulator.json",
-        "examples/config/weather.json",
-        "examples/config/scenario.json"
-    );
+  // Set up all the server
+  ds::DistributedServer primary_server =
+      ds::DistributedServer("127.0.0.1", 8999, ds::kServerType::PRIMARY);
+  std::vector<ds::DistributedServer> replica_servers = {
+      ds::DistributedServer("192.168.2.3", 8999, ds::kServerType::REPLICA),
+      ds::DistributedServer("192.168.2.3", 9000, ds::kServerType::REPLICA)};
 
-    // Setup the list of simulators that will be used
-    std::vector<std::pair<Simulator*, sensor_vec>> server_list = {
-        std::make_pair(
-            &Simulator::getInstance(config, "192.168.2.3", 8999), 
-            sensor_vec()),
-        std::make_pair(
-            &Simulator::getInstance(config, "192.168.2.3", 9000), 
-            sensor_vec())
-    };
+  // Configure the senors for each server
+  if (!primary_server.Configure(
+          {ds::kSensorType::VIEWPORT, ds::kSensorType::BINARY_STATE}) ||
+      !replica_servers[0].Configure(
+          {ds::kSensorType::VIEWPORT, ds::kSensorType::RADAR}) ||
+      !replica_servers[1].Configure(
+          {ds::kSensorType::VIEWPORT, ds::kSensorType::LIDAR})) {
+    return -1;
+  }
 
-    // Setup all the sensors for each server in the list
-    for(auto& server : server_list) {
-        if(!server.first->configure()) {
-            std::cerr << "ERROR! Unable to configure simulator: " 
-                << server.first->getServerIp() << ":" 
-                << server.first->getServerPort()
+  // Bench marking stuff
+  int frame_count = 0;
+  uint64_t control_time = 0;
+  uint64_t sample_time = 0;
+  mono::precise_stopwatch stopwatch;
+  // Shared data between servers
+  nlohmann::json state_data;
+  while (true) {
+    // Cue the primary and time it
+    auto control_start_time =
+        stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
+    primary_server.Sample(&state_data);
+    control_time +=
+        stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
+        control_start_time;
+
+    // Cue the replicas and time them
+    auto sample_start_time =
+        stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
+    for (auto server : replica_servers) {
+      server.Sample(&state_data);
+    }
+    sample_time +=
+        stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
+        sample_start_time;
+
+    // Spit out FPS data every 10 frames
+    if ((++frame_count) % 10 == 0) {
+      std::cout << "Control Avg: " << (control_time / frame_count) / 1e6
                 << std::endl;
-            return -1;
-        }
-
-        if(server.first->getServerPort() == 8999) {
-            StateConfig s_config;
-            s_config.server_ip = server.first->getServerIp();
-            s_config.server_port = server.first->getServerPort();
-            s_config.listen_port = 8101;
-            s_config.desired_tags = {"vehicle", "dynamic"};
-            s_config.include_obb = false;
-            s_config.debug_drawing = true;
-            server.second.emplace_back(std::make_shared<Sensor>(
-                std::make_unique<StateConfig>(s_config)));
-            server.second.back()->sampleCallback = stateCallback;
-        }
-
-        ViewportCameraConfig vp_config;
-        vp_config.server_ip = server.first->getServerIp();
-        vp_config.server_port = server.first->getServerPort();
-        vp_config.location.z = 200;
-        vp_config.resolution = Resolution(256,256);
-        Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
-
-        for(auto& sensor : server.second) {
-            if(!sensor->configure()) {
-                std::cerr << "ERROR! Unable to configure sensor "
-                          << sensor->config->type << " on port " 
-                          << sensor->config->listen_port << " for server "
-                          << server.first->getServerIp() << ":" 
-                          << server.first->getServerPort() << std::endl;
-                return -1;
-            }
-        }
+      std::cout << "Sample Avg: " << (sample_time / frame_count) / 1e6
+                << std::endl;
+      std::cout << "FPS: " << frame_count / ((control_time + sample_time) / 1e6)
+                << std::endl;
+      frame_count = 0;
+      control_time = 0;
+      sample_time = 0;
     }
+  }
 
-    std::cout << "Sampling sensor loop" << std::endl;
-    for(int step = 0; step < config.scenario.size(); step++) {
-        server_list[0].first->stepSampleAll(server_list[0].second, step, 1);
-        // Spin while we're waiting on the new state data to come in
-        while(!NEW_STATE_DATA_AVAILABLE) {
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-        }
-        NEW_STATE_DATA_AVAILABLE = false;
-        std::cout << "Sending frame:" << CURRENT_STATE_FRAME << std::endl;
-        for(size_t i = 1; i < server_list.size(); i++) {
-            server_list[i].first->stateStepSampleAll(server_list[i].second, 
-                CURRENT_STATE_FRAME);
-        }
-    }
-
-    return 0;
+  return 0;
 }
