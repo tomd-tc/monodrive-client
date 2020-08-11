@@ -132,6 +132,8 @@ public:
         float elevation_fov{10.0f};
         float ray_division_y{10.0f};
         float ray_division_z{10.0f};
+        float ray_division_noise_y{200.0f};
+        float ray_division_noise_z{200.0f};
         bool debug_frustum{false};
         bool debug_scan{false};
         bool debug_rescan{false};
@@ -525,6 +527,8 @@ void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
         {"elevation_fov", config.elevation_fov},
         {"ray_division_z", config.ray_division_z},
         {"ray_division_y", config.ray_division_y},
+        {"ray_division_noise_z", config.ray_division_noise_z},
+        {"ray_division_noise_y", config.ray_division_noise_y},
         {"debug_frustum", config.debug_frustum},
         {"debug_scan", config.debug_scan},
         {"debug_rescan", config.debug_rescan}
