@@ -6,6 +6,7 @@
 #include <exception>
 #include "JsonHelpers.h"
 #include "DataFrame.h"
+#include "Util.h"
 #include "config_types.h"
 
 class SensorBaseConfig
@@ -839,3 +840,26 @@ void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
     json_get(j, "debug_tags", config.debug_tags);
 }
 /// END Waypoint Sensor JSON parsing
+
+
+std::unique_ptr<SensorBaseConfig> inline sensorConfigFactory(const nlohmann::json& j)
+{
+    std::string sensorType;
+    json_get(j, "type", sensorType);
+    std::cout << sensorType << std::endl;
+
+    if (sensorType == "Camera")
+    {
+        CameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<CameraConfig>(cfg);
+    }
+    else if (sensorType == "Lidar")
+    {
+        LidarConfig cfg;
+        from_json(j, cfg);
+        return make_unique<LidarConfig>(cfg);
+    }
+
+    return nullptr;
+}
