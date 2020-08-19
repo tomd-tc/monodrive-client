@@ -142,29 +142,37 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
 
 void DistributedServer::StateSensorCallback(DataFrame* frame) {
   // Grab the state data and signal that its available
-  state_sensor_data_updated = true;
-  if (state_data) {
-    *state_data =
-        static_cast<BinaryStateFrame*>(frame)->state_buffer.BufferToJson();
+  if (state_data_string != nullptr) {
+    *state_data_string =
+        static_cast<BinaryStateFrame*>(frame)->state_buffer.as_string();
   }
+  state_sensor_data_updated = true;
 }
 
-bool DistributedServer::Sample(nlohmann::json* input_state_data, bool async) {
-  state_data = input_state_data;
-  std::unique_lock<std::mutex> lk(sample_mutex);
-  sample_complete = false;
+bool DistributedServer::Sample(std::string* state_data, bool async) {
+  state_data_string = state_data;
+
+  {
+    std::lock_guard<std::mutex> lk(sample_mutex);
+    ready_to_sample = true;
+  }
   sample_trigger.notify_all();
+
   if (!async) {
     while(!sample_complete);
   }
+  sample_complete = false;
   return true;
 }
 
 
 void DistributedServer::SampleThread() {
+  nlohmann::json state_data;
+
   while (connected) {
     std::unique_lock<std::mutex> lk(sample_mutex);
-    sample_trigger.wait(lk, [=]{return !sample_complete;});
+    sample_trigger.wait(lk, [=]{return ready_to_sample;});
+    ready_to_sample = false;
     switch (server_type) {
       case kServerType::PRIMARY:
         // For primaries, always wait for the state data to come back
@@ -174,7 +182,8 @@ void DistributedServer::SampleThread() {
         break;
       case kServerType::REPLICA:
         // Replicas just get a state update
-        sim->stateStepSampleAll(sensors, *state_data);
+        state_data["state_data_as_string"] = *state_data_string;
+        sim->stateStepAll(sensors, state_data);
         break;
       default:
         std::cerr << "DistributedServer::Sample: ERROR! Unknown server type: "
@@ -183,4 +192,8 @@ void DistributedServer::SampleThread() {
     lk.unlock();
     sample_complete = true;
   }
+}
+
+bool DistributedServer::IsSampling() {
+  return !sample_complete || sim->sampleInProgress(sensors);
 }
