@@ -846,7 +846,6 @@ std::unique_ptr<SensorBaseConfig> inline sensorConfigFactory(const nlohmann::jso
 {
     std::string sensorType;
     json_get(j, "type", sensorType);
-    std::cout << sensorType << std::endl;
 
     if (sensorType == "Camera") {
         CameraConfig cfg;

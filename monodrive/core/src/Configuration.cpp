@@ -71,6 +71,14 @@ void Configuration::loadSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
             std::cerr << "Could not load sensor config " << s.dump() << std::endl;
             continue;
         }
+
+        std::string serverIP = "127.0.0.1";
+        short serverPort = 8999;
+        json_get(s, "server_ip", serverIP);
+        json_get(s, "server_port", serverPort);
+        cfg->server_ip = serverIP;
+        cfg->server_port;
+
         sensors.push_back(std::make_shared<Sensor>(std::move(cfg)));
     }
 }

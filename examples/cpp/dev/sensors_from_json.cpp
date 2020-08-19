@@ -20,18 +20,15 @@
 
 int main(int argc, char** argv)
 {
-    //Single Simulator Example
-    std::string server0_ip = "127.0.0.1";
-    int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
 
-    //Read JSON files in cpp_client/config directory
+    // Load configuration from file
     Configuration config(
         "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
         "examples/config/scenario_multi_vehicle_straightaway.json",
         "examples/config/sensors.json"
     );
-    Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
+    Simulator& sim0 = Simulator::getInstance(config);
 
     // Load sensors from file
     std::vector<std::shared_ptr<Sensor>> sensors;
@@ -48,10 +45,6 @@ int main(int argc, char** argv)
     {
         sensor->configure();
     }
-
-
-    //Get number of steps in scenario and start timer
-    mono::precise_stopwatch stopwatch;
 
     /// initialize the vehicle, the first control command spawns the vehicle
     sim0.sendControl(0, 0, 1, 1);
