@@ -102,6 +102,24 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
       sensors.emplace_back(
           std::make_shared<Sensor>(std::make_unique<LidarConfig>(l_config)));
     } break;
+    case kSensorType::IMU: {
+      IMUConfig imu_config;
+      imu_config.server_ip = sim->getServerIp();
+      imu_config.server_port = sim->getServerPort();
+      imu_config.listen_port = listen_port;
+      sensors.emplace_back(
+          std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
+    } break;
+    case kSensorType::WAYPOINT: {
+      WaypointConfig waypoint_config;
+      waypoint_config.server_ip = sim->getServerIp();
+      waypoint_config.server_port = sim->getServerPort();
+      waypoint_config.distance = 1000.0;
+      waypoint_config.frequency = 100.0;
+      waypoint_config.listen_port = listen_port;
+      sensors.emplace_back(
+          std::make_shared<Sensor>(std::make_unique<WaypointConfig>(waypoint_config)));
+    } break;
     default:
       std::cerr << "DistributedServer::AddSensor: ERROR! Unknown sensor type: "
                 << sensor_type << " for server " << sim->getServerIp() << ":"

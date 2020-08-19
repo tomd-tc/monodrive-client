@@ -172,6 +172,21 @@ namespace monodrive_msgs
 
         static monodrive_msgs::OOBB OOBBToROSOOBB(const ::OOBB& oobb) {
             monodrive_msgs::OOBB result;
+            result.name = oobb.name;
+            result.orientation = QuatToROSQuaternion(oobb.orientation);
+            result.center = Vec3fToROSVector3(oobb.center);
+            result.scale = Vec3fToROSVector3(oobb.scale);
+            result.extents = Vec3fToROSVector3(oobb.extents);
+            return result;
+        }
+
+        static ::OOBB ROSOOBBToOOBB(const monodrive_msgs::OOBB& oobb) {
+            ::OOBB result;
+            result.name = oobb.name;
+            result.orientation = ROSQuaternionToQuat(oobb.orientation);
+            result.center = ROSVector3ToVec3f(oobb.center);
+            result.scale = ROSVector3ToVec3f(oobb.scale);
+            result.extents = ROSVector3ToVec3f(oobb.extents);
             return result;
         }
 

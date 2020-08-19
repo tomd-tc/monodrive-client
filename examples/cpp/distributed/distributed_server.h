@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 
 #include <vector>
 #include <set>
@@ -25,7 +25,9 @@ enum kSensorType {
     STATE,
     VIEWPORT,
     RADAR,
-    LIDAR
+    LIDAR,
+    IMU,
+    WAYPOINT
 };
 
 /// The primary server needs a scenario file for closed loop mode
