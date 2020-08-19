@@ -125,6 +125,10 @@ ByteBuffer StateFrame::write() const {
 	return buffer;
 }
 
+void BinaryStateFrame::parse(ByteBuffer& buffer){
+    state_buffer = buffer;
+}
+
 void CollisionFrame::parse(ByteBuffer& buffer){
     auto j = buffer.BufferToJson();
     json_get(j, "game_time", game_time);

@@ -54,8 +54,9 @@ public:
     std::vector<std::string> undesired_tags{};
     bool debug_drawing{false};
     bool include_obb{false};
+    bool send_binary_frame{false};
     virtual DataFrame* DataFrameFactory() override{
-        return new StateFrame;
+        return send_binary_frame ? new BinaryStateFrame : new StateFrame;
     }
     virtual nlohmann::json dump(){
         return *this;

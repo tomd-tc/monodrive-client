@@ -151,6 +151,13 @@ public:
 	int sample_count;
 };
 
+class MONODRIVECORE_API BinaryStateFrame : public StateFrame {
+public:
+    virtual void parse(ByteBuffer& buffer) override;
+    ByteBuffer state_buffer;
+};
+
+
 class MONODRIVECORE_API CollisionFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
