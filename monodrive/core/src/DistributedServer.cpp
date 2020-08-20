@@ -1,6 +1,7 @@
 #include <functional>
+#include <memory>
 
-#include "distributed_server.h"
+#include "DistributedServer.h"
 
 using namespace distributed_server;
 

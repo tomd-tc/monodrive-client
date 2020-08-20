@@ -10,7 +10,7 @@
 #include "Sensor.h"
 #include "Simulator.h"
 #include "Stopwatch.h"
-#include "distributed_server.h"
+#include "DistributedServer.h"
 #include "sensor_config.h"
 
 namespace ds = distributed_server;
