@@ -34,6 +34,11 @@ DistributedServer::~DistributedServer() {
   }
 }
 
+bool DistributedServer::Configure(){
+  std::vector<kSensorType> no_sensors;
+  return Configure(no_sensors);
+}
+
 bool DistributedServer::Configure(const std::vector<kSensorType>& sensor_types){
   // Configure the simulator
   sensors.clear();
@@ -57,7 +62,7 @@ bool DistributedServer::Configure(const std::vector<kSensorType>& sensor_types){
   return true;
 }
 
-bool DistributedServer::AddSensor(kSensorType sensor_type) {
+bool DistributedServer::AddSensor(kSensorType sensor_type, std::function<void(DataFrame*)> callback) {
   // Go through all the reserved ports and make a reservation for this sensor
   int listen_port = 8101;
   while (kServerReservedPorts.count(listen_port)) {
@@ -78,8 +83,8 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
       s_config.send_binary_frame = true;
       sensors.emplace_back(
           std::make_shared<Sensor>(std::make_unique<StateConfig>(s_config)));
-      sensors.back()->sampleCallback = std::bind(
-          &DistributedServer::StateSensorCallback, this, std::placeholders::_1);
+      //sensors.back()->sampleCallback = std::bind(
+      //    &DistributedServer::StateSensorCallback, this, std::placeholders::_1);
     } break;
     case kSensorType::VIEWPORT: {
       ViewportCameraConfig vp_config;
@@ -144,6 +149,8 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
       return false;
   };
 
+  sensors.back()->sampleCallback = callback;
+
   // Actually configure the sensors and make sure it worked
   for (auto& sensor : sensors) {
     if (!sensor->configure()) {
@@ -159,17 +166,17 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
   return true;
 }
 
-void DistributedServer::StateSensorCallback(DataFrame* frame) {
+/*void DistributedServer::StateSensorCallback(DataFrame* frame) {
   // Grab the state data and signal that its available
   if (state_data_string != nullptr) {
     *state_data_string =
         static_cast<BinaryStateFrame*>(frame)->state_buffer.as_string();
   }
   state_sensor_data_updated = true;
-}
+}*/
 
-bool DistributedServer::Sample(std::string* state_data, bool async) {
-  state_data_string = state_data;
+bool DistributedServer::Sample(/*std::string* state_data,*/ bool async) {
+  //state_data_string = state_data;
 
   {
     std::lock_guard<std::mutex> lk(sample_mutex);
@@ -196,12 +203,12 @@ void DistributedServer::SampleThread() {
       case kServerType::PRIMARY:
         // For primaries, always wait for the state data to come back
         sim->sampleAll(sensors);
-        while (!state_sensor_data_updated);
-        state_sensor_data_updated = false;
+        //while (!state_sensor_data_updated);
+        //state_sensor_data_updated = false;
         break;
       case kServerType::REPLICA:
         // Replicas just get a state update
-        state_data["state_data_as_string"] = *state_data_string;
+        //state_data["state_data_as_string"] = *state_data_string;
         sim->stateStepAll(sensors, state_data);
         break;
       default:

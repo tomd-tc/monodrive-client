@@ -15,7 +15,7 @@ namespace monodrive_msgs
 
     class MessageFactory 
     {
-
+    public:
         static geometry_msgs::Vector3 Vec3fToROSVector3(const Vec3f& vec) {
             geometry_msgs::Vector3 result;
             result.x = vec.x;
@@ -224,9 +224,9 @@ namespace monodrive_msgs
             return result;
         }
 
-        static sensor_msgs::Imu FromMonoDriveFrame(std::string frame_id, const ImuFrame& frame) {
+        static sensor_msgs::Imu FromMonoDriveFrame(const ImuFrame& frame) {
             sensor_msgs::Imu message;
-            message.header.stamp.sec = frame.timer / 19660800;
+//            message.header.stamp.sec = frame.timer / 19660800;
 //            message.orientation
             message.orientation_covariance = {0,0,0,0,0,0,0,0,0}; 
             message.angular_velocity = Vec3fToROSVector3(frame.angular_velocity);
