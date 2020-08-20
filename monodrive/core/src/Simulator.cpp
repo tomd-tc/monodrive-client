@@ -199,6 +199,9 @@ bool Simulator::stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors
 	ApiMessage message(333, REPLAY_StateStepSimulationCommand_ID, true, state);
 	for(auto& sensor : sensors)
     {
+		if (!sensor->config->enable_streaming) {
+			continue;
+		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	bool success = sendCommand(message);
@@ -221,6 +224,9 @@ void Simulator::stepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, int
 {
 	for(auto& sensor : sensors)
     {
+		if (!sensor->config->enable_streaming) {
+			continue;
+		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	step(stepIndex, numSteps);
@@ -240,6 +246,9 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
 	for(auto& sensor : sensors){
+		if (!sensor->config->enable_streaming) {
+			continue;
+		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	if(sendCommand(sampleMessage)){
@@ -260,9 +269,12 @@ bool Simulator::sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors)
 	}
 	ApiMessage sampleMessage(999, SampleSensorListCommand_ID, true, {{"ports", ports}});
 	for(auto& sensor : sensors){
+		if (!sensor->config->enable_streaming) {
+			continue;
+		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
-	if(sendCommand(sampleMessage)){
+	if(sendCommand(sampleMessage)) {
 		waitForSamples(sensors);
 	}
 	else{
@@ -275,9 +287,12 @@ bool Simulator::sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors)
 void Simulator::waitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors)
 {
 	bool samplingInProgress = true;
-	do{
+	do {
 		samplingInProgress = false;
-		for(auto& sensor : sensors){
+		for(auto& sensor : sensors) {
+			if (!sensor->config->enable_streaming) {
+				continue;
+			}
 			if(sensor->sampleInProgress.load(std::memory_order::memory_order_relaxed)){
 				samplingInProgress = true;
 				break;
