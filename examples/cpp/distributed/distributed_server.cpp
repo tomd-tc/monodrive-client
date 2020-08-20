@@ -15,6 +15,22 @@ DistributedServer::DistributedServer(const std::string& ip_address,
 
   // All server ports are technically reserved as well
   kServerReservedPorts.insert(port);
+
+  sample_thread = std::thread(&DistributedServer::SampleThread, this);
+}
+
+DistributedServer::DistributedServer(const DistributedServer& rhs) {
+  server_type = rhs.server_type;
+  sim = rhs.sim;
+  sensors = rhs.sensors;
+}
+
+DistributedServer::~DistributedServer() {
+  connected = false;
+  sample_trigger.notify_all();
+  if (sample_thread.joinable()) {
+    sample_thread.join();
+  }
 }
 
 bool DistributedServer::Configure(const std::vector<kSensorType>& sensor_types){
@@ -96,7 +112,7 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
       l_config.server_port = sim->getServerPort();
       l_config.location.x = -10.f;
       l_config.location.z = 190.f;
-      l_config.horizontal_resolution = 0.1f;
+      l_config.horizontal_resolution = 0.4f;
       l_config.n_lasers = 16;
       l_config.listen_port = listen_port;
       sensors.emplace_back(
@@ -144,30 +160,58 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
 
 void DistributedServer::StateSensorCallback(DataFrame* frame) {
   // Grab the state data and signal that its available
+  if (state_data_string != nullptr) {
+    *state_data_string =
+        static_cast<BinaryStateFrame*>(frame)->state_buffer.as_string();
+  }
   state_sensor_data_updated = true;
-  if (state_data) {
-    *state_data =
-        static_cast<BinaryStateFrame*>(frame)->state_buffer.BufferToJson();
+}
+
+bool DistributedServer::Sample(std::string* state_data, bool async) {
+  state_data_string = state_data;
+
+  {
+    std::lock_guard<std::mutex> lk(sample_mutex);
+    ready_to_sample = true;
+  }
+  sample_trigger.notify_all();
+
+  if (!async) {
+    while(!sample_complete);
+  }
+  sample_complete = false;
+  return true;
+}
+
+
+void DistributedServer::SampleThread() {
+  nlohmann::json state_data;
+
+  while (connected) {
+    std::unique_lock<std::mutex> lk(sample_mutex);
+    sample_trigger.wait(lk, [=]{return ready_to_sample;});
+    ready_to_sample = false;
+    switch (server_type) {
+      case kServerType::PRIMARY:
+        // For primaries, always wait for the state data to come back
+        sim->sampleAll(sensors);
+        while (!state_sensor_data_updated);
+        state_sensor_data_updated = false;
+        break;
+      case kServerType::REPLICA:
+        // Replicas just get a state update
+        state_data["state_data_as_string"] = *state_data_string;
+        sim->stateStepAll(sensors, state_data);
+        break;
+      default:
+        std::cerr << "DistributedServer::Sample: ERROR! Unknown server type: "
+                  << server_type << std::endl;
+    }
+    lk.unlock();
+    sample_complete = true;
   }
 }
 
-bool DistributedServer::Sample(nlohmann::json* input_state_data) {
-  state_data = input_state_data;
-  switch (server_type) {
-    case kServerType::PRIMARY:
-      // For primaries, always wait for the state data to come back
-      sim->sampleAll(sensors);
-      while(!state_sensor_data_updated);
-      state_sensor_data_updated = false;
-      break;
-    case kServerType::REPLICA:
-      // Replicas just get a state update
-      sim->stateStepSampleAll(sensors, *state_data);
-      break;
-    default:
-      std::cerr << "DistributedServer::Sample: ERROR! Unknown server type: "
-                << server_type << std::endl;
-      return false;
-  }
-  return true;
+bool DistributedServer::IsSampling() {
+  return !sample_complete || sim->sampleInProgress(sensors);
 }

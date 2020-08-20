@@ -41,6 +41,9 @@ public:
 	bool stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state);
 	void stepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, int stepIndex, int numSteps);
 
+	bool stateStepAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state);
+	bool sampleInProgress(std::vector<std::shared_ptr<Sensor>>& sensors);
+
 	// triggers every sensor on the server to send it's data frame
 	// the sensors in the list will go into a read state
 	// this should only be called when the sensors in the list count for all the sensors on the server
@@ -66,4 +69,5 @@ private:
 	Configuration config;
 	std::string serverIp;
 	short serverPort;
+	std::atomic<bool> lastSendCommand{false};
 };

@@ -194,11 +194,40 @@ bool Simulator::step(int stepIndex, int numSteps)
 	return sendCommand(message);
 }
 
-bool Simulator::stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state)
+bool Simulator::sampleInProgress(std::vector<std::shared_ptr<Sensor>>& sensors){
+  // are sensors done sampling?
+  bool samplingInProgress = false;
+  // is simulator done stepping?
+  if (lastSendCommand.load(std::memory_order::memory_order_relaxed)) {
+    for (auto& sensor : sensors) {
+      if (sensor->sampleInProgress.load(
+              std::memory_order::memory_order_relaxed)) {
+        samplingInProgress = true;
+        break;
+      }
+    }
+  }
+  return samplingInProgress;
+}
+
+bool Simulator::stateStepAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state)
 {
 	ApiMessage message(333, REPLAY_StateStepSimulationCommand_ID, true, state);
 	for(auto& sensor : sensors)
     {
+		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+	}
+	lastSendCommand = sendCommand(message);
+
+	return lastSendCommand;
+}
+
+
+bool Simulator::stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors, const nlohmann::json& state)
+{
+	ApiMessage message(333, REPLAY_StateStepSimulationCommand_ID, true, state);
+	for(auto& sensor : sensors)
+   {
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	bool success = sendCommand(message);
