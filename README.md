@@ -31,7 +31,7 @@ To build the examples the following are required:
 - [VSCode](https://code.visualstudio.com/)
 - Install packages: 
     ```bash 
-    sudo apt-get update && sudo apt-get install libboost-dev build-essential libeigen3-dev
+    sudo apt-get update && sudo apt-get install libboost-dev libboost-system-dev build-essential libeigen3-dev
     ```
 ## VSCode Setup and Build Instructions
 1. Open VSCode.
