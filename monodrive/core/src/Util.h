@@ -1,7 +1,8 @@
 // monoDrive Client utils
+#pragma once
 
 template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
+std::unique_ptr<T> static make_unique(Args&&... args)
 {
   // helper for old c++11 standard
   // h/t https://stackoverflow.com/a/24609331
