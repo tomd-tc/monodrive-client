@@ -10,7 +10,7 @@
 #include "Sensor.h"
 #include "Simulator.h"
 #include "Stopwatch.h"
-#include "distributed_server.h"
+#include "DistributedServer.h"
 #include "sensor_config.h"
 
 namespace ds = distributed_server;
@@ -24,7 +24,7 @@ std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
 std::mutex STATE_DATA_MUTEX;
 
-void PrimaryThread(std::shared_ptr<ds::DistributedServer> server) {
+void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -55,7 +55,7 @@ void PrimaryThread(std::shared_ptr<ds::DistributedServer> server) {
 }
 
 void ReplicaThread(
-    std::vector<std::shared_ptr<ds::DistributedServer>> servers) {
+    std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> servers) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -78,7 +78,7 @@ void ReplicaThread(
     }
 
     for (auto& server : servers) {
-      server->Sample(&SHARED_STATE_DATA_BUFFER, true);
+      server->Sample(&SHARED_STATE_DATA_BUFFER);
     }
 
     for (auto& server : servers) {
@@ -104,13 +104,10 @@ void ReplicaThread(
 int main(int argc, char** argv) {
   // Set up all the server
   auto primary_server =
-      std::make_shared<ds::DistributedServer>("127.0.0.1", 8999,
-                                              ds::kServerType::PRIMARY);
-  std::vector<std::shared_ptr<ds::DistributedServer>> replica_servers = {
-      std::make_shared<ds::DistributedServer>("192.168.2.3", 8999,
-                                              ds::kServerType::REPLICA),
-      std::make_shared<ds::DistributedServer>("192.168.2.3", 9000,
-                                              ds::kServerType::REPLICA)
+      std::make_shared<ds::PrimaryDistributedServer>("127.0.0.1", 8999);
+  std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> replica_servers = {
+      std::make_shared<ds::ReplicaDistributedServer>("192.168.2.3", 8999),
+      // std::make_shared<ds::ReplicaDistributedServer>("192.168.2.3", 9000),
   };
 
   // Configure the senors for each server
@@ -119,9 +116,9 @@ int main(int argc, char** argv) {
           ||
       !replica_servers[0]->Configure(
           {ds::kSensorType::VIEWPORT, ds::kSensorType::RADAR})
-          ||
-      !replica_servers[1]->Configure(
-          {ds::kSensorType::VIEWPORT, ds::kSensorType::LIDAR})
+      //     ||
+      // !replica_servers[1]->Configure(
+      //     {ds::kSensorType::VIEWPORT, ds::kSensorType::LIDAR})
           ) {
     return -1;
   }

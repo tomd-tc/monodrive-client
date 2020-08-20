@@ -1,36 +1,17 @@
 #include <functional>
 
-#include "distributed_server.h"
+#include "DistributedServer.h"
 
 using namespace distributed_server;
 
-DistributedServer::DistributedServer(const std::string& ip_address,
-                                     const int& port,
-                                     const kServerType& server_type)
-    : server_type(server_type) {
+DistributedServer::DistributedServer(const Configuration& config,
+                                     const std::string& ip_address,
+                                     const int& port) : server_config(config) {
   // Go ahead and grab an instance of the server before configuring
-  sim = &Simulator::getInstance(
-      server_type == kServerType::PRIMARY ? kPrimaryConfig : kReplicaConfig, 
-      ip_address, port);
+  sim = &Simulator::getInstance(server_config, ip_address, port);
 
   // All server ports are technically reserved as well
   kServerReservedPorts.insert(port);
-
-  sample_thread = std::thread(&DistributedServer::SampleThread, this);
-}
-
-DistributedServer::DistributedServer(const DistributedServer& rhs) {
-  server_type = rhs.server_type;
-  sim = rhs.sim;
-  sensors = rhs.sensors;
-}
-
-DistributedServer::~DistributedServer() {
-  connected = false;
-  sample_trigger.notify_all();
-  if (sample_thread.joinable()) {
-    sample_thread.join();
-  }
 }
 
 bool DistributedServer::Configure(const std::vector<kSensorType>& sensor_types){
@@ -77,8 +58,6 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
       s_config.send_binary_frame = true;
       sensors.emplace_back(
           std::make_shared<Sensor>(std::make_unique<StateConfig>(s_config)));
-      sensors.back()->sampleCallback = std::bind(
-          &DistributedServer::StateSensorCallback, this, std::placeholders::_1);
     } break;
     case kSensorType::VIEWPORT: {
       ViewportCameraConfig vp_config;
@@ -140,60 +119,50 @@ bool DistributedServer::AddSensor(kSensorType sensor_type) {
   return true;
 }
 
-void DistributedServer::StateSensorCallback(DataFrame* frame) {
+bool DistributedServer::IsSampling() {
+  return !sample_complete.load(std::memory_order_relaxed) ||
+         sim->sampleInProgress(sensors);
+}
+
+void PrimaryDistributedServer::StateSensorCallback(DataFrame* frame) {
   // Grab the state data and signal that its available
   if (state_data_string != nullptr) {
     *state_data_string =
         static_cast<BinaryStateFrame*>(frame)->state_buffer.as_string();
   }
-  state_sensor_data_updated = true;
+  state_sensor_data_updated.store(true, std::memory_order_relaxed);
 }
 
-bool DistributedServer::Sample(std::string* state_data, bool async) {
+bool PrimaryDistributedServer::Sample(std::string* state_data) {
+  // Store the pointer for output in the callback
   state_data_string = state_data;
 
-  {
-    std::lock_guard<std::mutex> lk(sample_mutex);
-    ready_to_sample = true;
+  // For primaries, always wait for the state data to come back
+  bool success = sim->sampleAll(sensors);
+  if (success) {
+    while (!state_sensor_data_updated.load(std::memory_order_relaxed));
+    state_sensor_data_updated = false;
   }
-  sample_trigger.notify_all();
+  sample_complete.store(true, std::memory_order_relaxed);
 
-  if (!async) {
-    while(!sample_complete);
-  }
-  sample_complete = false;
-  return true;
+  return success;
 }
 
-
-void DistributedServer::SampleThread() {
-  nlohmann::json state_data;
-
-  while (connected) {
-    std::unique_lock<std::mutex> lk(sample_mutex);
-    sample_trigger.wait(lk, [=]{return ready_to_sample;});
-    ready_to_sample = false;
-    switch (server_type) {
-      case kServerType::PRIMARY:
-        // For primaries, always wait for the state data to come back
-        sim->sampleAll(sensors);
-        while (!state_sensor_data_updated);
-        state_sensor_data_updated = false;
-        break;
-      case kServerType::REPLICA:
-        // Replicas just get a state update
-        state_data["state_data_as_string"] = *state_data_string;
-        sim->stateStepAll(sensors, state_data);
-        break;
-      default:
-        std::cerr << "DistributedServer::Sample: ERROR! Unknown server type: "
-                  << server_type << std::endl;
-    }
-    lk.unlock();
-    sample_complete = true;
+bool PrimaryDistributedServer::AddSensor(kSensorType sensor_type) {
+  bool success = DistributedServer::AddSensor(sensor_type);
+  if (sensor_type == kSensorType::BINARY_STATE) {
+    sensors.back()->sampleCallback =
+        std::bind(&PrimaryDistributedServer::StateSensorCallback, this,
+                  std::placeholders::_1);
   }
+  return success;
 }
 
-bool DistributedServer::IsSampling() {
-  return !sample_complete || sim->sampleInProgress(sensors);
+bool ReplicaDistributedServer::Sample(std::string* state_data) {
+  // Replicas just get a state update
+  nlohmann::json state_data_json;
+  state_data_json["state_data_as_string"] = *state_data;
+  bool success = sim->stateStepAll(sensors, state_data_json);
+  sample_complete.store(true, std::memory_order_relaxed);
+  return success;
 }

@@ -170,6 +170,14 @@ bool Simulator::configure()
 	return true;
 }
 
+bool Simulator::sendCommandAsync(ApiMessage message, nlohmann::json *response)
+{
+	message.asyncWrite(controlSocket);
+	ApiMessage res;
+	res.asyncRead(controlSocket);
+	return true;
+}
+
 bool Simulator::sendCommand(ApiMessage message, nlohmann::json *response)
 {
 	message.write(controlSocket);
@@ -217,7 +225,7 @@ bool Simulator::stateStepAll(std::vector<std::shared_ptr<Sensor>>& sensors, cons
     {
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
-	lastSendCommand = sendCommand(message);
+	lastSendCommand = sendCommandAsync(message);
 
 	return lastSendCommand;
 }

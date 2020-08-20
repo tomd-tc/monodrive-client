@@ -34,6 +34,7 @@ public:
 	void disconnect();
 	void stop();
 	bool sendCommand(ApiMessage message, nlohmann::json* response=nullptr);
+	bool sendCommandAsync(ApiMessage message, nlohmann::json* response=nullptr);
 	bool step(int stepIndex, int numSteps);
 	std::thread stepThread(int stepIndex, int numSteps) {
 		return std::thread(&Simulator::step, this, stepIndex, numSteps);
