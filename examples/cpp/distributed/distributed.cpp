@@ -3,6 +3,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <mutex>
+#include <thread>
 
 #include "Configuration.h"
 #include "Sensor.h"
@@ -16,6 +18,9 @@ namespace ds = distributed_server;
 // The shared state data object that the primary will populate and the replicas
 // will use
 std::string SHARED_STATE_DATA("");
+// Set up a double buffering system so there's always a buffer available to 
+// the primary server and we don't have to do a full copy
+std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
 std::mutex STATE_DATA_MUTEX;
 
@@ -28,6 +33,7 @@ void PrimaryThread(std::shared_ptr<ds::DistributedServer> server) {
   while (true) {
     auto control_start_time =
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
+
     {
       std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
       server->Sample(&SHARED_STATE_DATA);
@@ -37,6 +43,7 @@ void PrimaryThread(std::shared_ptr<ds::DistributedServer> server) {
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
         control_start_time;
 
+    // Spit out FPS about every second
     if ((++frame_count) % 100 == 0) {
       std::cout << "=== Control Avg: " << (control_time / frame_count) / 1e6
                 << std::endl;
@@ -45,8 +52,6 @@ void PrimaryThread(std::shared_ptr<ds::DistributedServer> server) {
       control_time = 0;
     }
   }
-
-  std::cout << "Primary thread ending..." << std::endl;
 }
 
 void ReplicaThread(
@@ -54,7 +59,7 @@ void ReplicaThread(
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
-  std::string local_state_data;
+  std::string local_state_data("");
 
   std::cout << "Replica thread starting..." << std::endl;
   while (true) {
@@ -62,17 +67,18 @@ void ReplicaThread(
     auto sample_start_time =
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
 
-    {
-      std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
-      local_state_data = SHARED_STATE_DATA;
-      // If there has not been a state data update yet, then keep waiting
-      if (local_state_data == "") {
-        continue;
-      }
+    // Using a try_lock here because a scoped lock has too much overhead
+    // Just keep  trying and breaking until we get it
+    while (!STATE_DATA_MUTEX.try_lock());
+    std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
+    STATE_DATA_MUTEX.unlock();
+
+    if (SHARED_STATE_DATA_BUFFER == "") {
+      continue;
     }
 
     for (auto& server : servers) {
-      server->Sample(&local_state_data, true);
+      server->Sample(&SHARED_STATE_DATA_BUFFER, true);
     }
 
     for (auto& server : servers) {
@@ -83,7 +89,7 @@ void ReplicaThread(
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
         sample_start_time;
 
-    // Spit out FPS data every 10 frames
+    // Spit out FPS about every second
     if ((++frame_count) % 30 == 0) {
       std::cout << "=== Sample Avg: " << (sample_time / frame_count) / 1e6
                 << std::endl;
@@ -93,7 +99,6 @@ void ReplicaThread(
       sample_time = 0;
     }
   }
-  std::cout << "Replica thread ending..." << std::endl;
 }
 
 int main(int argc, char** argv) {
