@@ -24,6 +24,7 @@ std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
 std::mutex STATE_DATA_MUTEX;
 
+
 void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
   uint64_t control_time = 0;
   int frame_count = 0;
@@ -102,28 +103,48 @@ void ReplicaThread(
 }
 
 int main(int argc, char** argv) {
+  /// The primary server needs a scenario file for closed loop mode
+  Configuration primary_config(
+      "examples/cpp/distributed/simulator_straightaway.json",
+      "examples/config/weather.json",
+      "examples/config/scenario_multi_vehicle_straightaway.json",
+      "examples/cpp/distributed/primary_sensors.json");
+  /// The replica servers just need to be forced into replay mode
+  Configuration replica_lidar_config(
+      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/weather.json", 
+      "examples/config/scenario.json",
+      "examples/cpp/distributed/replica_lidar_sensors.json");
+  Configuration replica_radar_config(
+      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/weather.json", 
+      "examples/config/scenario.json",
+      "examples/cpp/distributed/replica_radar_sensors.json");
+
   // Set up all the server
-  auto primary_server =
-      std::make_shared<ds::PrimaryDistributedServer>("127.0.0.1", 8999);
+  auto primary_server = std::make_shared<ds::PrimaryDistributedServer>(
+      primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> replica_servers = {
-      std::make_shared<ds::ReplicaDistributedServer>("192.168.2.3", 8999),
-      // std::make_shared<ds::ReplicaDistributedServer>("192.168.2.3", 9000),
+      std::make_shared<ds::ReplicaDistributedServer>(replica_radar_config,
+                                                     "192.168.2.3", 8999),
+      std::make_shared<ds::ReplicaDistributedServer>(replica_lidar_config,
+                                                     "192.168.2.3", 9000),
   };
 
-  // Configure the senors for each server
-  if (!primary_server->Configure(
-          {ds::kSensorType::VIEWPORT, ds::kSensorType::BINARY_STATE}) 
-          ||
-      !replica_servers[0]->Configure(
-          {ds::kSensorType::VIEWPORT, ds::kSensorType::RADAR})
-      //     ||
-      // !replica_servers[1]->Configure(
-      //     {ds::kSensorType::VIEWPORT, ds::kSensorType::LIDAR})
-          ) {
+  // Configure the primary first
+  if (!primary_server->Configure()){
+    std::cerr << "Unable to configure primary server!" << std::endl;
     return -1;
   }
+  // 
+  for(auto& server : replica_servers) {
+    if(!server->Configure()){
+      std::cout << "Unable to configure replica server!" << std::endl;
+      return -1;
+    }
+  }
 
-  // Bench marking stuff
+  // Kick off the orchestration threads
   std::thread primary_thread(PrimaryThread, primary_server);
   std::thread replica_thread(ReplicaThread, replica_servers);
 

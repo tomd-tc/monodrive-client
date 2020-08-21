@@ -33,8 +33,9 @@ public:
     nlohmann::json scenario;
     nlohmann::json sensorsConfig;
 
-    void loadSensors(std::vector<std::shared_ptr<Sensor>>& sensors);
-private:
+    bool loadSensors(std::vector<std::shared_ptr<Sensor>>& sensors);
+
+   private:
     nlohmann::json load(const std::string& path);
 
 };
