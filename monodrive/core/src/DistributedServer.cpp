@@ -108,15 +108,13 @@ bool PrimaryDistributedServer::Configure() {
   // Search for an existing state sensor that's streaming binary data
   bool bin_state_added = false;
   for (auto& sensor : sensors) {
-    if (sensor->config->type == "BinaryState") {
-      auto state_config = static_cast<StateConfig*>(sensor->config.get());
-      if (state_config->send_binary_data) {
-        sensors.back()->sampleCallback =
-            std::bind(&PrimaryDistributedServer::StateSensorCallback, this,
-                      std::placeholders::_1);
-        bin_state_added = true;
-        break;
-      }
+    if (sensor->config->type == "BinaryState" and
+        sensor->config->send_binary_data) {
+      sensors.back()->sampleCallback =
+          std::bind(&PrimaryDistributedServer::StateSensorCallback, this,
+                    std::placeholders::_1);
+      bin_state_added = true;
+      break;
     }
   }
 
