@@ -5,41 +5,43 @@
 using namespace distributed_server;
 
 DistributedServer::DistributedServer(const Configuration& config,
-                                     const std::string& ip_address,
-                                     const int& port) : server_config(config) {
+                                     const std::string& ipAddress,
+                                     const int& port,
+                                     const int& simulationMode)
+    : serverConfig(config) {
   // Make sure to copy the desired IP and port to the configurations since we
   // may be getting a resused config file
-  server_config.simulator["server_ip"] = ip_address;
-  server_config.simulator["server_port"] = port;
+  serverConfig.simulator["server_ip"] = ipAddress;
+  serverConfig.simulator["server_port"] = port;
+  serverConfig.simulator["simulation_mode"] = simulationMode;
   // Set all the sensors to this server's IP address so we don't use a value
   // from the shared config files.
-  for(auto& sensor : server_config.sensorsConfig) {
-    std::cout << "Type:" << sensor["type"] << std::endl;
-    sensor["server_ip"] = ip_address;
+  for(auto& sensor : serverConfig.sensorsConfig) {
+    sensor["server_ip"] = ipAddress;
     sensor["server_port"] = port;
   }
 
   // Go ahead and grab an instance of the server before configuring
-  sim = &Simulator::getInstance(server_config, ip_address, port);
+  sim = &Simulator::getInstance(serverConfig, ipAddress, port);
 
   // All server ports are technically reserved as well
   kServerReservedPorts.insert(port);
 }
 
-bool DistributedServer::Configure(){
+bool DistributedServer::configure(){
   // Configure the simulator
   sensors.clear();
 
   // Read in all the sensor configurations for this server
-  if (!server_config.loadSensors(sensors)) {
-    std::cerr << "DistributedServer::Configure: ERROR! Unable to configure one "
+  if (!serverConfig.loadSensors(sensors)) {
+    std::cerr << "DistributedServer::configure: ERROR! Unable to configure one "
                  "or more sensors on server: "
               << sim->getServerIp() << ":" << sim->getServerPort() << std::endl;
     return false;
   }
 
   if (!sim->configure()) {
-    std::cerr << "DistributedServer::Configure: ERROR! Unable to configure "
+    std::cerr << "DistributedServer::configure: ERROR! Unable to configure "
                  "simulator: "
               << sim->getServerIp() << ":" << sim->getServerPort() << std::endl;
     return false;
@@ -48,7 +50,7 @@ bool DistributedServer::Configure(){
   for(auto& sensor : sensors) {
     // Actually configure the sensor to start streaming
     if(!sensor->configure()) {
-      std::cerr << "DistributedServer::Configure: ERROR! Unable to configure "
+      std::cerr << "DistributedServer::configure: ERROR! Unable to configure "
                    "sensor type: "
                 << sensor->config->type << " on port "
                 << sensor->config->listen_port << " for server "
@@ -59,7 +61,7 @@ bool DistributedServer::Configure(){
     // dynamically creating sensors
     if (kServerReservedPorts.count(sensor->config->listen_port) > 0 and
         sensor->config->type != "ViewportCamera") {
-      std::cerr << "DistributedServer::Configure: ERROR! Server port conflict "
+      std::cerr << "DistributedServer::configure: ERROR! Server port conflict "
                    "for sensor type: "
                 << sensor->config->type << " on port "
                 << sensor->config->listen_port << " for server "
@@ -72,89 +74,74 @@ bool DistributedServer::Configure(){
   return true;
 }
 
-bool DistributedServer::IsSampling() {
-  return !sample_complete.load(std::memory_order_relaxed) ||
+bool DistributedServer::isSampling() {
+  return !sampleComplete.load(std::memory_order_relaxed) ||
          sim->sampleInProgress(sensors);
 }
 
-void PrimaryDistributedServer::StateSensorCallback(DataFrame* frame) {
+void PrimaryDistributedServer::stateSensorCallback(DataFrame* frame) {
   // Grab the state data and signal that its available
-  if (state_data_string != nullptr) {
-    *state_data_string =
+  if (stateDataString != nullptr) {
+    *stateDataString =
         static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
   }
-  state_sensor_data_updated.store(true, std::memory_order_relaxed);
+  stateSensorDataUpdated.store(true, std::memory_order_relaxed);
 }
 
-bool PrimaryDistributedServer::Sample(std::string* state_data) {
+bool PrimaryDistributedServer::sample(std::string* stateData) {
   // Store the pointer for output in the callback
-  state_data_string = state_data;
+  stateDataString = stateData;
 
   // For primaries, always wait for the state data to come back
   bool success = sim->sampleAll(sensors);
   if (success) {
-    while (!state_sensor_data_updated.load(std::memory_order_relaxed));
-    state_sensor_data_updated = false;
+    while (!stateSensorDataUpdated.load(std::memory_order_relaxed));
+    stateSensorDataUpdated = false;
   }
-  sample_complete.store(true, std::memory_order_relaxed);
+  sampleComplete.store(true, std::memory_order_relaxed);
 
   return success;
 }
 
-bool PrimaryDistributedServer::Configure() {
-  if(!DistributedServer::Configure()) {
+bool PrimaryDistributedServer::configure() {
+  if(!DistributedServer::configure()) {
     return false;
-  }
-  // Search for an existing state sensor that's streaming binary data
-  bool bin_state_added = false;
-  for (auto& sensor : sensors) {
-    if (sensor->config->type == "BinaryState" and
-        sensor->config->send_binary_data) {
-      sensors.back()->sampleCallback =
-          std::bind(&PrimaryDistributedServer::StateSensorCallback, this,
-                    std::placeholders::_1);
-      bin_state_added = true;
-      break;
-    }
   }
 
   // If the sensor didn't exist, we have to add it to the primary so it can
   // distribute the state data to replicas
-  if(!bin_state_added) {
-    int listen_port = 8100;
-    while(kServerReservedPorts.count(listen_port) > 0){
-      listen_port++;
-    }
-
-    StateConfig s_config;
-    s_config.server_ip = sim->getServerIp();
-    s_config.server_port = sim->getServerPort();
-    s_config.listen_port = listen_port;
-    s_config.desired_tags = {"vehicle", "dynamic"};
-    s_config.include_obb = false;
-    s_config.debug_drawing = false;
-    s_config.send_binary_data = true;
-    sensors.emplace_back(
-        std::make_shared<Sensor>(std::make_unique<StateConfig>(s_config)));
-    sensors.back()->sampleCallback =
-        std::bind(&PrimaryDistributedServer::StateSensorCallback, this,
-                  std::placeholders::_1);
-    if(!sensors.back()->configure()) {
-      std::cerr << "PrimaryDistributedServer::Configure: Unable to configure "
-                   "binary state sensor!"
-                << std::endl;
-      return false;
-    }
-
+  int listenPort = 8100;
+  while (kServerReservedPorts.count(listenPort) > 0) {
+    listenPort++;
   }
+
+  StateConfig sConfig;
+  sConfig.server_ip = sim->getServerIp();
+  sConfig.server_port = sim->getServerPort();
+  sConfig.listen_port = listenPort;
+  sConfig.desired_tags = {"vehicle", "dynamic"};
+  sConfig.include_obb = false;
+  sConfig.debug_drawing = false;
+  sensors.emplace_back(
+      std::make_shared<Sensor>(std::make_unique<StateConfig>(sConfig), false));
+  sensors.back()->sampleCallback =
+      std::bind(&PrimaryDistributedServer::stateSensorCallback, this,
+                std::placeholders::_1);
+  if (!sensors.back()->configure()) {
+    std::cerr << "PrimaryDistributedServer::configure: Unable to configure "
+                 "binary state sensor!"
+              << std::endl;
+    return false;
+  }
+
   return true;
 }
 
-bool ReplicaDistributedServer::Sample(std::string* state_data) {
+bool ReplicaDistributedServer::sample(std::string* stateData) {
   // Replicas just get a state update
-  nlohmann::json state_data_json;
-  state_data_json["state_data_as_string"] = *state_data;
-  bool success = sim->stateStepAll(sensors, state_data_json);
-  sample_complete.store(true, std::memory_order_relaxed);
+  nlohmann::json stateDataJson;
+  stateDataJson["state_data_as_string"] = *stateData;
+  bool success = sim->stateStepAll(sensors, stateDataJson);
+  sampleComplete.store(true, std::memory_order_relaxed);
   return success;
 }

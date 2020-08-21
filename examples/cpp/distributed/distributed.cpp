@@ -37,7 +37,7 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
 
     {
       std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
-      server->Sample(&SHARED_STATE_DATA);
+      server->sample(&SHARED_STATE_DATA);
     }
 
     control_time +=
@@ -79,11 +79,11 @@ void ReplicaThread(
     }
 
     for (auto& server : servers) {
-      server->Sample(&SHARED_STATE_DATA_BUFFER);
+      server->sample(&SHARED_STATE_DATA_BUFFER);
     }
 
     for (auto& server : servers) {
-      while (server->IsSampling());
+      while (server->isSampling());
     }
 
     sample_time +=
@@ -105,18 +105,18 @@ void ReplicaThread(
 int main(int argc, char** argv) {
   /// The primary server needs a scenario file for closed loop mode
   Configuration primary_config(
-      "examples/cpp/distributed/simulator_straightaway.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json",
       "examples/config/scenario_multi_vehicle_straightaway.json",
       "examples/cpp/distributed/primary_sensors.json");
   /// The replica servers just need to be forced into replay mode
   Configuration replica_lidar_config(
-      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
       "examples/cpp/distributed/replica_lidar_sensors.json");
   Configuration replica_radar_config(
-      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
       "examples/cpp/distributed/replica_radar_sensors.json");
@@ -132,13 +132,13 @@ int main(int argc, char** argv) {
   };
 
   // Configure the primary first
-  if (!primary_server->Configure()){
+  if (!primary_server->configure()){
     std::cerr << "Unable to configure primary server!" << std::endl;
     return -1;
   }
   // 
   for(auto& server : replica_servers) {
-    if(!server->Configure()){
+    if(!server->configure()){
       std::cout << "Unable to configure replica server!" << std::endl;
       return -1;
     }

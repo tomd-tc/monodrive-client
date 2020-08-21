@@ -88,7 +88,7 @@ public:
 	void asyncRead(tcp::socket& socket) {
 		asyncRead(socket, [](std::error_code ec, ApiMessage& message){
 			if(ec){
-				std::cerr << "ApiMessage::asyncWrite: Unable to write message. Error code: " << ec << std::endl;
+				std::cerr << "ApiMessage::asyncWrite: Unable to read message. Error code: " << ec << std::endl;
 			}
 		});
 	}
