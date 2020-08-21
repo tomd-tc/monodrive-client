@@ -21,6 +21,7 @@ class SensorBaseConfig
         int listen_port = 0;
         bool wait_for_fresh_frame = true;
         bool enable_streaming = true;
+        bool send_binary_data = false;
         Location location;
         struct Rotation
         {
@@ -55,9 +56,11 @@ public:
     std::vector<std::string> undesired_tags{};
     bool debug_drawing{false};
     bool include_obb{false};
-    bool send_binary_frame{false};
     virtual DataFrame* DataFrameFactory() override{
-        return send_binary_frame ? new BinaryStateFrame : new StateFrame;
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
+        return new StateFrame;
     }
     virtual nlohmann::json dump(){
         return *this;
@@ -144,6 +147,9 @@ public:
         bool debug_rescan{false};
     }sbr;   
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new RadarFrame(send_radar_cube, num_sweeps, num_samples_per_sweep, elements);
     }
     virtual nlohmann::json dump(){
@@ -174,6 +180,9 @@ public:
         bool debug_rescan{false};
     }sbr;   
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new UltrasonicFrame(send_processed_data, 1);
     }
     virtual nlohmann::json dump(){
@@ -210,6 +219,9 @@ public:
         bool debug_draw{false};
     } annotation;
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         int nChannels = 4;
         if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
             nChannels = 4;
@@ -234,6 +246,9 @@ public:
     }
     int face_size{512};
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new CubeCameraFrame(resolution.x, resolution.y);
     }
     virtual nlohmann::json dump() {
@@ -285,6 +300,9 @@ public:
     bool follow_roll = false;
 
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         int nChannels = 1;
         int channelDepth = 1;
         return new CameraFrame(resolution.x, resolution.y, nChannels, channelDepth, false);
@@ -302,6 +320,9 @@ public:
         type = "GPS";
     }
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new GPSFrame;
     }
 };
@@ -314,6 +335,9 @@ public:
         type = "IMU";
     }
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new ImuFrame;
     }
 };
@@ -327,6 +351,9 @@ public:
     }
     virtual DataFrame* DataFrameFactory() override 
     {
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new WaypointFrame;
     }
     virtual nlohmann::json dump()
@@ -349,6 +376,9 @@ public:
     }
     int wheel_number = 0;
     virtual DataFrame* DataFrameFactory() override {
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new RPMFrame(wheel_number);
     }
     virtual nlohmann::json dump(){
@@ -367,6 +397,9 @@ public:
     std::vector<std::string> undesired_tags{"static"};
     virtual nlohmann::json dump() { return *this; }
     virtual DataFrame* DataFrameFactory() override{
+        if(send_binary_data) {
+            return new BinaryDataFrame;
+        }
         return new CollisionFrame;
     }
 };

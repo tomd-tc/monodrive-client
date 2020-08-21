@@ -81,7 +81,7 @@ void PrimaryDistributedServer::StateSensorCallback(DataFrame* frame) {
   // Grab the state data and signal that its available
   if (state_data_string != nullptr) {
     *state_data_string =
-        static_cast<BinaryStateFrame*>(frame)->state_buffer.as_string();
+        static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
   }
   state_sensor_data_updated.store(true, std::memory_order_relaxed);
 }
@@ -110,7 +110,7 @@ bool PrimaryDistributedServer::Configure() {
   for (auto& sensor : sensors) {
     if (sensor->config->type == "BinaryState") {
       auto state_config = static_cast<StateConfig*>(sensor->config.get());
-      if (state_config->send_binary_frame) {
+      if (state_config->send_binary_data) {
         sensors.back()->sampleCallback =
             std::bind(&PrimaryDistributedServer::StateSensorCallback, this,
                       std::placeholders::_1);
@@ -135,7 +135,7 @@ bool PrimaryDistributedServer::Configure() {
     s_config.desired_tags = {"vehicle", "dynamic"};
     s_config.include_obb = false;
     s_config.debug_drawing = false;
-    s_config.send_binary_frame = true;
+    s_config.send_binary_data = true;
     sensors.emplace_back(
         std::make_shared<Sensor>(std::make_unique<StateConfig>(s_config)));
     sensors.back()->sampleCallback =

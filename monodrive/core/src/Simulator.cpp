@@ -208,6 +208,9 @@ bool Simulator::sampleInProgress(std::vector<std::shared_ptr<Sensor>>& sensors){
   // is simulator done stepping?
   if (lastSendCommand.load(std::memory_order::memory_order_relaxed)) {
     for (auto& sensor : sensors) {
+      if (!sensor->config->enable_streaming) {
+        continue;
+      }
       if (sensor->sampleInProgress.load(
               std::memory_order::memory_order_relaxed)) {
         samplingInProgress = true;
