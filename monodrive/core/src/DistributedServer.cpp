@@ -41,7 +41,14 @@ bool DistributedServer::LoadSensors() {
   if (sample_complete) {
     delete sample_complete;
   }
-  sample_complete = new Event(sensors.size());
+  int sensorCount = 0;
+  for (auto& sensor : sensors) {
+    if (sensor->config->type == "ViewportCamera")
+      continue;
+
+    sensorCount++;
+  }
+  sample_complete = new Event(sensorCount);
   return true;
 }
 
@@ -59,6 +66,9 @@ bool DistributedServer::Configure(){
   }
 
   for(auto& sensor : sensors) {
+    // chain callback
+    sensor->sampleCallback = SetupCallback(sensor);
+
     // Actually configure the sensor to start streaming
     if(!sensor->configure()) {
       std::cerr << "DistributedServer::Configure: ERROR! Unable to configure "
@@ -90,6 +100,19 @@ bool DistributedServer::IsSampling() {
          sim->sampleInProgress(sensors);
 }
 
+std::function<void(DataFrame*)> DistributedServer::SetupCallback(std::shared_ptr<Sensor> sensor) {
+  std::cout << "setup callback for " << sensor->config->type << "\n" << (sensor->sampleCallback ? "func" : "no func") << std::endl;
+  auto sensorCallback = sensor->sampleCallback;
+  return [this, sensor, sensorCallback](DataFrame* frame){
+    std::cout << "sensor receive: " << sensor->config->type << std::endl;
+    sample_complete->Notify();
+    if (sensorCallback) {
+      sensorCallback(frame);
+    }else {
+              std::cout << "sensor callback is empty" << std::endl;
+            }
+  };
+}
 
 bool PrimaryDistributedServer::Sample(std::string* state_data) {
   // Store the pointer for output in the callback
@@ -113,32 +136,11 @@ bool PrimaryDistributedServer::Configure() {
   for (auto& sensor : sensors) {
     if (sensor->config->type == "BinaryState") {
       auto state_config = static_cast<StateConfig*>(sensor->config.get());
-      if (state_config->send_binary_frame) {
-        auto sensorCallback = sensor->sampleCallback;
-        auto callback = [this, sensorCallback](DataFrame* frame) {
-          if (state_data_string != nullptr) {
-            *state_data_string = static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
-          }
-          sample_complete->Notify();
-
-          if (sensorCallback) {
-            sensorCallback(frame);
-          }
-        };
-        sensor->sampleCallback = callback;
+      if (state_config->send_binary_data) {
         bin_state_added = true;
         break;
       }
-    } else {
-      auto sensorCallback = sensor->sampleCallback;
-      auto callback = [this, sensorCallback](DataFrame* frame) {
-          sample_complete->Notify();
-
-          if (sensorCallback) {
-            sensorCallback(frame);
-          }
-      };
-    }
+    } 
   }
 
   // If the sensor didn't exist, we have to add it to the primary so it can
@@ -156,12 +158,11 @@ bool PrimaryDistributedServer::Configure() {
     s_config.desired_tags = {"vehicle", "dynamic"};
     s_config.include_obb = false;
     s_config.debug_drawing = false;
-    s_config.send_binary_frame = true;
+    s_config.send_binary_data = true;
     sensors.emplace_back(
         std::make_shared<Sensor>(std::make_unique<StateConfig>(s_config)));
-    sensors.back()->sampleCallback =
-        std::bind(&PrimaryDistributedServer::StateSensorCallback, this,
-                  std::placeholders::_1);
+    sensors.back()->sampleCallback = SetupCallback(sensors.back());
+
     if(!sensors.back()->configure()) {
       std::cerr << "PrimaryDistributedServer::Configure: Unable to configure "
                    "binary state sensor!"
@@ -169,8 +170,34 @@ bool PrimaryDistributedServer::Configure() {
       return false;
     }
 
+    if (sample_complete) {
+      delete sample_complete;
+    }
+    sample_complete = new Event(sensors.size());
   }
   return true;
+}
+
+std::function<void(DataFrame*)> PrimaryDistributedServer::SetupCallback(std::shared_ptr<Sensor> sensor) {
+  auto state_config = static_cast<StateConfig*>(sensor->config.get());
+  if (state_config->send_binary_data) {
+    auto sensorCallback = sensor->sampleCallback;
+    std::cout << "setup callback for " << sensor->config->type << "\n" << (sensor->sampleCallback ? "func" : "no func") << std::endl;
+    return [this, sensorCallback](DataFrame* frame) {
+//            std::cout << "state sensor receive" << std::endl;
+            if (state_data_string != nullptr) {
+              *state_data_string = static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
+            }
+
+            if (sensorCallback) {
+              sensorCallback(frame);
+            } else {
+              std::cout << "sensor callback is empty" << std::endl;
+            }
+            sample_complete->Notify();
+          };
+  }
+  return DistributedServer::SetupCallback(sensor);
 }
 
 bool ReplicaDistributedServer::Sample(std::string* state_data) {
@@ -178,6 +205,5 @@ bool ReplicaDistributedServer::Sample(std::string* state_data) {
   nlohmann::json state_data_json;
   state_data_json["state_data_as_string"] = *state_data;
   bool success = sim->stateStepAll(sensors, state_data_json);
-  sample_complete.store(true, std::memory_order_relaxed);
   return success;
 }

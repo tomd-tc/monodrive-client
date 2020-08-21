@@ -56,6 +56,7 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
 }
 
 void ReplicaThread(
+  std::shared_ptr<ds::PrimaryDistributedServer> master,
     std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> servers) {
   uint64_t sample_time = 0;
   int frame_count = 0;
@@ -73,6 +74,8 @@ void ReplicaThread(
     while (!STATE_DATA_MUTEX.try_lock());
     std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
     STATE_DATA_MUTEX.unlock();
+
+    master->sample_complete->Wait();
 
     if (SHARED_STATE_DATA_BUFFER == "") {
       continue;
@@ -126,9 +129,9 @@ int main(int argc, char** argv) {
       primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> replica_servers = {
       std::make_shared<ds::ReplicaDistributedServer>(replica_radar_config,
-                                                     "192.168.2.3", 8999),
+                                                     "192.168.86.41", 8999),
       std::make_shared<ds::ReplicaDistributedServer>(replica_lidar_config,
-                                                     "192.168.2.3", 9000),
+                                                     "192.168.86.41", 9000),
   };
 
   // Configure the primary first
@@ -146,7 +149,7 @@ int main(int argc, char** argv) {
 
   // Kick off the orchestration threads
   std::thread primary_thread(PrimaryThread, primary_server);
-  std::thread replica_thread(ReplicaThread, replica_servers);
+  std::thread replica_thread(ReplicaThread, primary_server, replica_servers);
 
   primary_thread.join();
   replica_thread.join();

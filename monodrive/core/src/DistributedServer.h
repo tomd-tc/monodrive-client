@@ -38,6 +38,7 @@ public:
 
         if (event_count <= 0) {
             condition.notify_all();
+            Reset();
         }
         return signalled;
     }
@@ -82,11 +83,14 @@ public:
 
     Event* sample_complete = nullptr;
 
- protected:
-    /// A pointer to the server object
-    Simulator* sim = nullptr;
     /// The array of sensors that is configured for this server
     std::vector<std::shared_ptr<Sensor>> sensors;
+
+ protected:
+    virtual std::function<void(DataFrame*)> SetupCallback(std::shared_ptr<Sensor> sensor);
+
+    /// A pointer to the server object
+    Simulator* sim = nullptr;
     /// @brief The set of configuration items for this server
     Configuration server_config;
     /// @brief Flag that is set when a sample send is completed
@@ -111,6 +115,9 @@ class PrimaryDistributedServer : public DistributedServer {
     /// @brief Handle adding a predefined sensor to the server
     /// @return true if the configuration was successful
     bool Configure() override final;
+
+protected:
+    virtual std::function<void(DataFrame*)> SetupCallback(std::shared_ptr<Sensor> sensor) override;
 private:
     std::string* state_data_string = nullptr;
 };
@@ -123,8 +130,7 @@ class ReplicaDistributedServer : public DistributedServer {
   /// @param ip_address - The IP address to the server
   /// @param port - The port number for server command communication
   ReplicaDistributedServer(const Configuration& config,
-                           const std::string& ip_address, const int& port, 
-                           Event* sample_complete)
+                           const std::string& ip_address, const int& port)
       : DistributedServer(config, ip_address, port)
       {}
   /// @brief String of state data to send to the replica to update the physics
