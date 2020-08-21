@@ -6,6 +6,7 @@
 #include <exception>
 #include "JsonHelpers.h"
 #include "DataFrame.h"
+#include "Util.h"
 #include "config_types.h"
 
 class SensorBaseConfig
@@ -840,3 +841,100 @@ void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
     json_get(j, "debug_tags", config.debug_tags);
 }
 /// END Waypoint Sensor JSON parsing
+
+
+std::unique_ptr<SensorBaseConfig> inline sensorConfigFactory(const nlohmann::json& j)
+{
+    std::string sensorType;
+    json_get(j, "type", sensorType);
+
+    if (sensorType == "Camera") {
+        CameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<CameraConfig>(cfg);
+    }
+    else if (sensorType == "SemanticCamera") {
+        SemanticCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<SemanticCameraConfig>(cfg);
+    }
+    else if (sensorType == "Camera360") {
+        Camera360Config cfg;
+        from_json(j, cfg);
+        return make_unique<Camera360Config>(cfg);
+    }
+    else if (sensorType == "FisheyeCamera") {
+        FisheyeCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<FisheyeCameraConfig>(cfg);
+    }
+    else if (sensorType == "Lidar") {
+        LidarConfig cfg;
+        from_json(j, cfg);
+        return make_unique<LidarConfig>(cfg);
+    }
+    else if (sensorType == "SemanticLidar") {
+        SemanticLidarConfig cfg;
+        from_json(j, cfg);
+        return make_unique<SemanticLidarConfig>(cfg);
+    }
+    else if (sensorType == "Radar") {
+        RadarConfig cfg;
+        from_json(j, cfg);
+        return make_unique<RadarConfig>(cfg);
+    }
+    else if (sensorType == "Ultrasonic") {
+        UltrasonicConfig cfg;
+        from_json(j, cfg);
+        return make_unique<UltrasonicConfig>(cfg);
+    }
+    else if (sensorType == "RadarGroundTruth") {
+        return nullptr;
+    }
+    else if (sensorType == "GPS") {
+        GPSConfig cfg;
+        from_json(j, cfg);
+        return make_unique<GPSConfig>(cfg);
+    }
+    else if (sensorType == "IMU") {
+        IMUConfig cfg;
+        from_json(j, cfg);
+        return make_unique<IMUConfig>(cfg);
+    }
+    else if (sensorType == "State") {
+        StateConfig cfg;
+        from_json(j, cfg);
+        return make_unique<StateConfig>(cfg);
+    }
+    else if (sensorType == "Waypoint") {
+        WaypointConfig cfg;
+        from_json(j, cfg);
+        return make_unique<WaypointConfig>(cfg);
+    }
+    else if (sensorType == "RPM") {
+        RPMConfig cfg;
+        from_json(j, cfg);
+        return make_unique<RPMConfig>(cfg);
+    }
+    else if (sensorType == "Collision") {
+        CollisionConfig cfg;
+        from_json(j, cfg);
+        return make_unique<CollisionConfig>(cfg);
+    }
+    else if (sensorType == "DepthCamera") {
+        DepthCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<DepthCameraConfig>(cfg);
+    }
+    else if (sensorType == "OccupancyGrid") {
+        OccupancyGridConfig cfg;
+        from_json(j, cfg);
+        return make_unique<OccupancyGridConfig>(cfg);
+    }
+    else if (sensorType == "ViewportCamera") {
+        ViewportCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<ViewportCameraConfig>(cfg);
+    }
+    return nullptr;
+}

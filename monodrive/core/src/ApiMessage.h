@@ -85,6 +85,14 @@ public:
 		}
 	}
 
+	void asyncRead(tcp::socket& socket) {
+		asyncRead(socket, [](std::error_code ec, ApiMessage& message){
+			if(ec){
+				std::cerr << "ApiMessage::asyncWrite: Unable to write message. Error code: " << ec << std::endl;
+			}
+		});
+	}
+
 	template<typename ReadHandler>
 	void asyncRead(tcp::socket& socket, ReadHandler handler)
 	{
@@ -141,6 +149,14 @@ public:
 			});
 	}
 
+	void asyncWrite(tcp::socket& socket) {
+		asyncWrite(socket, [](std::error_code ec, ApiMessage& message){
+			if(ec){
+				std::cerr << "ApiMessage::asyncWrite: Unable to write message. Error code: " << ec << std::endl;
+			}
+		});
+	}
+
 	template<typename WriteHandler>
 	void asyncWrite(tcp::socket& socket, WriteHandler handler)
 	{
@@ -148,7 +164,7 @@ public:
 			std::string data = serialize().dump();
 			// std::cout << "ApiMessage::asyncWrite: " << data << std::endl;
 
-			uint32_t length = header_length + data.size();
+			uint32_t length = uint32_t(header_length + data.size());
 			sendBuffer.resize(length);
 			sendBuffer.writeInt(CONTROL_HEADER);
 			sendBuffer.writeInt(length);

@@ -44,7 +44,8 @@ bool Sensor::configure()
 	}
 	if (!startListening())
 	{
-		return false;
+		// If streaming wasn't enabled, the configuration is still successful
+		return !config->enable_streaming;
 	}
 	return startSampleLoop();
 }

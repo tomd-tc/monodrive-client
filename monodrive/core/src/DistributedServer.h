@@ -1,4 +1,4 @@
- #pragma once
+#pragma once
 
 #include <vector>
 #include <set>
@@ -16,104 +16,122 @@ namespace distributed_server {
 /// Global static for this class so nobody has any ports that clash
 static std::set<int> kServerReservedPorts;
 
-/// Servers are either the primary controller or the replica runners
-enum kServerType {
-    PRIMARY = 0,
-    REPLICA
+class Event
+{
+public:
+    inline Event(int count = 1) :
+        event_count(count), 
+        event_number(count) 
+    {}
+
+    inline void Wait() const {
+        std::unique_lock< std::mutex > lock(mutex);
+        condition.wait(lock,[&]()->bool{ return event_count > 0; });
+    }
+
+    inline bool Notify() {
+        bool signalled;
+        mutex.lock();
+        event_count--;
+        signalled = event_count <= 0;
+        mutex.unlock();
+
+        if (event_count <= 0) {
+            condition.notify_all();
+        }
+        return signalled;
+    }
+	
+    inline void Reset() {
+        mutex.lock();
+        event_count = event_number;
+        mutex.unlock();
+    }
+
+    inline bool HasPending() const { return event_count > 0; }
+
+private:
+    int event_count;
+    int event_number;
+    mutable std::mutex mutex;
+    mutable std::condition_variable condition;
 };
 
-/// Available sensor types for distributed server testing
-enum kSensorType {
-    BINARY_STATE = 0,
-    STATE,
-    VIEWPORT,
-    RADAR,
-    LIDAR,
-    IMU,
-    WAYPOINT
-};
-
-/// The primary server needs a scenario file for closed loop mode
-static const Configuration kPrimaryConfig(
-    "examples/config/simulator_straightaway.json",
-    "examples/config/weather.json",
-    "examples/config/scenario_multi_vehicle_straightaway.json");
-/// The replica servers just need to be forced into replay mode
-static const Configuration kReplicaConfig(
-    "examples/config/simulator_straightaway_replay.json",
-    "examples/config/weather.json", 
-    "examples/config/scenario.json");
-
-/// @class A class for managing benchmarking on distributed servers
+/// @class Base class for managing a remote Simulator instance
 class DistributedServer {
 public:
     /// @brief Constructor
+    /// @param config - The set of configurations to use with the server
     /// @param ip_address - The IP address to the server
     /// @param port - The port number for server command communication
-    /// @param server_type - Either the primary or replica server
-    DistributedServer(const std::string& ip_address, const int& port,
-                    const kServerType& server_type);
-    /// @brief Copy constructor
-    /// @param rhs - The server to copy
-    DistributedServer(const DistributedServer& rhs);
-    /// @brief Destructor
-    ~DistributedServer();
-    /// @brief Assignment overload
-    /// @param rhs - The server to copy
-    /// @return The server to copy to
-    DistributedServer& operator=(const DistributedServer& rhs) = default;
+    DistributedServer(const Configuration& config,
+                      const std::string& ip_address,
+                      const int& port);
+    
+    virtual bool LoadSensors();
     /// @brief Configure the specified sensors for the server
-    /// @param sensor_types - A vector of kSensorTypes to run on this server
     /// @return true if all sensors were successfully configured
-    bool Configure(const std::vector<kSensorType>& sensor_types);
-    bool Configure();
-    /// @brief Sample the sensors on this server
-    /// @param state_data - If this is a primary server this is populated with the
-    /// current state data from the primary server. If this is a replica then the
-    /// state data will be sent to server for update.
-    /// return true if the sampling was successful
-    /// @param async - If true, then this call will be non-blocking. Default is
-    /// false.
-    bool Sample(/*std::string* state_data,*/ bool async=false);
+    virtual bool Configure();
+    /// @brief Sample the sensors on this server. Pure virtual.
+    /// @param state_data - The state data to process during the sample
+    /// @return true if the sample was successful
+    virtual bool Sample(std::string* state_data) = 0;
     /// @brief Determine if this server is still sampling sensors
     /// @return true if a sample is still in progress
-    bool IsSampling();
+    virtual bool IsSampling();
 
-    /// @brief Handle adding a predefined sensor to the server
-    /// @param sensor_type - The sensor to add
-    bool AddSensor(kSensorType sensor_type, std::function<void(DataFrame*)> callback = nullptr);
+    Event* sample_complete = nullptr;
 
-private:
-    /// @brief The callback that will handle incoming state data for
-    /// primary servers.
-    /// @param frame - The incoming state data frame
-    //void StateSensorCallback(DataFrame* frame);
-    /// @brief The main worker thread for triggering sensor samples
-    void SampleThread();
-
-    /// The array of sensors that is configured for this server
-    std::vector<std::shared_ptr<Sensor>> sensors;
+ protected:
     /// A pointer to the server object
     Simulator* sim = nullptr;
-    /// The current type of server
-    kServerType server_type;
-    /// Flag to communicate if state data has been received or not
-//    bool state_sensor_data_updated = false;
-    /// The pointer to the current set of state data
-//    std::string* state_data_string = nullptr;
-    /// Condition variable to signal that a sample should occur
-    std::condition_variable sample_trigger;
-    /// Mutex for the sample thread's trigger
-    std::mutex sample_mutex;
-    /// True if the server is ready for another sample
-    bool ready_to_sample{false};
-    /// True if the current sample has been completed
-    bool sample_complete{false};
-    /// Mutex to wait for a non-async sample to complete
-    std::mutex sample_complete_mutex;
-    /// Thread that performs a sample on this server
-    std::thread sample_thread;
-    /// Condition that we are currently connected to a server
-    bool connected{true};
+    /// The array of sensors that is configured for this server
+    std::vector<std::shared_ptr<Sensor>> sensors;
+    /// @brief The set of configuration items for this server
+    Configuration server_config;
+    /// @brief Flag that is set when a sample send is completed
+//    std::atomic<bool> sample_complete;
  };
+
+/// @class Class for managing a remote Simulator that collects state data
+class PrimaryDistributedServer : public DistributedServer {
+ public:
+    /// @brief Constructor
+    /// @param config - The set of configurations to use with the server
+    /// @param ip_address - The IP address to the server
+    /// @param port - The port number for server command communication
+    PrimaryDistributedServer(const Configuration& config,
+                            const std::string& ip_address, const int& port)
+        : DistributedServer(config, ip_address, port) {}
+    /// @brief String that will be populated with the state data when this
+    /// function returns. Must be instantiated.
+    /// @param state_data - The state data to process during the sample
+    /// @return true if the sample call was successful
+    bool Sample(std::string* state_data) final;
+    /// @brief Handle adding a predefined sensor to the server
+    /// @return true if the configuration was successful
+    bool Configure() override final;
+private:
+    std::string* state_data_string = nullptr;
+};
+
+/// @class Class for managing a remote Simulator that collects state data
+class ReplicaDistributedServer : public DistributedServer {
+ public:
+  /// @brief Constructor
+  /// @param config - The set of configurations to use with the server
+  /// @param ip_address - The IP address to the server
+  /// @param port - The port number for server command communication
+  ReplicaDistributedServer(const Configuration& config,
+                           const std::string& ip_address, const int& port, 
+                           Event* sample_complete)
+      : DistributedServer(config, ip_address, port)
+      {}
+  /// @brief String of state data to send to the replica to update the physics
+  /// state of the server 
+  /// @param state_data - The state data to process during the sample
+  /// @return true if the sample call was successful
+  bool Sample(std::string* state_data) final;
+ private:
+};
 }
