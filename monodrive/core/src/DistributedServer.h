@@ -38,12 +38,17 @@ public:
  /// @brief Determine if this server is still sampling sensors
  /// @return true if a sample is still in progress
  virtual bool isSampling();
+ /// @brief Send command to server and block until response
+ virtual bool sendCommand(ApiMessage message, nlohmann::json* response=nullptr);
+ /// @brief Send command to server and return immediately
+ virtual bool sendCommandAsync(ApiMessage message, nlohmann::json* response=nullptr);
+
+ /// The array of sensors that is configured for this server
+ std::vector<std::shared_ptr<Sensor>> sensors;
 
  protected:
   /// A pointer to the server object
   Simulator* sim = nullptr;
-  /// The array of sensors that is configured for this server
-  std::vector<std::shared_ptr<Sensor>> sensors;
   /// @brief The set of configuration items for this server
   Configuration serverConfig;
   /// @brief Flag that is set when a sample send is completed

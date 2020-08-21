@@ -39,6 +39,14 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server) {
       server->sample(&SHARED_STATE_DATA);
     }
 
+    // apply controls
+    EgoControlConfig ego_control_config;
+    ego_control_config.forward_amount = 0.3f;
+    ego_control_config.right_amount = 0.0f;
+    ego_control_config.brake_amount = 0.0f;
+    ego_control_config.drive_mode = 1;
+    server->sendCommandAsync(ego_control_config.message());
+
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
         control_start_time;

@@ -79,6 +79,14 @@ bool DistributedServer::isSampling() {
          sim->sampleInProgress(sensors);
 }
 
+bool DistributedServer::sendCommand(ApiMessage message, nlohmann::json* response) {
+  return sim->sendCommand(message, response);
+}
+
+bool DistributedServer::sendCommandAsync(ApiMessage message, nlohmann::json* response) {
+  return sim->sendCommandAsync(message, response);
+}
+
 void PrimaryDistributedServer::stateSensorCallback(DataFrame* frame) {
   // Grab the state data and signal that its available
   if (stateDataString != nullptr) {
