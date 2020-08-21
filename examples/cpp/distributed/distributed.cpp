@@ -13,7 +13,6 @@
 #include "DistributedServer.h"
 #include "sensor_config.h"
 
-namespace ds = distributed_server;
 
 // The shared state data object that the primary will populate and the replicas
 // will use
@@ -25,7 +24,7 @@ std::string SHARED_STATE_DATA_BUFFER("");
 std::mutex STATE_DATA_MUTEX;
 
 
-void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -56,7 +55,7 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
 }
 
 void ReplicaThread(
-    std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> servers) {
+    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -122,12 +121,12 @@ int main(int argc, char** argv) {
       "examples/cpp/distributed/replica_radar_sensors.json");
 
   // Set up all the server
-  auto primary_server = std::make_shared<ds::PrimaryDistributedServer>(
+  auto primary_server = std::make_shared<PrimaryDistributedServer>(
       primary_config, "127.0.0.1", 8999);
-  std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> replica_servers = {
-      std::make_shared<ds::ReplicaDistributedServer>(replica_radar_config,
+  std::vector<std::shared_ptr<ReplicaDistributedServer>> replica_servers = {
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                      "192.168.2.3", 8999),
-      std::make_shared<ds::ReplicaDistributedServer>(replica_lidar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
                                                      "192.168.2.3", 9000),
   };
 

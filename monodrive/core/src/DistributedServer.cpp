@@ -1,8 +1,8 @@
 #include <functional>
 
 #include "DistributedServer.h"
+#include "Util.h"
 
-using namespace distributed_server;
 
 DistributedServer::DistributedServer(const Configuration& config,
                                      const std::string& ipAddress,
@@ -123,7 +123,7 @@ bool PrimaryDistributedServer::configure() {
   sConfig.include_obb = false;
   sConfig.debug_drawing = false;
   sensors.emplace_back(
-      std::make_shared<Sensor>(std::make_unique<StateConfig>(sConfig), false));
+      std::make_shared<Sensor>(make_unique<StateConfig>(sConfig), false));
   sensors.back()->sampleCallback =
       std::bind(&PrimaryDistributedServer::stateSensorCallback, this,
                 std::placeholders::_1);

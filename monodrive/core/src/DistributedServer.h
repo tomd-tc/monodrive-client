@@ -11,7 +11,6 @@
 #include "Simulator.h"
 #include "DataFrame.h"
 
-namespace distributed_server {
 
 /// Global static for this class so nobody has any ports that clash
 static std::set<int> kServerReservedPorts;
@@ -25,10 +24,10 @@ public:
  /// @param port - The port number for server command communication
  /// @param simulatorMode - The desired simulation (e.g. replay, closed loop,
  /// etc.) for this server
- DistributedServer::DistributedServer(const Configuration& config,
-                                      const std::string& ipAddress,
-                                      const int& port, 
-                                      const int& simulationMode);
+ DistributedServer(const Configuration& config,
+                   const std::string& ipAddress,
+                   const int& port,
+                   const int& simulationMode);
  /// @brief Configure the specified sensors for the server
  /// @return true if all sensors were successfully configured
  virtual bool configure();
@@ -78,7 +77,7 @@ class PrimaryDistributedServer : public DistributedServer {
   /// The pointer to the current set of state data
   std::string* stateDataString = nullptr;
   /// Flag to communicate if state data has been received or not
-  std::atomic<bool> stateSensorDataUpdated = false;
+  std::atomic<bool> stateSensorDataUpdated{false};
 };
 
 /// @class Class for managing a remote Simulator that collects state data
@@ -99,4 +98,3 @@ class ReplicaDistributedServer : public DistributedServer {
   bool sample(std::string* stateData) final;
  private:
 };
-}
