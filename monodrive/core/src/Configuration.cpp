@@ -56,12 +56,13 @@ nlohmann::json Configuration::load(const std::string& path)
 
 
 
-void Configuration::loadSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
+bool Configuration::loadSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
 {
+    bool success = true;
     if (!sensorsConfig.is_array())
     {
         std::cerr << "Cannot load sensors from invalid JSON array." << std::endl;
-        return;
+        return false;
     }
     for (auto& s : sensorsConfig)
     {
@@ -69,6 +70,7 @@ void Configuration::loadSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
         if (!cfg)
         {
             std::cerr << "Could not load sensor config " << s.dump() << std::endl;
+            success = false;
             continue;
         }
 
@@ -77,8 +79,10 @@ void Configuration::loadSensors(std::vector<std::shared_ptr<Sensor>>& sensors)
         json_get(s, "server_ip", serverIP);
         json_get(s, "server_port", serverPort);
         cfg->server_ip = serverIP;
-        cfg->server_port;
+        cfg->server_port = serverPort;
 
         sensors.push_back(std::make_shared<Sensor>(std::move(cfg)));
     }
+
+    return success;
 }
