@@ -20,7 +20,6 @@
 #include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem;
-namespace ds = distributed_server;
 
 // The shared state data object that the primary will populate and the replicas
 // will use
@@ -44,7 +43,7 @@ void run_monodrive(float fps)
   }
 }
 
-void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server, ds::Event* replicas_ready_event) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* replicasReadyEvent) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -56,7 +55,7 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server, ds::Eve
 
     {
       std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
-      server->Sample(&SHARED_STATE_DATA);
+      server->sample(&SHARED_STATE_DATA);
     }
 
     control_time +=
@@ -71,14 +70,16 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server, ds::Eve
       frame_count = 0;
       control_time = 0;
     }
-    replicas_ready_event->Wait();
+
+    // wait for replicas to finish
+    replicasReadyEvent->wait();
   }
 }
 
 void ReplicaThread(
-  std::shared_ptr<ds::PrimaryDistributedServer> master,
-    std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> servers, 
-    ds::Event* replicas_ready_event) {
+  std::shared_ptr<PrimaryDistributedServer> primary,
+    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers, 
+    Event* replicasReadyEvent) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -97,20 +98,21 @@ void ReplicaThread(
     STATE_DATA_MUTEX.unlock();
 
     std::cout << "replicas waiting" << std::endl;
-    master->sample_complete->Wait();
+    primary->sampleComplete->wait();
 
     if (SHARED_STATE_DATA_BUFFER == "") {
       continue;
     }
 
     for (auto& server : servers) {
-      server->Sample(&SHARED_STATE_DATA_BUFFER);
+      server->sample(&SHARED_STATE_DATA_BUFFER);
     }
 
     for (auto& server : servers) {
-      while (server->IsSampling());
+      while (server->isSampling());
 
-      replicas_ready_event->Notify();
+      // signal complete
+      replicasReadyEvent->notify();
     }
 
     sample_time +=
@@ -154,18 +156,18 @@ int main(int argc, char **argv)
       "examples/cpp/distributed/replica_radar_sensors.json");
 
   // Set up all the server
-  auto primary_server = std::make_shared<ds::PrimaryDistributedServer>(
+  auto primaryServer = std::make_shared<PrimaryDistributedServer>(
       primary_config, "127.0.0.1", 8999);
-  std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> replica_servers = {
-      std::make_shared<ds::ReplicaDistributedServer>(replica_radar_config,
+  std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                      "192.168.86.41", 8999),
-      std::make_shared<ds::ReplicaDistributedServer>(replica_lidar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
                                                      "192.168.86.41", 9000),
   };
 
-  primary_server->LoadSensors();
+  primaryServer->loadSensors();
 
-  for (auto& sensor : primary_server->sensors) {
+  for (auto& sensor : primaryServer->sensors) {
     if (sensor->config->type == "BinaryState" || sensor->config->type == "State") {
       std::shared_ptr<ros::NodeHandle> node_handle_state = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
       ros::Publisher pub_state = node_handle_state->advertise<monodrive_msgs::StateSensor>("/monodrive/state", 1);
@@ -196,29 +198,29 @@ int main(int argc, char **argv)
   }
 
   // Configure the primary 
-  if (!primary_server->Configure()){
+  if (!primaryServer->configure()){
     std::cerr << "Unable to configure primary server!" << std::endl;
     return -1;
   }
   // 
-  for(auto& server : replica_servers) {
-    if(!server->Configure()){
+  for(auto& server : replicaServers) {
+    if(!server->configure()){
       std::cout << "Unable to configure replica server!" << std::endl;
       return -1;
     }
   }
 
   // Bench marking stuff
-  ds::Event* replicas_ready_event = new ds::Event(replica_servers.size());
-  std::thread replica_thread(ReplicaThread, primary_server, replica_servers, replicas_ready_event);
-  std::thread primary_thread(PrimaryThread, primary_server, replicas_ready_event);
+  Event* replicasReadyEvent = new Event(replicaServers.size());
+  std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
+  std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
 
   float fps = 100.f;
   run_monodrive(fps);
 
-  primary_thread.join();
-  replica_thread.join();
+  primaryThread.join();
+  replicaThread.join();
 
-  delete replicas_ready_event;
+  delete replicasReadyEvent;
   return 0;
 }

@@ -11,7 +11,6 @@
 #include "Simulator.h"
 #include "DataFrame.h"
 
-namespace distributed_server {
 
 /// Global static for this class so nobody has any ports that clash
 static std::set<int> kServerReservedPorts;
@@ -20,40 +19,40 @@ class Event
 {
 public:
     inline Event(int count = 1) :
-        event_count(count), 
-        event_number(count) 
+        eventCount(count), 
+        eventNumber(count) 
     {}
 
-    inline void Wait() const {
+    inline void wait() const {
         std::unique_lock< std::mutex > lock(mutex);
-        condition.wait(lock,[&]()->bool{ return event_count > 0; });
+        condition.wait(lock,[&]()->bool{ return eventCount > 0; });
     }
 
-    inline bool Notify() {
+    inline bool notify() {
         bool signalled;
         mutex.lock();
-        event_count--;
-        signalled = event_count <= 0;
+        eventCount--;
+        signalled = eventCount <= 0;
         mutex.unlock();
 
-        if (event_count <= 0) {
+        if (eventCount <= 0) {
             condition.notify_all();
-            Reset();
+            reset();
         }
         return signalled;
     }
 	
-    inline void Reset() {
+    inline void reset() {
         mutex.lock();
-        event_count = event_number;
+        eventCount = eventNumber;
         mutex.unlock();
     }
 
-    inline bool HasPending() const { return event_count > 0; }
+    inline bool hasPending() const { return eventCount > 0; }
 
 private:
-    int event_count;
-    int event_number;
+    int eventCount;
+    int eventNumber;
     mutable std::mutex mutex;
     mutable std::condition_variable condition;
 };
@@ -67,38 +66,43 @@ public:
     /// @param port - The port number for server command communication
     DistributedServer(const Configuration& config,
                       const std::string& ip_address,
-                      const int& port);
+                      const int& port,
+                      const int& simulationMode);
                       
     virtual ~DistributedServer() {
-        delete sample_complete;
+        delete sampleComplete;
     }
     
-    virtual bool LoadSensors();
+    virtual bool loadSensors();
     /// @brief Configure the specified sensors for the server
     /// @return true if all sensors were successfully configured
-    virtual bool Configure();
+    virtual bool configure();
     /// @brief Sample the sensors on this server. Pure virtual.
-    /// @param state_data - The state data to process during the sample
+    /// @param stateData - The state data to process during the sample
     /// @return true if the sample was successful
-    virtual bool Sample(std::string* state_data) = 0;
+    virtual bool sample(std::string* stateData) = 0;
     /// @brief Determine if this server is still sampling sensors
     /// @return true if a sample is still in progress
-    virtual bool IsSampling();
+    virtual bool isSampling();
+    /// @brief Send command to server and block until response
+    virtual bool sendCommand(ApiMessage message, nlohmann::json* response=nullptr);
+    /// @brief Send command to server and return immediately
+    virtual bool sendCommandAsync(ApiMessage message, nlohmann::json* response=nullptr);
 
-    Event* sample_complete = nullptr;
+
+    /// @brief Event that triggers when a sample send is completed
+    Event* sampleComplete = nullptr;
 
     /// The array of sensors that is configured for this server
     std::vector<std::shared_ptr<Sensor>> sensors;
 
  protected:
-    virtual std::function<void(DataFrame*)> SetupCallback(std::shared_ptr<Sensor> sensor);
+    virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor);
 
     /// A pointer to the server object
     Simulator* sim = nullptr;
     /// @brief The set of configuration items for this server
-    Configuration server_config;
-    /// @brief Flag that is set when a sample send is completed
-//    std::atomic<bool> sample_complete;
+    Configuration serverConfig;
  };
 
 /// @class Class for managing a remote Simulator that collects state data
@@ -110,20 +114,20 @@ class PrimaryDistributedServer : public DistributedServer {
     /// @param port - The port number for server command communication
     PrimaryDistributedServer(const Configuration& config,
                             const std::string& ip_address, const int& port)
-        : DistributedServer(config, ip_address, port) {}
+        : DistributedServer(config, ip_address, port, 0) {}
     /// @brief String that will be populated with the state data when this
     /// function returns. Must be instantiated.
-    /// @param state_data - The state data to process during the sample
+    /// @param stateData - The state data to process during the sample
     /// @return true if the sample call was successful
-    bool Sample(std::string* state_data) final;
+    bool sample(std::string* stateData) final;
     /// @brief Handle adding a predefined sensor to the server
     /// @return true if the configuration was successful
-    bool Configure() override final;
+    bool configure() override final;
 
 protected:
-    virtual std::function<void(DataFrame*)> SetupCallback(std::shared_ptr<Sensor> sensor) override;
+    virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor) override;
 private:
-    std::string* state_data_string = nullptr;
+    std::string* stateDataString = nullptr;
 };
 
 /// @class Class for managing a remote Simulator that collects state data
@@ -131,17 +135,16 @@ class ReplicaDistributedServer : public DistributedServer {
  public:
   /// @brief Constructor
   /// @param config - The set of configurations to use with the server
-  /// @param ip_address - The IP address to the server
+  /// @param ipAddress - The IP address to the server
   /// @param port - The port number for server command communication
   ReplicaDistributedServer(const Configuration& config,
-                           const std::string& ip_address, const int& port)
-      : DistributedServer(config, ip_address, port)
+                           const std::string& ipAddress, const int& port)
+      : DistributedServer(config, ipAddress, port, 2)
       {}
   /// @brief String of state data to send to the replica to update the physics
   /// state of the server 
-  /// @param state_data - The state data to process during the sample
+  /// @param stateData - The state data to process during the sample
   /// @return true if the sample call was successful
-  bool Sample(std::string* state_data) final;
+  bool sample(std::string* stateData) final;
  private:
 };
-}

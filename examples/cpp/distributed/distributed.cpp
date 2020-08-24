@@ -13,7 +13,6 @@
 #include "DistributedServer.h"
 #include "sensor_config.h"
 
-namespace ds = distributed_server;
 
 // The shared state data object that the primary will populate and the replicas
 // will use
@@ -25,7 +24,7 @@ std::string SHARED_STATE_DATA_BUFFER("");
 std::mutex STATE_DATA_MUTEX;
 
 
-void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server, ds::Event* replicas_ready_event) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* replicasReadyEvent) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -37,8 +36,16 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server, ds::Eve
 
     {
       std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
-      server->Sample(&SHARED_STATE_DATA);
+      server->sample(&SHARED_STATE_DATA);
     }
+
+    // apply controls
+    EgoControlConfig ego_control_config;
+    ego_control_config.forward_amount = 0.3f;
+    ego_control_config.right_amount = 0.0f;
+    ego_control_config.brake_amount = 0.0f;
+    ego_control_config.drive_mode = 1;
+    server->sendCommandAsync(ego_control_config.message());
 
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -54,14 +61,14 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server, ds::Eve
     }
 
     // wait for replicas to finish
-    replicas_ready_event->Wait();
+    replicasReadyEvent->wait();
   }
 }
 
 void ReplicaThread(
-  std::shared_ptr<ds::PrimaryDistributedServer> master,
-    std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> servers,
-    ds::Event* replicas_ready_event) {
+  std::shared_ptr<PrimaryDistributedServer> primary,
+    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers,
+    Event* replicasReadyEvent) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -79,22 +86,22 @@ void ReplicaThread(
     std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
     STATE_DATA_MUTEX.unlock();
 
-    // wait for master
-    master->sample_complete->Wait();
+    // wait for primary
+    primary->sampleComplete->wait();
 
     if (SHARED_STATE_DATA_BUFFER == "") {
       continue;
     }
 
     for (auto& server : servers) {
-      server->Sample(&SHARED_STATE_DATA_BUFFER);
+      server->sample(&SHARED_STATE_DATA_BUFFER);
     }
 
     for (auto& server : servers) {
-      while (server->IsSampling());
+      while (server->isSampling());
 
       // signal complete
-      replicas_ready_event->Notify();
+      replicasReadyEvent->notify();
     }
 
     sample_time +=
@@ -116,53 +123,53 @@ void ReplicaThread(
 int main(int argc, char** argv) {
   /// The primary server needs a scenario file for closed loop mode
   Configuration primary_config(
-      "examples/cpp/distributed/simulator_straightaway.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json",
       "examples/config/scenario_multi_vehicle_straightaway.json",
       "examples/cpp/distributed/primary_sensors.json");
   /// The replica servers just need to be forced into replay mode
   Configuration replica_lidar_config(
-      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
       "examples/cpp/distributed/replica_lidar_sensors.json");
   Configuration replica_radar_config(
-      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
       "examples/cpp/distributed/replica_radar_sensors.json");
 
   // Set up all the server
-  auto primary_server = std::make_shared<ds::PrimaryDistributedServer>(
+  auto primaryServer = std::make_shared<PrimaryDistributedServer>(
       primary_config, "127.0.0.1", 8999);
-  std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> replica_servers = {
-      std::make_shared<ds::ReplicaDistributedServer>(replica_radar_config,
+  std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                      "192.168.86.41", 8999),
-      std::make_shared<ds::ReplicaDistributedServer>(replica_lidar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
                                                      "192.168.86.41", 9000),
   };
 
   // Configure the primary first
-  if (!primary_server->Configure()){
+  if (!primaryServer->configure()){
     std::cerr << "Unable to configure primary server!" << std::endl;
     return -1;
   }
   // 
-  for(auto& server : replica_servers) {
-    if(!server->Configure()){
+  for(auto& server : replicaServers) {
+    if(!server->configure()){
       std::cout << "Unable to configure replica server!" << std::endl;
       return -1;
     }
   }
 
   // Kick off the orchestration threads
-  ds::Event* replicas_ready_event = new ds::Event(replica_servers.size());
-  std::thread replica_thread(ReplicaThread, primary_server, replica_servers, replicas_ready_event);
-  std::thread primary_thread(PrimaryThread, primary_server, replicas_ready_event);
+  Event* replicasReadyEvent = new Event(replicaServers.size());
+  std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
+  std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
 
-  primary_thread.join();
-  replica_thread.join();
+  primaryThread.join();
+  replicaThread.join();
 
-  delete replicas_ready_event;
+  delete replicasReadyEvent;
   return 0;
 }
