@@ -24,6 +24,14 @@ namespace monodrive_msgs
             return result;
         }
 
+        static Vec3f ROSVector3ToVec3f(const geometry_msgs::Vector3& vec) {
+            Vec3f result;
+            result.x = vec.x;
+            result.y = vec.y;
+            result.z = vec.z;
+            return result;
+        }
+
         static geometry_msgs::Point Vec3fToROSPoint(const Vec3f& vec) {
             geometry_msgs::Point result;
             result.x = vec.x;
@@ -32,11 +40,11 @@ namespace monodrive_msgs
             return result;
         }
 
-        static Vec3f ROSVector3ToVec3f(const geometry_msgs::Vector3& vec) {
+        static Vec3f ROSPointToVec3f(const geometry_msgs::Point& point) {
             Vec3f result;
-            result.x = vec.x;
-            result.y = vec.y;
-            result.z = vec.z;
+            result.x = point.x;
+            result.y = point.y;
+            result.z = point.z;
             return result;
         }
 
@@ -76,6 +84,13 @@ namespace monodrive_msgs
             geometry_msgs::PoseWithCovariance result;
             result.pose.position = Vec3fToROSPoint(transform.position);
             result.pose.orientation = QuatToROSQuaternion(transform.orientation);
+            return result;
+        }
+
+        static ::Transform ROSPoseToTransform(const geometry_msgs::PoseWithCovariance& pose) {
+            ::Transform result;
+            result.position = ROSPointToVec3f(pose.pose.position);
+            result.orientation = ROSQuaternionToQuat(pose.pose.orientation);
             return result;
         }
 
@@ -170,6 +185,14 @@ namespace monodrive_msgs
             return result;
         }
 
+        static ::WheelState ROSWheelStateToWheelState(const monodrive_msgs::WheelState& wheelState) {
+            ::WheelState result;
+            result.id = wheelState.id;
+            result.speed = wheelState.speed;
+            result.pose = ROSTransformToTransform(wheelState.transform);
+            return result;
+        }
+
         static monodrive_msgs::OOBB OOBBToROSOOBB(const ::OOBB& oobb) {
             monodrive_msgs::OOBB result;
             result.name = oobb.name;
@@ -209,18 +232,19 @@ namespace monodrive_msgs
 
         static ::VehicleState ROSVehicleStateToVehicleState(const monodrive_msgs::VehicleState& vehicleState) {
             ::VehicleState result;
-            /*result.name = vehicleState.name;
-            result.pose = FromMonoDriveType(vehicleState.pose);
-            result.twist = FromMonoDriveType(vehicleState.twist);
-            result.tags = vehicleState.tags;
+            result.state.name = vehicleState.name;
+            result.state.odometry.pose = ROSPoseToTransform(vehicleState.pose);
+            result.state.odometry.linear_velocity = ROSVector3ToVec3f(vehicleState.twist.twist.linear);
+            result.state.odometry.angular_velocity = ROSVector3ToVec3f(vehicleState.twist.twist.angular);
+            result.state.tags = vehicleState.tags;
 
             for (auto& wheel : vehicleState.wheels) {
-                result.wheels.push_back(FromMonoDriveType(wheel);)
+                result.wheels.push_back(ROSWheelStateToWheelState(wheel));
             }
             
-            for (auto& oobb : oobbs) {
-                result.oobbs.push_back(FromMonoDriveType(oobb));
-            }*/
+            for (auto& oobb : vehicleState.oobbs) {
+                result.state.oobbs.push_back(ROSOOBBToOOBB(oobb));
+            }
             return result;
         }
 
