@@ -25,7 +25,7 @@ std::string SHARED_STATE_DATA_BUFFER("");
 std::mutex STATE_DATA_MUTEX;
 
 
-void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
+void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server, ds::Event* replicas_ready_event) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -52,12 +52,16 @@ void PrimaryThread(std::shared_ptr<ds::PrimaryDistributedServer> server) {
       frame_count = 0;
       control_time = 0;
     }
+
+    // wait for replicas to finish
+    replicas_ready_event->Wait();
   }
 }
 
 void ReplicaThread(
   std::shared_ptr<ds::PrimaryDistributedServer> master,
-    std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> servers) {
+    std::vector<std::shared_ptr<ds::ReplicaDistributedServer>> servers,
+    ds::Event* replicas_ready_event) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -75,6 +79,7 @@ void ReplicaThread(
     std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
     STATE_DATA_MUTEX.unlock();
 
+    // wait for master
     master->sample_complete->Wait();
 
     if (SHARED_STATE_DATA_BUFFER == "") {
@@ -87,6 +92,9 @@ void ReplicaThread(
 
     for (auto& server : servers) {
       while (server->IsSampling());
+
+      // signal complete
+      replicas_ready_event->Notify();
     }
 
     sample_time +=
@@ -148,10 +156,13 @@ int main(int argc, char** argv) {
   }
 
   // Kick off the orchestration threads
-  std::thread primary_thread(PrimaryThread, primary_server);
-  std::thread replica_thread(ReplicaThread, primary_server, replica_servers);
+  ds::Event* replicas_ready_event = new ds::Event(replica_servers.size());
+  std::thread replica_thread(ReplicaThread, primary_server, replica_servers, replicas_ready_event);
+  std::thread primary_thread(PrimaryThread, primary_server, replicas_ready_event);
 
   primary_thread.join();
   replica_thread.join();
+
+  delete replicas_ready_event;
   return 0;
 }

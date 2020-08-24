@@ -68,6 +68,10 @@ public:
     DistributedServer(const Configuration& config,
                       const std::string& ip_address,
                       const int& port);
+                      
+    virtual ~DistributedServer() {
+        delete sample_complete;
+    }
     
     virtual bool LoadSensors();
     /// @brief Configure the specified sensors for the server
