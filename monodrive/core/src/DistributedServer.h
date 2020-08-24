@@ -15,19 +15,27 @@
 /// Global static for this class so nobody has any ports that clash
 static std::set<int> kServerReservedPorts;
 
+/// @class event class that uses std::condition_variable to 
+/// implement non-busy wait and count based notifications
 class Event
 {
 public:
+    /// @brief constructor
+    /// @param count - the number of times notify needs to get called in order to trigger event
     inline Event(int count = 1) :
         eventCount(count), 
         eventNumber(count) 
     {}
 
+    /// @brief blocks the current thread until eventCount is zero
     inline void wait() const {
         std::unique_lock< std::mutex > lock(mutex);
         condition.wait(lock,[&]()->bool{ return eventCount > 0; });
     }
 
+    /// @brief decrements eventCount. If eventCount becomes zero, the event is
+    /// triggered and any threads waiting on the condition get signaled.
+    /// When the event is triggered, eventCount is reset to the original value
     inline bool notify() {
         bool signalled;
         mutex.lock();
@@ -42,18 +50,24 @@ public:
         return signalled;
     }
 	
+    /// @brief resets the event to initial state
     inline void reset() {
         mutex.lock();
         eventCount = eventNumber;
         mutex.unlock();
     }
 
+    /// @brief returns true if event has pending items before it triggers
     inline bool hasPending() const { return eventCount > 0; }
 
 private:
+    /// the number of times notify needs to be called to trigger the event
     int eventCount;
+    /// the value used to reset the event to initial state
     int eventNumber;
+    /// mutex to synchronize access to state and to wait on condition variable
     mutable std::mutex mutex;
+    /// the condition variable used for non-busy waits
     mutable std::condition_variable condition;
 };
 
@@ -69,10 +83,13 @@ public:
                       const int& port,
                       const int& simulationMode);
                       
+    /// @brief destructor
     virtual ~DistributedServer() {
         delete sampleComplete;
     }
     
+    /// @brief create the specified sensors for the server
+    /// @return true if all sensors were created successfully
     virtual bool loadSensors();
     /// @brief Configure the specified sensors for the server
     /// @return true if all sensors were successfully configured
@@ -97,6 +114,10 @@ public:
     std::vector<std::shared_ptr<Sensor>> sensors;
 
  protected:
+    /// @brief set up the sensor callback for the given sensor.
+    /// @return the callback for the sensor that calls sampleComplete->notify() 
+    /// to signal sample completion, and to forward the sensor data to any
+    /// callback registered with the sensor
     virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor);
 
     /// A pointer to the server object
