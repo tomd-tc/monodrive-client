@@ -101,16 +101,13 @@ bool DistributedServer::IsSampling() {
 }
 
 std::function<void(DataFrame*)> DistributedServer::SetupCallback(std::shared_ptr<Sensor> sensor) {
-  std::cout << "setup callback for " << sensor->config->type << "\n" << (sensor->sampleCallback ? "func" : "no func") << std::endl;
   auto sensorCallback = sensor->sampleCallback;
   return [this, sensor, sensorCallback](DataFrame* frame){
-    std::cout << "sensor receive: " << sensor->config->type << std::endl;
-    sample_complete->Notify();
     if (sensorCallback) {
       sensorCallback(frame);
-    }else {
-              std::cout << "sensor callback is empty" << std::endl;
-            }
+    } 
+    
+    sample_complete->Notify();
   };
 }
 
@@ -182,18 +179,15 @@ std::function<void(DataFrame*)> PrimaryDistributedServer::SetupCallback(std::sha
   auto state_config = static_cast<StateConfig*>(sensor->config.get());
   if (state_config->send_binary_data) {
     auto sensorCallback = sensor->sampleCallback;
-    std::cout << "setup callback for " << sensor->config->type << "\n" << (sensor->sampleCallback ? "func" : "no func") << std::endl;
     return [this, sensorCallback](DataFrame* frame) {
-//            std::cout << "state sensor receive" << std::endl;
             if (state_data_string != nullptr) {
               *state_data_string = static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
             }
 
             if (sensorCallback) {
               sensorCallback(frame);
-            } else {
-              std::cout << "sensor callback is empty" << std::endl;
-            }
+            } 
+            
             sample_complete->Notify();
           };
   }

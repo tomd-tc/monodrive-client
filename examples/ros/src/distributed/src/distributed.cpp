@@ -140,7 +140,7 @@ int main(int argc, char **argv)
       "examples/cpp/distributed/simulator_straightaway.json",
       "examples/config/weather.json",
       "examples/config/scenario_multi_vehicle_straightaway.json",
-      "examples/cpp/distributed/primary_sensors.json");
+      "examples/ros/src/distributed/config/primary_sensors.json");
   /// The replica servers just need to be forced into replay mode
   Configuration replica_lidar_config(
       "examples/cpp/distributed/simulator_straightaway_replay.json",
@@ -172,7 +172,6 @@ int main(int argc, char **argv)
       sensor->sampleCallback = [pub_state](DataFrame *frame) {
         StateFrame data = *static_cast<StateFrame*>(frame);
         monodrive_msgs::StateSensor msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
-        std::cout << "publishing state" << std::endl;
         pub_state.publish(msg);
       };
     } 
@@ -182,7 +181,6 @@ int main(int argc, char **argv)
       sensor->sampleCallback = [pub_imu](DataFrame *frame) {
         ImuFrame data = *static_cast<ImuFrame*>(frame);
         sensor_msgs::Imu msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
-        std::cout << "publishing imu" << std::endl;
         pub_imu.publish(msg);
       };
     }
@@ -192,7 +190,6 @@ int main(int argc, char **argv)
       sensor->sampleCallback = [pub_waypoint](DataFrame *frame) {
         WaypointFrame data = *static_cast<WaypointFrame*>(frame);
         monodrive_msgs::WaypointSensor msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
-        std::cout << "publishing waypoint" << std::endl;
         pub_waypoint.publish(msg);
       };
     }
