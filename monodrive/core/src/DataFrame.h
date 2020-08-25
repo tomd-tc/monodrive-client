@@ -35,6 +35,13 @@ public:
 	virtual ~DataFrame() {}
 };
 
+class MONODRIVECORE_API BinaryDataFrame : public DataFrame{
+public:
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+    ByteBuffer data_frame;
+};
+
 class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;

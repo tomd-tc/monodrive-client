@@ -30,6 +30,7 @@ add_executable(config_export config_export.cpp)
 add_executable(autopilot_control autopilot_control.cpp)
 add_executable(camera_360 camera_360.cpp)
 add_executable(fisheye_camera fisheye_camera.cpp)
+add_executable(sensors_from_json sensors_from_json.cpp)
 
 # link monodrive client
 target_link_libraries(camera_sensor monodrive)
@@ -56,6 +57,7 @@ target_link_libraries(config_export monodrive)
 target_link_libraries(autopilot_control monodrive)
 target_link_libraries(camera_360 monodrive)
 target_link_libraries(fisheye_camera monodrive)
+target_link_libraries(sensors_from_json monodrive)
 
 # copy monodrive dll to runtime directory
 if(MSVC)
@@ -90,6 +92,7 @@ if(MSVC)
   add_dependencies(waypoint_sensor monodrive_lib_copy_dev)
   add_dependencies(camera_360 monodrive_lib_copy_dev)
   add_dependencies(fisheye_camera monodrive_lib_copy_dev)
+  add_dependencies(sensors_from_json monodrive_lib_copy_dev)
 endif(MSVC)
 
 # eigen
@@ -142,6 +145,10 @@ target_link_libraries(camera_360 ${OpenCV_LIBRARIES})
 target_include_directories(fisheye_camera PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(fisheye_camera ${OpenCV_LIBRARIES})
 target_link_libraries(fisheye_camera ${OpenCV_LIBRARIES})
+
+target_include_directories(sensors_from_json PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(sensors_from_json ${OpenCV_LIBRARIES})
+target_link_libraries(sensors_from_json ${OpenCV_LIBRARIES})
 
 # filesystem
 target_link_libraries(config_export -lstdc++fs)
