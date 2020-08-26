@@ -110,6 +110,7 @@ public:
     int bandwidth{250000000};
     int max_radar_returns{500};
     int elements{8};
+    std::string fmcw{""};
     struct Transmitter
     {
         float peak_power{5.0f};
@@ -138,7 +139,7 @@ public:
         bool debug_frustum{false};
         bool debug_scan{false};
         bool debug_rescan{false};
-    }sbr;   
+    }sbr;
     virtual DataFrame* DataFrameFactory() override{
         return new RadarFrame(send_radar_cube, num_sweeps, num_samples_per_sweep, elements);
     }
