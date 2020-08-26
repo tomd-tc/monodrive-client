@@ -282,8 +282,8 @@ class MONODRIVECORE_API UltrasonicFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
-    UltrasonicFrame(bool send_ultrasonic_raw, int numSamples) 
-        : bSendUltrasonicRaw(send_ultrasonic_raw),
+    UltrasonicFrame(bool bSendProcessed, int numSamples)
+        : bSendProcessed(bSendProcessed),
         currentFrameIndex(0)
     {
         ultrasonicTargetListFrame = new UltrasonicTargetListFrame();
@@ -294,14 +294,14 @@ public:
         delete ultrasonicRawFrame;
     }
     virtual bool parse_complete() const{
-        if(!bSendUltrasonicRaw or currentFrameIndex % 2 == 0)
+        if(!bSendProcessed or currentFrameIndex % 2 == 0)
             return true;
         else
             return false;
     }
     UltrasonicTargetListFrame* ultrasonicTargetListFrame;
     UltrasonicRawFrame* ultrasonicRawFrame;
-    bool bSendUltrasonicRaw;
+    bool bSendProcessed;
     int currentFrameIndex;
 };
 
