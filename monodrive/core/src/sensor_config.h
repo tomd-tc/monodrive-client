@@ -596,7 +596,7 @@ void inline from_json(const nlohmann::json& j, RadarConfig& config)
     json_get(j, "sbr", config.sbr);
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter& config)
 {
     json_get(j, "peak_power", config.peak_power);
     json_get(j, "aperture", config.aperture);
@@ -611,7 +611,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
      };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Receiver& config)
 {
     json_get(j, "gain", config.gain);
     json_get(j, "aperture", config.aperture);
@@ -630,7 +630,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
     };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
+void inline from_json(const nlohmann::json& j, RadarConfig::SBR& config)
 {
     json_get(j, "long_range_scan_distance", config.long_range_scan_distance);
     json_get(j, "short_range_scan_distance",config.short_range_scan_distance);
@@ -668,7 +668,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig& config)
 /// END Radar Config JSON Parsing
 
 /// Ultrasonic Config JSON Parsing
-void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
+void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR& config) {
     j = nlohmann::json{
         {"scan_distance", config.scan_distance},
         {"azimuth_fov", config.azimuth_fov},
@@ -680,7 +680,7 @@ void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
         {"debug_rescan", config.debug_rescan}
     };
 }
-void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR config) {
+void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR& config) {
     json_get(j, "scan_distance", config.scan_distance);
     json_get(j, "azimuth_fov", config.azimuth_fov);
     json_get(j, "elevation_fov", config.elevation_fov);
