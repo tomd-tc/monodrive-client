@@ -406,7 +406,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 }
 void inline from_json(const nlohmann::json& j, SensorBaseConfig::ROS& ros)
 {
-    json_get(j,"publis_to_ross", ros.publish_to_ros);
+    json_get(j,"publish_to_ros", ros.publish_to_ros);
     json_get(j,"advertise", ros.advertise);
     json_get(j,"topic", ros.topic);
     json_get(j,"message_type", ros.message_type);
@@ -545,7 +545,7 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
 
 void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
 {
-    SensorBaseConfig* base = static_cast<CameraConfig*>(&config);
+    CameraConfig* base = static_cast<CameraConfig*>(&config);
     from_json(j, *base);
 
     json_get(j, "use_vehicle_hud", config.enable_hud);
