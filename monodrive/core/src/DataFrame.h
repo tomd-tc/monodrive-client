@@ -35,6 +35,13 @@ public:
 	virtual ~DataFrame() {}
 };
 
+class MONODRIVECORE_API BinaryDataFrame : public DataFrame{
+public:
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+    ByteBuffer data_frame;
+};
+
 class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
@@ -224,6 +231,13 @@ public:
     CameraAnnotationFrame* annotationFrame;
     bool bHasAnnotation;
     int currentFrameIndex;
+};
+
+class MONODRIVECORE_API CubeCameraFrame : public CameraFrame{
+public:
+    CubeCameraFrame(int width, int height) : CameraFrame(width, height, 4, 1, false)
+    {
+    }
 };
 
 class MONODRIVECORE_API LidarFrame : public DataFrame {

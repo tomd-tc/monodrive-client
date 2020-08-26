@@ -36,6 +36,28 @@ void from_json(const nlohmann::json& j, FRotator& v) {
 	}
 }
 
+void to_json(nlohmann::json& j, const FIntPoint& v)
+{
+	j = nlohmann::json{ 
+		{ "x", v.X },
+		{ "y", v.Y }
+	};
+}
+
+void from_json(const nlohmann::json& j, FIntPoint& v)
+{
+	if (j.find("x") != j.end()) {
+		v.X = j.at("x").get<int>();
+		v.Y = j.at("y").get<int>();
+	}
+	else {
+		auto vec = j.get<std::vector<float>>();
+		v.X = j[0].get<int>();
+		v.Y = j[1].get<int>();
+	}
+
+}
+
 void to_json(nlohmann::json& j, const FVector& v) {
 	j = nlohmann::json{ 
 		{ "x", v.X },
