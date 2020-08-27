@@ -158,7 +158,7 @@ public:
 	}
 
 	void asyncWrite(tcp::socket& socket) {
-		asyncWrite(socket, [](std::error_code ec, ApiMessage& message){
+		asyncWrite(socket, [](std::error_code ec, ApiMessage& msg){
 			if(ec){
 				std::cerr << "ApiMessage::asyncWrite: Unable to write message. Error code: " << ec << std::endl;
 			}
