@@ -51,8 +51,11 @@ public:
     }
 	
     /// @brief resets the event to initial state
-    inline void reset() {
+    inline void reset(int newCount = -1) {
         mutex.lock();
+        if (newCount > 0) {
+            eventNumber = newCount;
+        }
         eventCount = eventNumber;
         mutex.unlock();
     }
@@ -115,10 +118,13 @@ public:
 
  protected:
     /// @brief set up the sensor callback for the given sensor.
+    /// @param sensor - the sensor to set up the callback for
     /// @return the callback for the sensor that calls sampleComplete->notify() 
     /// to signal sample completion, and to forward the sensor data to any
     /// callback registered with the sensor
     virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor);
+    /// @brief returns the number of streaming sensors in the sensors array
+    int getStreamingSensorsCount();
 
     /// A pointer to the server object
     Simulator* sim = nullptr;

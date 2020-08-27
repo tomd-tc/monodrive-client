@@ -43,14 +43,9 @@ bool DistributedServer::loadSensors() {
   if (sampleComplete) {
     delete sampleComplete;
   }
-  int sensorCount = 0;
-  for (auto& sensor : sensors) {
-    if (sensor->config->type == "ViewportCamera")
-      continue;
-
-    sensorCount++;
-  }
-  sampleComplete = new Event(sensorCount);
+  
+  
+  sampleComplete = new Event(getStreamingSensorsCount());
   return true;
 }
 
@@ -121,6 +116,17 @@ bool DistributedServer::sendCommandAsync(ApiMessage message, nlohmann::json* res
   return sim->sendCommandAsync(message, response);
 }
 
+int DistributedServer::getStreamingSensorsCount() {
+  int sensorCount = 0;
+  for (auto& sensor : sensors) {
+    if (sensor->config->type == "ViewportCamera")
+      continue;
+
+    sensorCount++;
+  }
+  return sensorCount;
+}
+
 bool PrimaryDistributedServer::sample(std::string* stateData) {
   // Store the pointer for output in the callback
   stateDataString = stateData;
@@ -166,7 +172,7 @@ bool PrimaryDistributedServer::configure() {
     if (sampleComplete) {
       delete sampleComplete;
     }
-    sampleComplete = new Event(sensors.size());
+    sampleComplete->reset(getStreamingSensorsCount());
 
   return true;
 }

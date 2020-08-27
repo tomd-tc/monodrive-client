@@ -31,7 +31,7 @@ std::string SHARED_STATE_DATA_BUFFER("");
 std::mutex STATE_DATA_MUTEX;
 
 
-void run_monodrive(float fps)
+void rosLoop(float fps)
 {
 
   ros::Rate rate(fps);
@@ -43,7 +43,7 @@ void run_monodrive(float fps)
   }
 }
 
-void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* replicasReadyEvent) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, const Event& replicasReadyEvent) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -72,14 +72,14 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
     }
 
     // wait for replicas to finish
-    replicasReadyEvent->wait();
+    replicasReadyEvent.wait();
   }
 }
 
 void ReplicaThread(
   std::shared_ptr<PrimaryDistributedServer> primary,
     std::vector<std::shared_ptr<ReplicaDistributedServer>> servers, 
-    Event* replicasReadyEvent) {
+    const Event& replicasReadyEvent) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -97,7 +97,6 @@ void ReplicaThread(
     std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
     STATE_DATA_MUTEX.unlock();
 
-    std::cout << "replicas waiting" << std::endl;
     primary->sampleComplete->wait();
 
     if (SHARED_STATE_DATA_BUFFER == "") {
@@ -112,7 +111,7 @@ void ReplicaThread(
       while (server->isSampling());
 
       // signal complete
-      replicasReadyEvent->notify();
+      replicasReadyEvent.notify();
     }
 
     sample_time +=
@@ -168,7 +167,7 @@ int main(int argc, char **argv)
   primaryServer->loadSensors();
 
   for (auto& sensor : primaryServer->sensors) {
-    if (sensor->config->type == "BinaryState" || sensor->config->type == "State") {
+    if (sensor->config->type == "State") {
       std::shared_ptr<ros::NodeHandle> node_handle_state = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
       ros::Publisher pub_state = node_handle_state->advertise<monodrive_msgs::StateSensor>("/monodrive/state", 1);
       sensor->sampleCallback = [pub_state](DataFrame *frame) {
@@ -211,16 +210,15 @@ int main(int argc, char **argv)
   }
 
   // Bench marking stuff
-  Event* replicasReadyEvent = new Event(replicaServers.size());
+  Event replicasReadyEvent(replicaServers.size());
   std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
   std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
 
   float fps = 100.f;
-  run_monodrive(fps);
+  rosLoop(fps);
 
   primaryThread.join();
   replicaThread.join();
 
-  delete replicasReadyEvent;
   return 0;
 }
