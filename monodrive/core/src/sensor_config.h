@@ -372,6 +372,15 @@ public:
     }
 };
 
+struct ViewportConfig
+{
+    bool enable_hud{false};
+    Resolution window_size{0, 0};
+    Resolution window_offset{0, 0};
+    bool fullscreen{false};
+    int monitor_number{0};
+};
+
 class ViewportCameraConfig : public CameraConfig
 {
 public:
@@ -380,11 +389,8 @@ public:
         type = "ViewportCamera";
         enable_streaming = false;
     }
-    bool enable_hud{false};
-    Resolution window_size{0, 0};
-    Resolution window_offset{0, 0};
-    bool fullscreen{false};
-    int monitor_number{0};
+    ViewportConfig viewport;
+
     virtual DataFrame* DataFrameFactory() override {
         return nullptr;
     }
@@ -532,9 +538,8 @@ void inline from_json(const nlohmann::json& j, Camera360Config& config)
     json_get(j, "face_size", config.face_size);
 }
 
-void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
+void inline to_json(nlohmann::json& j, const ViewportConfig& config)
 {
-    j = static_cast<CameraConfig>(config);
     j["use_vehicle_hud"] = config.enable_hud;
     j["window_size"] = config.window_size;
     j["window_offset"] = config.window_offset;
@@ -542,17 +547,27 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
     j["monitor_number"] = config.monitor_number;
 }
 
+void inline from_json(const nlohmann::json& j, ViewportConfig& config)
+{
+    json_get(j, "use_vehicle_hud", config.enable_hud);
+    json_get(j, "window_size", config.window_size);
+    json_get(j, "window_offset", config.window_offset);
+    json_get(j, "fullscreen", config.fullscreen);
+    json_get(j, "monitor_number", config.monitor_number);
+}
+
+void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
+{
+    j = static_cast<CameraConfig>(config);
+    j["viewport"] = config.viewport;
+}
 
 void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
 {
     CameraConfig* base = static_cast<CameraConfig*>(&config);
     from_json(j, *base);
 
-    json_get(j, "use_vehicle_hud", config.enable_hud);
-    json_get(j, "window_size", config.window_size);
-    json_get(j, "window_offset", config.window_offset);
-    json_get(j, "fullscreen", config.fullscreen);
-    json_get(j, "monitor_number", config.monitor_number);
+    json_get(j, "viewport", config.viewport);
 }
 
 /// END Camera Config JSON Parsing
