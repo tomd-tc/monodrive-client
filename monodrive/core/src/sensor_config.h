@@ -22,12 +22,7 @@ class SensorBaseConfig
         bool wait_for_fresh_frame = true;
         bool enable_streaming = true;
         Location location;
-        struct Rotation
-        {
-            float yaw{0.0f};
-            float pitch{0.0f};
-            float roll{0.0f};
-        }rotation;
+        Rotation rotation;
         struct ROS{
             bool publish_to_ros{false};
             bool advertise{true};
@@ -115,6 +110,7 @@ public:
     int bandwidth{250000000};
     int max_radar_returns{500};
     int elements{8};
+    std::string fmcw{""};
     struct Transmitter
     {
         float peak_power{5.0f};
@@ -138,10 +134,12 @@ public:
         float elevation_fov{10.0f};
         float ray_division_y{10.0f};
         float ray_division_z{10.0f};
+        float ray_division_noise_y{200.0f};
+        float ray_division_noise_z{200.0f};
         bool debug_frustum{false};
         bool debug_scan{false};
         bool debug_rescan{false};
-    }sbr;   
+    }sbr;
     virtual DataFrame* DataFrameFactory() override{
         return new RadarFrame(send_radar_cube, num_sweeps, num_samples_per_sweep, elements);
     }
@@ -159,6 +157,7 @@ public:
     }
     double fc{40000.0};
     double pwm_factor{2.5};
+    float period{60.0 / 1000.0f};
     int max_ultrasonic_returns{93};
     bool send_processed_data{true};
     struct SBR
@@ -271,13 +270,16 @@ public:
     }
 };
 
-class OccupancyGridConfig : public SensorBaseConfig
+class OccupancyGridConfig : public CameraConfig
 {
 public:
-    OccupancyGridConfig() {
-        type= "OccupancyGrid";
+    OccupancyGridConfig()
+    {
+        type = "OccupancyGrid";
+        channels = "gray";
+        rotation = Rotation(0.0, -90.0, 0.0);
+        location = Location(0.0, 0.0, 0.0);
     }
-    Resolution resolution;
     double meters_per_pixel = 0.1;
     bool follow_yaw = false;
     bool follow_pitch = false;
@@ -391,20 +393,6 @@ public:
     }
 };
 /// SensorBaseConfig
-void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
-{
-    j = nlohmann::json{
-        {"yaw", rotation.yaw},
-        {"pitch", rotation.pitch},
-        {"roll", rotation.roll}
-    };
-}
-void inline from_json(const nlohmann::json& j, SensorBaseConfig::Rotation& rotation)
-{
-    json_get(j,"yaw", rotation.yaw);
-    json_get(j,"pitch", rotation.pitch);
-    json_get(j, "roll", rotation.roll);
-}
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 {
     j = nlohmann::json{   
@@ -418,7 +406,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 }
 void inline from_json(const nlohmann::json& j, SensorBaseConfig::ROS& ros)
 {
-    json_get(j,"publis_to_ross", ros.publish_to_ros);
+    json_get(j,"publish_to_ros", ros.publish_to_ros);
     json_get(j,"advertise", ros.advertise);
     json_get(j,"topic", ros.topic);
     json_get(j,"message_type", ros.message_type);
@@ -557,7 +545,7 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
 
 void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
 {
-    SensorBaseConfig* base = static_cast<CameraConfig*>(&config);
+    CameraConfig* base = static_cast<CameraConfig*>(&config);
     from_json(j, *base);
 
     json_get(j, "use_vehicle_hud", config.enable_hud);
@@ -580,6 +568,8 @@ void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
         {"elevation_fov", config.elevation_fov},
         {"ray_division_z", config.ray_division_z},
         {"ray_division_y", config.ray_division_y},
+        {"ray_division_noise_z", config.ray_division_noise_z},
+        {"ray_division_noise_y", config.ray_division_noise_y},
         {"debug_frustum", config.debug_frustum},
         {"debug_scan", config.debug_scan},
         {"debug_rescan", config.debug_rescan}
@@ -607,7 +597,7 @@ void inline from_json(const nlohmann::json& j, RadarConfig& config)
     json_get(j, "sbr", config.sbr);
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter& config)
 {
     json_get(j, "peak_power", config.peak_power);
     json_get(j, "aperture", config.aperture);
@@ -622,7 +612,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
      };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Receiver& config)
 {
     json_get(j, "gain", config.gain);
     json_get(j, "aperture", config.aperture);
@@ -641,7 +631,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
     };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
+void inline from_json(const nlohmann::json& j, RadarConfig::SBR& config)
 {
     json_get(j, "long_range_scan_distance", config.long_range_scan_distance);
     json_get(j, "short_range_scan_distance",config.short_range_scan_distance);
@@ -679,7 +669,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig& config)
 /// END Radar Config JSON Parsing
 
 /// Ultrasonic Config JSON Parsing
-void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
+void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR& config) {
     j = nlohmann::json{
         {"scan_distance", config.scan_distance},
         {"azimuth_fov", config.azimuth_fov},
@@ -691,7 +681,7 @@ void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
         {"debug_rescan", config.debug_rescan}
     };
 }
-void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR config) {
+void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR& config) {
     json_get(j, "scan_distance", config.scan_distance);
     json_get(j, "azimuth_fov", config.azimuth_fov);
     json_get(j, "elevation_fov", config.elevation_fov);

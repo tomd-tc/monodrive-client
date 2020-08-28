@@ -39,7 +39,7 @@ ByteBuffer UltrasonicRawFrame::write() const{
 }
 
 void UltrasonicFrame::parse(ByteBuffer& buffer){
-    if(bSendUltrasonicRaw and currentFrameIndex % 2 == 1){
+    if(bSendProcessed and currentFrameIndex % 2 == 1){
         ultrasonicRawFrame->parse_header(buffer);
         ultrasonicRawFrame->parse(buffer);
     }
