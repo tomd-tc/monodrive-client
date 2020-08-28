@@ -29,6 +29,8 @@ int main(int argc, char** argv)
 
     // configure viewport cameras
     ViewportCameraConfig vp0;
+    vp0.server_ip = sim.getServerIp();
+    vp0.server_port = sim.getServerPort();
     vp0.listen_port = 0;
     vp0.location.z = 400;
     vp0.location.x = -800;
@@ -37,6 +39,8 @@ int main(int argc, char** argv)
     Sensor(std::make_unique<ViewportCameraConfig>(vp0)).configure();
 
     ViewportCameraConfig vp1;
+    vp1.server_ip = sim.getServerIp();
+    vp1.server_port = sim.getServerPort();
     vp1.listen_port = 1;
     vp1.location.z = 125;
     vp1.location.y = -25;
@@ -47,6 +51,8 @@ int main(int argc, char** argv)
     Sensor(std::make_unique<ViewportCameraConfig>(vp1)).configure();
 
     ViewportCameraConfig vp2;
+    vp2.server_ip = sim.getServerIp();
+    vp2.server_port = sim.getServerPort();
     vp2.listen_port = 2;
     vp2.location.z = 125;
     vp2.rotation.yaw = 0;
@@ -56,6 +62,8 @@ int main(int argc, char** argv)
     Sensor(std::make_unique<ViewportCameraConfig>(vp2)).configure();
 
     ViewportCameraConfig vp3;
+    vp3.server_ip = sim.getServerIp();
+    vp3.server_port = sim.getServerPort();
     vp3.listen_port = 3;
     vp3.location.z = 125;
     vp3.location.y = 25;

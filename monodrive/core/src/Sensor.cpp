@@ -1,24 +1,29 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
+#include "Sensor.h"
+
 #include <iostream>
 #include <thread>
 #include <string>
 #include <memory>
 
-#include "Sensor.h"
 #include "Simulator.h"
 #include "Stopwatch.h"
 
-
-Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensorConfig) : config(std::move(sensorConfig))
-{
-	name = std::string(config->type) + std::string("_") + std::to_string(config->listen_port);
-	// ViewportCamera doesn't need a connection
-	if (config->listen_port != 0)
-	{
-		listener = new Connection(config->server_ip, config->listen_port);
-	} 
-	frame = config->DataFrameFactory();
-	sampleCallback = [](DataFrame* frame){return;};
+Sensor::Sensor(std::unique_ptr<SensorBaseConfig> sensorConfig,
+               bool parseBinaryData)
+    : config(std::move(sensorConfig)), parseBinaryData(parseBinaryData) {
+  name = std::string(config->type) + std::string("_") +
+         std::to_string(config->listen_port);
+  // ViewportCamera doesn't need a connection
+  if (config->listen_port != 0) {
+    listener = new Connection(config->server_ip, config->listen_port);
+  }
+  if (parseBinaryData) {
+    frame = config->DataFrameFactory();
+  } else {
+    frame = new BinaryDataFrame();
+  }
+  sampleCallback = [](DataFrame* frame) { return; };
 }
 
 Sensor::~Sensor()
@@ -44,7 +49,8 @@ bool Sensor::configure()
 	}
 	if (!startListening())
 	{
-		return false;
+		// If streaming wasn't enabled, the configuration is still successful
+		return !config->enable_streaming;
 	}
 	return startSampleLoop();
 }
