@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     vp_config.server_port = sim0.getServerPort();
     vp_config.location.z = 200;
     vp_config.resolution = Resolution(256,256);
-    vp_config.viewport.enable_hud = true;
+    vp_config.enable_hud = true;
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     // Send configurations to the simulator

@@ -35,43 +35,46 @@ int main(int argc, char** argv)
     vp0.location.z = 400;
     vp0.location.x = -800;
     vp0.rotation.pitch = -15;
-    vp0.viewport.enable_hud = true;
+    vp0.enable_hud = true;
     Sensor(std::make_unique<ViewportCameraConfig>(vp0)).configure();
 
-    ViewportCameraConfig vp1;
+    CameraConfig vp1;
     vp1.server_ip = sim.getServerIp();
     vp1.server_port = sim.getServerPort();
     vp1.listen_port = 1;
+    vp1.enable_streaming = false;
     vp1.location.z = 125;
     vp1.location.y = -25;
     vp1.rotation.yaw = -60;
     vp1.resolution = Resolution(512, 512);
     vp1.viewport.window_offset = Resolution(0, 256);
     vp1.viewport.monitor_number = 0;
-    Sensor(std::make_unique<ViewportCameraConfig>(vp1)).configure();
+    Sensor(std::make_unique<CameraConfig>(vp1)).configure();
 
-    ViewportCameraConfig vp2;
+    CameraConfig vp2;
     vp2.server_ip = sim.getServerIp();
     vp2.server_port = sim.getServerPort();
     vp2.listen_port = 2;
+    vp2.enable_streaming = false;
     vp2.location.z = 125;
     vp2.rotation.yaw = 0;
     vp2.resolution = Resolution(896, 512);
     vp2.viewport.window_offset = Resolution(512, 256);
     vp2.viewport.monitor_number = 0;
-    Sensor(std::make_unique<ViewportCameraConfig>(vp2)).configure();
+    Sensor(std::make_unique<CameraConfig>(vp2)).configure();
 
-    ViewportCameraConfig vp3;
+    CameraConfig vp3;
     vp3.server_ip = sim.getServerIp();
     vp3.server_port = sim.getServerPort();
     vp3.listen_port = 3;
+    vp3.enable_streaming = false;
     vp3.location.z = 125;
     vp3.location.y = 25;
     vp3.rotation.yaw = 60;
     vp3.resolution = Resolution(512, 512);
     vp3.viewport.window_offset = Resolution(1408, 256);
     vp3.viewport.monitor_number = 0;
-    Sensor(std::make_unique<ViewportCameraConfig>(vp3)).configure();
+    Sensor(std::make_unique<CameraConfig>(vp3)).configure();
 
     // send control command
     while (true)
