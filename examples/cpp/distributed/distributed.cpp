@@ -22,6 +22,8 @@ std::string SHARED_STATE_DATA("");
 std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
 std::mutex STATE_DATA_MUTEX;
+// Flag to stop the example from running
+bool RUN_EXAMPLE=true;
 
 
 void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* replicasReadyEvent) {
@@ -30,7 +32,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
   mono::precise_stopwatch primary_stopwatch;
 
   std::cout << "Primary thread starting..." << std::endl;
-  while (true) {
+  while (RUN_EXAMPLE) {
     auto control_start_time =
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
 
@@ -75,7 +77,7 @@ void ReplicaThread(
   std::string local_state_data("");
 
   std::cout << "Replica thread starting..." << std::endl;
-  while (true) {
+  while (RUN_EXAMPLE) {
     // Cue the replicas and time them
     auto sample_start_time =
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
@@ -143,10 +145,10 @@ int main(int argc, char** argv) {
   auto primaryServer = std::make_shared<PrimaryDistributedServer>(
       primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                     "192.168.86.41", 8999),
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                     "192.168.86.41", 9000),
+                                                 "192.168.2.8", 8999),
+      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
+                                                 "192.168.86.41", 9000),
   };
 
   // Configure the primary first
@@ -161,6 +163,11 @@ int main(int argc, char** argv) {
       return -1;
     }
   }
+
+  auto sig_handler = [](int signum) {
+    RUN_EXAMPLE=false;
+  };
+  signal(SIGINT, sig_handler);
 
   // Kick off the orchestration threads
   Event* replicasReadyEvent = new Event(replicaServers.size());

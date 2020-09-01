@@ -27,6 +27,11 @@ public:
         eventNumber(count) 
     {}
 
+    inline ~Event() {
+        eventCount = 0;
+        condition.notify_all();
+    }
+
     /// @brief blocks the current thread until eventCount is zero
     inline void wait() const {
         std::unique_lock< std::mutex > lock(mutex);

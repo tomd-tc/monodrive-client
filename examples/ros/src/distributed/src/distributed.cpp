@@ -29,11 +29,11 @@ std::string SHARED_STATE_DATA("");
 std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
 std::mutex STATE_DATA_MUTEX;
+// Flag to tell all threads if we are still running
+std::atomic<bool> ROS_RUNNING{true};
 
 
-void rosLoop(float fps)
-{
-
+void rosLoop(float fps) {
   ros::Rate rate(fps);
 
   while (ros::ok())
@@ -41,15 +41,18 @@ void rosLoop(float fps)
     // Sample the sensors
     rate.sleep();
   }
+
+  ROS_RUNNING.store(false, std::memory_order_relaxed);
 }
 
-void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, std::shared_ptr<Event> replicasReadyEvent) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server,
+                   std::shared_ptr<Event> replicasReadyEvent) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
 
   std::cout << "Primary thread starting..." << std::endl;
-  while (true) {
+  while (ROS_RUNNING) {
     auto control_start_time =
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
 
@@ -72,7 +75,9 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, std::shared
     }
 
     // wait for replicas to finish
-    replicasReadyEvent->wait();
+    if(ROS_RUNNING) {
+      replicasReadyEvent->wait();
+    }
   }
 }
 
@@ -86,7 +91,7 @@ void ReplicaThread(
   std::string local_state_data("");
 
   std::cout << "Replica thread starting..." << std::endl;
-  while (true) {
+  while (ROS_RUNNING) {
     // Cue the replicas and time them
     auto sample_start_time =
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
@@ -97,7 +102,9 @@ void ReplicaThread(
     std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
     STATE_DATA_MUTEX.unlock();
 
-    primary->sampleComplete->wait();
+    if(ROS_RUNNING){
+      primary->sampleComplete->wait();
+    }
 
     if (SHARED_STATE_DATA_BUFFER == "") {
       continue;
@@ -136,20 +143,20 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "lane_follower");
   ros::NodeHandle n;
 
-/// The primary server needs a scenario file for closed loop mode
+  /// The primary server needs a scenario file for closed loop mode
   Configuration primary_config(
-      "examples/cpp/distributed/simulator_straightaway.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json",
       "examples/config/scenario_multi_vehicle_straightaway.json",
       "examples/ros/src/distributed/config/primary_sensors.json");
   /// The replica servers just need to be forced into replay mode
   Configuration replica_lidar_config(
-      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
       "examples/cpp/distributed/replica_lidar_sensors.json");
   Configuration replica_radar_config(
-      "examples/cpp/distributed/simulator_straightaway_replay.json",
+      "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
       "examples/cpp/distributed/replica_radar_sensors.json");
@@ -158,10 +165,10 @@ int main(int argc, char **argv)
   auto primaryServer = std::make_shared<PrimaryDistributedServer>(
       primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                     "192.168.86.41", 8999),
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                     "192.168.86.41", 9000),
+                                                 "192.168.2.8", 8999),
+      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
+                                                 "192.168.86.41", 9000),
   };
 
   primaryServer->loadSensors();
@@ -210,7 +217,7 @@ int main(int argc, char **argv)
   }
 
   // Bench marking stuff
-  auto replicasReadyEvent = std::shared_ptr<Event>(new Event(replicaServers.size()));
+  std::shared_ptr<Event> replicasReadyEvent = std::shared_ptr<Event>(new Event(replicaServers.size()));
   std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
   std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
 
