@@ -48,6 +48,9 @@ void inline json_log(const std::string& error_message)
 
 #endif
 
+// update me, should do the at check and return false rather than rely on exception handling
+// this is nice for debugging but causes slow down on normal operations where we expect the 
+// at to fail but have a default or something that is used when this function returns false
 template <typename T>
 bool inline json_get(const nlohmann::json& data, const std::string& key, T& value) {
     T temp;

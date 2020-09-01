@@ -1,0 +1,138 @@
+{
+  "trigger_boxes": [
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": true,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 20300.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox_9",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": -1.0,
+      "tags": []
+    }
+  ],
+  "vehicles": [
+    {
+      "behavior_settings": {
+        "destroy_on_collision": false,
+        "ignore_lane_change_boxes": false,
+        "ignore_other_vehicles": false,
+        "ignore_traffic_signals": false,
+        "initial_speed_is_delta": true,
+        "limit_speed_in_curves": true,
+        "obey_road_speed_limits": false,
+        "overtake_slower_vehicles": false,
+        "snap_to_lane": true
+      },
+      "body_color": "Carpaint_BabyBlue",
+      "class_path": "/Game/Vehicles/compact_monoDrive_01.compact_monoDrive_01_C",
+      "controller_settings": {
+        "delayed_start": 0.0,
+        "distance_to_stop_sign": 400.0,
+        "initial_speed": 50.0,
+        "lane_offset": 0.0,
+        "rolling_stop_speed": 0.0010000000474974513,
+        "search_forward_distance": 10000.0,
+        "set_speed": 50.0,
+        "spawn_offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "steer_forward_distance": 550.0,
+        "steer_forward_distance_lane_change": 1500.0
+      },
+      "location": {
+        "x": 9005.736328125,
+        "y": -235.04837036132813,
+        "z": 29.186630249023438
+      },
+      "name": "compact_monoDrive_01_C_3",
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": -0.0752258151769638
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "car",
+        "ego"
+      ]
+    },
+    {
+      "behavior_settings": {
+        "destroy_on_collision": false,
+        "ignore_lane_change_boxes": false,
+        "ignore_other_vehicles": false,
+        "ignore_traffic_signals": false,
+        "initial_speed_is_delta": true,
+        "limit_speed_in_curves": true,
+        "obey_road_speed_limits": false,
+        "overtake_slower_vehicles": false,
+        "snap_to_lane": true
+      },
+      "body_color": "Carpaint_OliveGreen",
+      "class_path": "/Game/Vehicles/sedan_monoDrive_01.sedan_monoDrive_01_C",
+      "controller_settings": {
+        "delayed_start": 0.0,
+        "distance_to_stop_sign": 400.0,
+        "initial_speed": 30.0,
+        "lane_offset": 0.0,
+        "rolling_stop_speed": 0.0010000000474974513,
+        "search_forward_distance": 10000.0,
+        "set_speed": 30.0,
+        "spawn_offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "steer_forward_distance": 550.0,
+        "steer_forward_distance_lane_change": 1500.0
+      },
+      "location": {
+        "x": 15074.7861328125,
+        "y": 187.65048217773438,
+        "z": 37.855743408203125
+      },
+      "name": "sedan_monoDrive_01_C_3",
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.7301412224769592
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "car"
+      ]
+    }
+  ]
+}

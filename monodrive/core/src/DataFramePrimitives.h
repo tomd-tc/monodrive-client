@@ -40,6 +40,8 @@ struct Odometry{
 
 struct ObjectState{
     std::string name;
+    std::string replay_class;
+    std::string color;
     Odometry odometry;
     std::vector<std::string> tags;
     std::vector<OOBB> oobbs;
