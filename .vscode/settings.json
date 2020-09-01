@@ -88,7 +88,13 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "resumable": "cpp"
+        "resumable": "cpp",
+        "*.tcc": "cpp",
+        "filesystem": "cpp",
+        "memory_resource": "cpp",
+        "string_view": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

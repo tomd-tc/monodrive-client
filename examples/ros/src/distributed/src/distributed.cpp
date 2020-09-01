@@ -1,18 +1,25 @@
-#include <chrono>
-#include <iostream>
-#include <string>
-#include <utility>
+#include <iostream> // std::cout
+#include <chrono>   // std::chrono
+#include <thread>   // std::thread
+#include <memory>
 #include <vector>
-#include <mutex>
-#include <thread>
 
-#include "Configuration.h"
-#include "Sensor.h"
+//monoDrive Includes
 #include "Simulator.h"
-#include "Stopwatch.h"
-#include "DistributedServer.h"
+#include "Configuration.h" // holder for sensor, simulator, scenario, weather, and vehicle configurations
+#include "Sensor.h"
 #include "sensor_config.h"
+#include "Stopwatch.h"
+#include <future>
 
+#include "ros/ros.h"
+#include "ros/package.h"
+#include "DistributedServer.h"
+#include "MessageFactory.h"
+
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
 
 // The shared state data object that the primary will populate and the replicas
 // will use
@@ -22,17 +29,30 @@ std::string SHARED_STATE_DATA("");
 std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
 std::mutex STATE_DATA_MUTEX;
-// Flag to stop the example from running
-bool RUN_EXAMPLE=true;
+// Flag to tell all threads if we are still running
+std::atomic<bool> ROS_RUNNING{true};
 
 
-void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* replicasReadyEvent) {
+void rosLoop(float fps) {
+  ros::Rate rate(fps);
+
+  while (ros::ok())
+  {
+    // Sample the sensors
+    rate.sleep();
+  }
+
+  ROS_RUNNING.store(false, std::memory_order_relaxed);
+}
+
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server,
+                   std::shared_ptr<Event> replicasReadyEvent) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
 
   std::cout << "Primary thread starting..." << std::endl;
-  while (RUN_EXAMPLE) {
+  while (ROS_RUNNING) {
     auto control_start_time =
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
 
@@ -40,14 +60,6 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
       std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
       server->sample(&SHARED_STATE_DATA);
     }
-
-    // apply controls
-    EgoControlConfig ego_control_config;
-    ego_control_config.forward_amount = 0.3f;
-    ego_control_config.right_amount = 0.0f;
-    ego_control_config.brake_amount = 0.0f;
-    ego_control_config.drive_mode = 1;
-    server->sendCommandAsync(ego_control_config.message());
 
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -63,21 +75,23 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
     }
 
     // wait for replicas to finish
-    replicasReadyEvent->wait();
+    if(ROS_RUNNING) {
+      replicasReadyEvent->wait();
+    }
   }
 }
 
 void ReplicaThread(
   std::shared_ptr<PrimaryDistributedServer> primary,
-    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers,
-    Event* replicasReadyEvent) {
+    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers, 
+    std::shared_ptr<Event> replicasReadyEvent) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
   std::string local_state_data("");
 
   std::cout << "Replica thread starting..." << std::endl;
-  while (RUN_EXAMPLE) {
+  while (ROS_RUNNING) {
     // Cue the replicas and time them
     auto sample_start_time =
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
@@ -88,8 +102,9 @@ void ReplicaThread(
     std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
     STATE_DATA_MUTEX.unlock();
 
-    // wait for primary
-    primary->sampleComplete->wait();
+    if(ROS_RUNNING){
+      primary->sampleComplete->wait();
+    }
 
     if (SHARED_STATE_DATA_BUFFER == "") {
       continue;
@@ -122,13 +137,18 @@ void ReplicaThread(
   }
 }
 
-int main(int argc, char** argv) {
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "lane_follower");
+  ros::NodeHandle n;
+
   /// The primary server needs a scenario file for closed loop mode
   Configuration primary_config(
       "examples/config/simulator_straightaway.json",
       "examples/config/weather.json",
       "examples/config/scenario_multi_vehicle_straightaway.json",
-      "examples/cpp/distributed/primary_sensors.json");
+      "examples/ros/src/distributed/config/primary_sensors.json");
   /// The replica servers just need to be forced into replay mode
   Configuration replica_lidar_config(
       "examples/config/simulator_straightaway.json",
@@ -151,7 +171,39 @@ int main(int argc, char** argv) {
                                                  "192.168.86.41", 9000),
   };
 
-  // Configure the primary first
+  primaryServer->loadSensors();
+
+  for (auto& sensor : primaryServer->sensors) {
+    if (sensor->config->type == "State") {
+      std::shared_ptr<ros::NodeHandle> node_handle_state = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+      ros::Publisher pub_state = node_handle_state->advertise<monodrive_msgs::StateSensor>("/monodrive/state", 1);
+      sensor->sampleCallback = [pub_state](DataFrame *frame) {
+        StateFrame data = *static_cast<StateFrame*>(frame);
+        monodrive_msgs::StateSensor msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
+        pub_state.publish(msg);
+      };
+    } 
+    else if (sensor->config->type == "IMU") {
+      std::shared_ptr<ros::NodeHandle> node_handle_imu = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+      ros::Publisher pub_imu = node_handle_imu->advertise<sensor_msgs::Imu>("/monodrive/imu", 1);
+      sensor->sampleCallback = [pub_imu](DataFrame *frame) {
+        ImuFrame data = *static_cast<ImuFrame*>(frame);
+        sensor_msgs::Imu msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
+        pub_imu.publish(msg);
+      };
+    }
+    else if (sensor->config->type == "Waypoint") {
+      std::shared_ptr<ros::NodeHandle> node_handle_waypoint = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+      ros::Publisher pub_waypoint = node_handle_waypoint->advertise<monodrive_msgs::WaypointSensor>("/monodrive/waypoint", 1);
+      sensor->sampleCallback = [pub_waypoint](DataFrame *frame) {
+        WaypointFrame data = *static_cast<WaypointFrame*>(frame);
+        monodrive_msgs::WaypointSensor msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
+        pub_waypoint.publish(msg);
+      };
+    }
+  }
+
+  // Configure the primary 
   if (!primaryServer->configure()){
     std::cerr << "Unable to configure primary server!" << std::endl;
     return -1;
@@ -164,19 +216,16 @@ int main(int argc, char** argv) {
     }
   }
 
-  auto sig_handler = [](int signum) {
-    RUN_EXAMPLE=false;
-  };
-  signal(SIGINT, sig_handler);
-
-  // Kick off the orchestration threads
-  Event* replicasReadyEvent = new Event(replicaServers.size());
+  // Bench marking stuff
+  std::shared_ptr<Event> replicasReadyEvent = std::shared_ptr<Event>(new Event(replicaServers.size()));
   std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
   std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
+
+  float fps = 100.f;
+  rosLoop(fps);
 
   primaryThread.join();
   replicaThread.join();
 
-  delete replicasReadyEvent;
   return 0;
 }
