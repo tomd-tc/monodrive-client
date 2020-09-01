@@ -13,8 +13,8 @@
         "overtake_slower_vehicles": false,
         "snap_to_lane": true
       },
-      "body_color": "Carpaint_White",
-      "class_path": "/Game/Vehicles/subcompact_monoDrive_01.subcompact_monoDrive_01_C",
+      "body_color": "Carpaint_Red",
+      "class_path": "/Game/Vehicles/crossover_01.crossover_01_C",
       "controller_settings": {
         "delayed_start": 0.0,
         "distance_to_stop_sign": 400.0,
@@ -28,7 +28,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "steer_forward_distance": 550.0,
+        "steer_forward_distance": 600.0,
         "steer_forward_distance_lane_change": 1500.0
       },
       "location": {
@@ -36,7 +36,7 @@
         "y": 450.0,
         "z": 30.0
       },
-      "name": "subcompact_monoDrive_01_C_1",
+      "name": "crossover_01_6",
       "rotation": {
         "pitch": 0.0,
         "roll": 0.0,
@@ -50,7 +50,6 @@
       "tags": [
         "vehicle",
         "dynamic",
-        "car",
         "ego"
       ]
     }
