@@ -155,6 +155,7 @@ protected:
     virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor) override;
 private:
     std::string* stateDataString = nullptr;
+    std::shared_ptr<Sensor> binaryStateSensor;
 };
 
 /// @class Class for managing a remote Simulator that collects state data

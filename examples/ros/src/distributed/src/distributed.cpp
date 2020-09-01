@@ -43,7 +43,7 @@ void rosLoop(float fps)
   }
 }
 
-void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, const Event& replicasReadyEvent) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, std::shared_ptr<Event> replicasReadyEvent) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -72,14 +72,14 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, const Event
     }
 
     // wait for replicas to finish
-    replicasReadyEvent.wait();
+    replicasReadyEvent->wait();
   }
 }
 
 void ReplicaThread(
   std::shared_ptr<PrimaryDistributedServer> primary,
     std::vector<std::shared_ptr<ReplicaDistributedServer>> servers, 
-    const Event& replicasReadyEvent) {
+    std::shared_ptr<Event> replicasReadyEvent) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -111,7 +111,7 @@ void ReplicaThread(
       while (server->isSampling());
 
       // signal complete
-      replicasReadyEvent.notify();
+      replicasReadyEvent->notify();
     }
 
     sample_time +=
@@ -210,7 +210,7 @@ int main(int argc, char **argv)
   }
 
   // Bench marking stuff
-  Event replicasReadyEvent(replicaServers.size());
+  auto replicasReadyEvent = std::shared_ptr<Event>(new Event(replicaServers.size()));
   std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
   std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
 

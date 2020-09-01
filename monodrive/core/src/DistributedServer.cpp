@@ -158,11 +158,11 @@ bool PrimaryDistributedServer::configure() {
     sConfig.desired_tags = {"vehicle", "dynamic"};
     sConfig.include_obb = false;
     sConfig.debug_drawing = false;
-    sensors.emplace_back(
-        std::make_shared<Sensor>(std::make_unique<StateConfig>(sConfig), false));
-    sensors.back()->sampleCallback = setupCallback(sensors.back());
+    binaryStateSensor = std::make_shared<Sensor>(std::make_unique<StateConfig>(sConfig), false);
+    binaryStateSensor->sampleCallback = setupCallback(binaryStateSensor);
+    sensors.emplace_back(binaryStateSensor);
 
-    if(!sensors.back()->configure()) {
+    if(!binaryStateSensor->configure()) {
       std::cerr << "PrimaryDistributedServer::Configure: Unable to configure "
                    "binary state sensor!"
                 << std::endl;
@@ -178,17 +178,11 @@ bool PrimaryDistributedServer::configure() {
 }
 
 std::function<void(DataFrame*)> PrimaryDistributedServer::setupCallback(std::shared_ptr<Sensor> sensor) {
-  auto state_config = static_cast<StateConfig*>(sensor->config.get());
-  if (sensor->config.get()->type == "State") {
-    auto sensorCallback = sensor->sampleCallback;
-    return [this, sensorCallback](DataFrame* frame) {
+  if (sensor == binaryStateSensor) {
+    return [this](DataFrame* frame) {
             if (stateDataString != nullptr) {
               *stateDataString = static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
             }
-
-            if (sensorCallback) {
-              sensorCallback(frame);
-            } 
             
             sampleComplete->notify();
           };
