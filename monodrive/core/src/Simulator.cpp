@@ -154,10 +154,6 @@ bool Simulator::configure()
 				std::cout << sendCommand(ApiMessage(1001, REPLAY_ConfigureTrajectoryCommand_ID, true, config.scenario)) << std::endl;
 			}
 		}
-		else{
-			std::cout << "No scenario was loaded to configure." << std::endl;
-			return false;
-		}
 	}
 
 
