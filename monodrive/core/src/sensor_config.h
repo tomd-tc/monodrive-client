@@ -270,10 +270,10 @@ public:
     }
 };
 
-class OccupancyGridConfig : public CameraConfig
+class OccupancyGridConfig : public SemanticCameraConfig
 {
 public:
-    OccupancyGridConfig()
+    OccupancyGridConfig() : SemanticCameraConfig()
     {
         type = "OccupancyGrid";
         channels = "gray";
@@ -778,7 +778,7 @@ void inline from_json(const nlohmann::json& j, CollisionConfig& config)
 /// Occupancy Grid Sensor JSON parsing
 void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SemanticCameraConfig>(config);
     j["stream_dimensions"] = config.resolution;
     j["meters_per_pixel"] = config.meters_per_pixel;
     j["follow_yaw"] = config.follow_yaw;
@@ -787,7 +787,7 @@ void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
 }
 void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SemanticCameraConfig* base = static_cast<SemanticCameraConfig*>(&config);
     from_json(j, *base);
 
     json_get(j, "stream_dimensions", config.resolution);
