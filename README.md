@@ -122,6 +122,17 @@ Finally run
 
 
 # monoDrive ROS Client
+There are two ways to integrate the monoDrive simulator with ROS. 
+
+The first is to configure the sensors to publish data directly to ROS instead of usng TCP streams. This is supported for
+IMU, Waypoint, State, Camera and Lidar sensors. The `simulator_control`, `vehicle_control`, and`wheel_vehicle_control` 
+examples demonstrate how to do this.
+
+The second is using TCP/IP streams to receive sensor data, converting that data on a frame by frame basis to ROS
+messages, and publishing those on the desired ROS topic. To support this approach, there is a message conversion utility
+class in `monodrive/ros/src/monodrive_msgs/include/MessageFactory.h` that facilitates converting raw sensor frame data to
+ROS messages and vice-versa. The `distributed` ROS example demonstrates how to use this approach.
+
 
 ## Ubuntu 18.04 Prerequisites
 - [monoDrive c++ client](https://github.com/monoDriveIO/monodrive-client/blob/master/README.md#monodrive-c++-client)
@@ -162,7 +173,7 @@ source devel/setup.bash
 echo "source <path/to/examples/ros/devel/setup.bash>" >> ~/.bashrc
 ```
 
-### monoDrive Simulator and Client network setup
+### monoDrive Simulator and Client network setup for the the direct-to-ROS examples
 
 *If you are running both the client and simulator on the same machine you can skip this section as the networking defaults are for local host.*
 
@@ -188,7 +199,7 @@ If you are running the simulator and client on separate machines the following n
 2. Forward the ports on both machines (`9090` and `8999`) from step 1 or disable the firewalls on both machines.
 
 
-### Launching the example
+### Launching the direct-to-ROS examples
 
 3. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
     1. Launch rosbridge, you can leave this running: 
@@ -204,6 +215,14 @@ If you are running the simulator and client on separate machines the following n
     3. Make sure the monoDrive simulator is running since the next command will connect to and start the simulator scenario running.
     ```bash
     rosrun simulator_control node
+    ```
+
+### Launching the message conversion to ROS example
+
+4. To launch the monoDrive example create 3 tabs and run each command in a separate terminal:
+    1. Make sure the monoDrive simulator is running since the run command will connect to and start the simulator scenario running.
+    ```bash
+    rosrun distributed node
     ```
 
 ### Using the G920 Logitech wheel
