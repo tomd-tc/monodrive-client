@@ -13,6 +13,7 @@
 #include "DistributedServer.h"
 #include "sensor_config.h"
 
+#pragma optimize("", off)
 
 // The shared state data object that the primary will populate and the replicas
 // will use
@@ -21,7 +22,7 @@ std::string SHARED_STATE_DATA("");
 // the primary server and we don't have to do a full copy
 std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
-std::mutex STATE_DATA_MUTEX;
+//std::mutex STATE_DATA_MUTEX;
 // Flag to stop the example from running
 bool RUN_EXAMPLE=true;
 
@@ -37,8 +38,9 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
 
     {
-      std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
-      server->sample(&SHARED_STATE_DATA);
+//      std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
+        std::cout << "primary sample" << std::endl;
+        server->sample(&SHARED_STATE_DATA);
     }
 
     // apply controls
@@ -63,6 +65,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
     }
 
     // wait for replicas to finish
+    std::cout << "wait on replicas" << std::endl;
     replicasReadyEvent->wait();
   }
 }
@@ -84,17 +87,23 @@ void ReplicaThread(
 
     // Using a try_lock here because a scoped lock has too much overhead
     // Just keep  trying and breaking until we get it
-    while (!STATE_DATA_MUTEX.try_lock());
-    std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
-    STATE_DATA_MUTEX.unlock();
+    //while (!STATE_DATA_MUTEX.try_lock());
+    //std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
+    //STATE_DATA_MUTEX.unlock();
 
     // wait for primary
+    std::cout << "wait on primary" << std::endl;
     primary->sampleComplete->wait();
 
+    SHARED_STATE_DATA_BUFFER = SHARED_STATE_DATA;
+    
     if (SHARED_STATE_DATA_BUFFER == "") {
+      std::cout << "primary signalled but no data" << std::endl;
+
       continue;
     }
 
+    std::cout << "replicas sample" << std::endl;
     for (auto& server : servers) {
       server->sample(&SHARED_STATE_DATA_BUFFER);
     }
@@ -105,6 +114,8 @@ void ReplicaThread(
       // signal complete
       replicasReadyEvent->notify();
     }
+    std::cout << "replicas complete" << std::endl;
+
 
     sample_time +=
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -174,8 +185,8 @@ int main(int argc, char** argv) {
   std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
   std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
 
-  primaryThread.join();
   replicaThread.join();
+  primaryThread.join();
 
   delete replicasReadyEvent;
   return 0;

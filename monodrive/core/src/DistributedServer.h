@@ -35,7 +35,10 @@ public:
     /// @brief blocks the current thread until eventCount is zero
     inline void wait() const {
         std::unique_lock< std::mutex > lock(mutex);
-        condition.wait(lock,[&]()->bool{ return eventCount > 0; });
+        // don't wait if no events pending
+        if (eventCount > 0) {
+            condition.wait(lock,[&]()->bool{ return eventCount == 0; });
+        }
     }
 
     /// @brief decrements eventCount. If eventCount becomes zero, the event is
@@ -52,6 +55,7 @@ public:
             condition.notify_all();
             reset();
         }
+        
         return signalled;
     }
 	

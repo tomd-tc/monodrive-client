@@ -3,6 +3,7 @@
 #include "DistributedServer.h"
 #include "Util.h"
 
+#pragma optimize("", off)
 
 DistributedServer::DistributedServer(const Configuration& config,
                                      const std::string& ipAddress,
@@ -71,7 +72,9 @@ bool DistributedServer::configure(){
 
   for(auto& sensor : sensors) {
     // chain callback
-    sensor->sampleCallback = setupCallback(sensor);
+    if (sensor->config->enable_streaming) {
+        sensor->sampleCallback = setupCallback(sensor);
+    }
 
     // Actually configure the sensor to start streaming
     if(!sensor->configure()) {
@@ -108,11 +111,11 @@ bool DistributedServer::isSampling() {
 std::function<void(DataFrame*)> DistributedServer::setupCallback(std::shared_ptr<Sensor> sensor) {
   auto sensorCallback = sensor->sampleCallback;
   return [this, sensor, sensorCallback](DataFrame* frame){
-    if (sensorCallback) {
+      sampleComplete->notify();
+
+      if (sensorCallback) {
       sensorCallback(frame);
     } 
-    
-    sampleComplete->notify();
   };
 }
 
@@ -140,7 +143,7 @@ bool PrimaryDistributedServer::sample(std::string* stateData) {
   // Store the pointer for output in the callback
   stateDataString = stateData;
   // For primaries, always wait for the state data to come back
-  bool success = sim->sampleAll(sensors);
+  bool success = sim->sampleAllAsync(sensors);
   if (success) {
     sampleComplete->wait();
   }
@@ -190,10 +193,9 @@ std::function<void(DataFrame*)> PrimaryDistributedServer::setupCallback(std::sha
     return [this](DataFrame* frame) {
             if (stateDataString != nullptr) {
               *stateDataString = static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
-            }
-            
+            }            
             sampleComplete->notify();
-          };
+    };
   }
   return DistributedServer::setupCallback(sensor);
 }
