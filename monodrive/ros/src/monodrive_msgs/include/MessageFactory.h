@@ -9,6 +9,7 @@
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
 #include "monodrive_msgs/WaypointSensor.h"
+#include "monodrive_msgs/Radar.h"
 
 
 namespace monodrive_msgs
@@ -17,6 +18,20 @@ namespace monodrive_msgs
     class MessageFactory 
     {
     public:
+        static monodrive_msgs::Complex complexToROSComplex(const std::complex<float> value) {
+            monodrive_msgs::Complex result;
+            result.real = value.real;
+            result.imag = value.imag;
+            return result;
+        }
+
+        static std::complex<float> ROSComplexTocomplex(const monodrive_msgs::Complex& value) {
+            std::complex<float> result;
+            result.real = value.real;
+            result.imag = value.imag;
+            return result;
+        }
+
         static geometry_msgs::Vector3 Vec3fToROSVector3(const Vec3f& vec) {
             geometry_msgs::Vector3 result;
             result.x = vec.x;
@@ -249,6 +264,70 @@ namespace monodrive_msgs
             return result;
         }
 
+        static monodrive_msgs::RadarTarget RadarTargetToROSRadarTarget(const ::RadarTarget& radarTarget) {
+            monodrive_msgs::RadarTarget result;
+            result.range = radarTarget.range;
+            result.aoa = radarTarget.aoa;
+            result.velocity = radarTarget.velocity;
+            result.rcs = radarTarget.rcs;
+            result.target_ids = radarTarget.target_ids;
+            return result;
+        }
+
+        static ::RadarTarget ROSRadarTargetToRadarTarget(const monodrive_msgs::RadarTarget& radarTarget) {
+            ::RadarTarget result;
+            result.range = radarTarget.range;
+            result.aoa = radarTarget.aoa;
+            result.velocity = radarTarget.velocity;
+            result.rcs = radarTarget.rcs;
+            result.target_ids = radarTarget.target_ids;
+            return result;
+        }
+
+        static monodrive_msgs::RadarCube RadarCubeFrameToROSRadarCube(const ::RadarCubeFrame& radarCubeFrame) {
+            monodrive_msgs::RadarCube result;
+            result.num_sweeps = radarCubeFrame.numSweeps;
+            result.num_samples_per_sweep = radarCubeFrame.numSamplesPerSweep;
+            result.num_elements = radarCubeFrame.numElements;
+            for (auto& value : radarCubeFrame.radar_cube) {
+                result.radar_cube.push_back(complexToROSComplex(value));
+            }
+            return result;
+        }
+
+        static ::RadarCubeFrame ROSRadarCubeToRadarCubeFrame(const monodrive_msgs::RadarCube& radarCube) {
+            ::RadarCubeFrame result;
+            result.numSweeps = radarCube.num_sweeps;
+            result.numSamplesPerSweep = radarCube.num_samples_per_sweep;
+            result.numElements = radarCube.num_elements;
+            for (auto& value : radarCube.radar_cube) {
+                result.radar_cube.push_back(ROSComplexTocomplex(value));
+            }
+            return result;
+        }
+
+        static monodrive_msgs::RadarTargetList RadarTargetListFrameToROSRadarTargetList(const ::RadarTargetListFrame& radarTargetListFrame) {
+            monodrive_msgs::RadarTargetList result;
+            for (auto& target : radarTargetListFrame.targets) {
+                result.targets.push_back(RadarTargetToROSRadarTarget(target));
+            }
+            for (auto& target : radarTargetListFrame.gt_targets) {
+                result.gt_targets.push_back(RadarTargetToROSRadarTarget(target));
+            }
+            return result;
+        }
+
+        static ::RadarTargetListFrame ROSRadarTargetListToRadarTargetListFrame(const monodrive_msgs::RadarTargetList& radarTargetList) {
+            ::RadarTargetListFrame result;
+            for (auto& target : radarTargetList.targets) {
+                result.targets.push_back(ROSRadarTargetToRadarTarget(target));
+            }
+            for (auto& target : radarTargetListFrame.gt_targets) {
+                result.gt_targets.push_back(ROSRadarTargetToRadarTarget(target));
+            }
+            return result;
+        }
+
         static sensor_msgs::Imu FromMonoDriveFrame(const ImuFrame& frame) {
             sensor_msgs::Imu message;
 //            message.header.stamp.sec = frame.timer / 19660800;
@@ -342,7 +421,24 @@ namespace monodrive_msgs
             return frame;
         }
 
-        
+        static monodrive_msgs::Radar FromMonoDriveFrame(const RadarFrame& frame) {
+            monodrive_msgs::Radar message;
+            message.has_radar_cube = frame.bSendRadarCube;
+            message.current_frame_index = frame.currentFrameIndex;
+            message.radar_target_list_frame = RadarTargetListFrameToROSRadarTargetList(*frame.radarTargetListFrame);
+            message.radar_cube_frame = ROSRadarCubeToRadarCubeFrame(*frame.radarCubeFrame);
+            return message;
+        }
+
+        static RadarFrame ToMonoDriveFrame(const monodrive_msgs::Radar& message) {
+            RadarFrame frame;
+            message.bSendRadarCube = frame.has_radar_cube;
+            message.currentFrameIndex = frame.current_frame_index;
+            *message.radarTargetListFrame = RadarTargetListFrameToROSRadarTargetList(frame.radar_target_list_frame);
+            *message.radarCubeFrame = ROSRadarCubeToRadarCubeFrame(frame.radar_cube_frame);
+            return frame;
+        }
+
     };
 
 } // namespace monodrive_msgs

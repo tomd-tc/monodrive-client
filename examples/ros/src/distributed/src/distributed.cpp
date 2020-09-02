@@ -171,32 +171,76 @@ int main(int argc, char **argv)
       // machine 1 instance 2
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                  "192.168.2.8", 9000),
-
+      // machine 2 instance 3
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.9", 8999),
+      // machine 2 instance 4
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                  "192.168.2.9", 9000),
-
+      // machine 3 instance 5
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.10", 8999),
+      // machine 3 instance 6
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                  "192.168.2.10", 9000),
-
+      // machine 4 instance 7
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.11", 8999),
+      // machine 4 instance 8
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                  "192.168.2.11", 9000),
-
+      // machine 5 instance 9
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.12", 8999),
+      // machine 5 instance 10
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                  "192.168.2.12", 9000),
-
+      // machine 6 instance 11
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.13", 8999),
+      // machine 6 instance 12
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                  "192.168.2.13", 9000),
-
   };
 
   primaryServer->loadSensors();
+  for (auto server : replicaServers) {
+    server->loadSensors();
+
+    for (auto& sensor : server->sensors) {
+      if (sensor->config->type == "Lidar") {
+        boost::asio::io_service io_service;
+        boost::asio::ip::udp::socket socket(io_service);
+        boost::asio::ip::udp::endpoint remote_endpoint;
+        socket.open(boost::asio::ip::udp::v4());
+        remote_endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 2368);
+        sensor->sampleCallback = [&remote_endpoint, &socket](DataFrame* frame){
+            auto& lidarFrame = *static_cast<LidarFrame*>(frame);
+            int count = 0;
+            for(auto& packet : lidarFrame.packets){
+                boost::system::error_code err;
+                socket.send_to(boost::asio::buffer(&packet, sizeof(LidarPacket)), remote_endpoint, 0, err);
+                std::this_thread::sleep_for(std::chrono::microseconds(1327));
+            }
+        };
+      } else if (sensor->config->type == "Radar") {
+        std::shared_ptr<ros::NodeHandle> node_handle_radar = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+        ros::Publisher pub_radar = node_handle_state->advertise<monodrive_msgs::Radar>("/monodrive/radar", 1);
+        sensor->sampleCallback = [pub_radar](DataFrame *frame) {
+          auto& data = *static_cast<RadarFrame*>(frame);
+          monodrive_msgs::Radar msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
+          pub_radar.publish(msg);
+        };
+      }
+    }
+  }
 
   for (auto& sensor : primaryServer->sensors) {
     if (sensor->config->type == "State") {
       std::shared_ptr<ros::NodeHandle> node_handle_state = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
       ros::Publisher pub_state = node_handle_state->advertise<monodrive_msgs::StateSensor>("/monodrive/state", 1);
       sensor->sampleCallback = [pub_state](DataFrame *frame) {
-        StateFrame data = *static_cast<StateFrame*>(frame);
+        auto& data = *static_cast<StateFrame*>(frame);
         monodrive_msgs::StateSensor msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
         pub_state.publish(msg);
       };
@@ -205,7 +249,7 @@ int main(int argc, char **argv)
       std::shared_ptr<ros::NodeHandle> node_handle_imu = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
       ros::Publisher pub_imu = node_handle_imu->advertise<sensor_msgs::Imu>("/monodrive/imu", 1);
       sensor->sampleCallback = [pub_imu](DataFrame *frame) {
-        ImuFrame data = *static_cast<ImuFrame*>(frame);
+        auto& data = *static_cast<ImuFrame*>(frame);
         sensor_msgs::Imu msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
         pub_imu.publish(msg);
       };
@@ -214,9 +258,18 @@ int main(int argc, char **argv)
       std::shared_ptr<ros::NodeHandle> node_handle_waypoint = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
       ros::Publisher pub_waypoint = node_handle_waypoint->advertise<monodrive_msgs::WaypointSensor>("/monodrive/waypoint", 1);
       sensor->sampleCallback = [pub_waypoint](DataFrame *frame) {
-        WaypointFrame data = *static_cast<WaypointFrame*>(frame);
+        auto& data = *static_cast<WaypointFrame*>(frame);
         monodrive_msgs::WaypointSensor msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
         pub_waypoint.publish(msg);
+      };
+    }
+    else if (sensor->config->type == "GPS") {
+      std::shared_ptr<ros::NodeHandle> node_handle_gps = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+      ros::Publisher pub_gps = node_handle_gps->advertise<sensor_msgs::NavSatFix>("/monodrive/gps", 1);
+      sensor->sampleCallback = [pub_gps](DataFrame *frame) {
+        auto& data = *static_cast<GPSFrame*>(frame);
+        sensor_msgs::NavSatFix msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
+        pub_gps.publish(msg);
       };
     }
   }
