@@ -5,6 +5,7 @@
 #include "geometry_msgs/TwistWithCovariance.h"
 #include "geometry_msgs/Vector3.h"
 #include "sensor_msgs/Imu.h"
+#include "sensor_msgs/NavSatFix.h"
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
 #include "monodrive_msgs/WaypointSensor.h"
@@ -319,6 +320,29 @@ namespace monodrive_msgs
             }
             return frame;
         }
+
+        static sensor_msgs::NavSatFix FromMonoDriveFrame(const GPSFrame& frame) {
+            sensor_msgs::NavSatFix message;
+            message.header.stamp.sec = long(frame.time / 1000.0);
+            message.latitude = frame.lattitude;
+            message.longitude = frame.longitude;
+            message.altitude = frame.elevation;
+            message.position_covariance = {0,0,0,0,0,0,0,0,0};
+            message.position_covariance_type = sensor_msgs::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
+            message.status.status = sensor_msgs::NavSatStatus::STATUS_FIX;
+            message.status.service = sensor_msgs::NavSatStatus::SERVICE_GPS;
+            return message;
+        }
+
+        static GPSFrame ToMonoDriveFrame(const sensor_msgs::NavSatFix& message) {
+            GPSFrame frame;
+            frame.lattitude = message.latitude;
+            frame.longitude = message.longitude;
+            frame.elevation = message.altitude;
+            return frame;
+        }
+
+        
     };
 
 } // namespace monodrive_msgs

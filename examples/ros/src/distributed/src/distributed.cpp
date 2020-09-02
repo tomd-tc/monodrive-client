@@ -140,7 +140,7 @@ void ReplicaThread(
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "lane_follower");
+  ros::init(argc, argv, "distributed");
   ros::NodeHandle n;
 
   /// The primary server needs a scenario file for closed loop mode
@@ -165,10 +165,28 @@ int main(int argc, char **argv)
   auto primaryServer = std::make_shared<PrimaryDistributedServer>(
       primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
+      // machine 1 instance 1
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
                                                  "192.168.2.8", 8999),
-      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "192.168.86.41", 9000),
+      // machine 1 instance 2
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.8", 9000),
+
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.9", 9000),
+
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.10", 9000),
+
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.11", 9000),
+
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.12", 9000),
+
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "192.168.2.13", 9000),
+
   };
 
   primaryServer->loadSensors();
