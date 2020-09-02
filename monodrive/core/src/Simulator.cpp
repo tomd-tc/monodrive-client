@@ -291,6 +291,7 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
+	
 	if(sendCommand(sampleMessage)){
 		waitForSamples(sensors);
 	}

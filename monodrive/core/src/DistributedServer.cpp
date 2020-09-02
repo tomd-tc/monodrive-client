@@ -4,7 +4,6 @@
 #include "Util.h"
 
 
-
 DistributedServer::DistributedServer(const Configuration& config,
                                      const std::string& ipAddress,
                                      const int& port,
@@ -26,7 +25,15 @@ DistributedServer::DistributedServer(const Configuration& config,
   sim = &Simulator::getInstance(serverConfig, ipAddress, port);
 
   // All server ports are technically reserved as well
-  kServerReservedPorts.insert(port);
+  kServerReservedPorts.insert(createPortKey(port));
+}
+
+std::string DistributedServer::createPortKey(const int& portNumber) {
+  if (sim != nullptr) {
+    return sim->getServerPort() + ":" + std::to_string(portNumber);
+  } else {
+    return std::to_string(portNumber);
+  }
 }
 
 bool DistributedServer::loadSensors() {
@@ -77,7 +84,8 @@ bool DistributedServer::configure(){
     }
     // Store all the port numbers so we know what we can use later when
     // dynamically creating sensors
-    if (kServerReservedPorts.count(sensor->config->listen_port) > 0 and
+    if (kServerReservedPorts.count(createPortKey(sensor->config->listen_port)) >
+            0 and
         sensor->config->type != "ViewportCamera") {
       std::cerr << "DistributedServer::configure: ERROR! Server port conflict "
                    "for sensor type: "
@@ -86,7 +94,7 @@ bool DistributedServer::configure(){
                 << sim->getServerIp() << ":" << sim->getServerPort()
                 << std::endl;
     } else {
-      kServerReservedPorts.insert(sensor->config->listen_port);
+      kServerReservedPorts.insert(createPortKey(sensor->config->listen_port));
     }
   }
   return true;
@@ -119,7 +127,8 @@ bool DistributedServer::sendCommandAsync(ApiMessage message, nlohmann::json* res
 int DistributedServer::getStreamingSensorsCount() {
   int sensorCount = 0;
   for (auto& sensor : sensors) {
-    if (sensor->config->type == "ViewportCamera")
+    if (sensor->config->type == "ViewportCamera" or
+        !sensor->config->enable_streaming)
       continue;
 
     sensorCount++;
@@ -146,8 +155,8 @@ bool PrimaryDistributedServer::configure() {
 
   // If the sensor didn't exist, we have to add it to the primary so it can
   // distribute the state data to replicas
-    int listenPort = 8100;
-    while(kServerReservedPorts.count(listenPort) > 0){
+    int listenPort = 8122;
+    while(kServerReservedPorts.count(createPortKey(listenPort)) > 0){
       listenPort++;
     }
 
@@ -158,7 +167,9 @@ bool PrimaryDistributedServer::configure() {
     sConfig.desired_tags = {"vehicle", "dynamic"};
     sConfig.include_obb = false;
     sConfig.debug_drawing = false;
+    sConfig.enable_streaming = true;
     binaryStateSensor = std::make_shared<Sensor>(std::make_unique<StateConfig>(sConfig), false);
+    binaryStateSensor->parseBinaryData = false;
     binaryStateSensor->sampleCallback = setupCallback(binaryStateSensor);
     sensors.emplace_back(binaryStateSensor);
 
@@ -169,9 +180,6 @@ bool PrimaryDistributedServer::configure() {
       return false;
     }
 
-    if (sampleComplete) {
-      delete sampleComplete;
-    }
     sampleComplete->reset(getStreamingSensorsCount());
 
   return true;

@@ -13,7 +13,7 @@
 
 
 /// Global static for this class so nobody has any ports that clash
-static std::set<int> kServerReservedPorts;
+static std::set<std::string> kServerReservedPorts;
 
 /// @class event class that uses std::condition_variable to 
 /// implement non-busy wait and count based notifications
@@ -22,7 +22,7 @@ class Event
 public:
     /// @brief constructor
     /// @param count - the number of times notify needs to get called in order to trigger event
-    inline Event(int count = 1) :
+    inline Event(int count = 0) :
         eventCount(count), 
         eventNumber(count) 
     {}
@@ -130,6 +130,10 @@ public:
     virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor);
     /// @brief returns the number of streaming sensors in the sensors array
     int getStreamingSensorsCount();
+    /// @brief Create the UID for the port for insertion into the global set
+    /// @param portNumber - The port to use
+    /// @return string representing the UID for the port
+    std::string createPortKey(const int& portNumber);
 
     /// A pointer to the server object
     Simulator* sim = nullptr;

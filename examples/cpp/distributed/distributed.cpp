@@ -47,7 +47,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
     ego_control_config.right_amount = 0.0f;
     ego_control_config.brake_amount = 0.0f;
     ego_control_config.drive_mode = 1;
-    server->sendCommandAsync(ego_control_config.message());
+    server->sendCommand(ego_control_config.message());
 
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -146,9 +146,9 @@ int main(int argc, char** argv) {
       primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "192.168.2.8", 8999),
-      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "192.168.86.41", 9000),
+                                                 "127.0.0.1", 9000),
+      // std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      //                                            "127.0.0.1", 9001),
   };
 
   // Configure the primary first
@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
   signal(SIGINT, sig_handler);
 
   // Kick off the orchestration threads
-  Event* replicasReadyEvent = new Event(replicaServers.size());
+  Event* replicasReadyEvent = new Event(int(replicaServers.size()));
   std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
   std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
 

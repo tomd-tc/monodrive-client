@@ -157,7 +157,7 @@ public:
     }
     double fc{40000.0};
     double pwm_factor{2.5};
-    float period{60.0 / 1000.0f};
+    float period{float(60.0 / 1000.0f)};
     int max_ultrasonic_returns{93};
     bool send_processed_data{true};
     struct SBR
