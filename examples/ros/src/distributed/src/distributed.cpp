@@ -28,7 +28,7 @@ std::string SHARED_STATE_DATA("");
 // the primary server and we don't have to do a full copy
 std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
-std::mutex STATE_DATA_MUTEX;
+//std::mutex STATE_DATA_MUTEX;
 // Flag to tell all threads if we are still running
 std::atomic<bool> ROS_RUNNING{true};
 
@@ -57,9 +57,18 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server,
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
 
     {
-      std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
+//      std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
+      std::cout << "primary sample" << std::endl;
       server->sample(&SHARED_STATE_DATA);
     }
+
+    // apply controls
+    EgoControlConfig ego_control_config;
+    ego_control_config.forward_amount = 0.3f;
+    ego_control_config.right_amount = 0.0f;
+    ego_control_config.brake_amount = 0.0f;
+    ego_control_config.drive_mode = 1;
+    server->sendCommand(ego_control_config.message());
 
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -76,6 +85,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server,
 
     // wait for replicas to finish
     if(ROS_RUNNING) {
+      std::cout << "wait on replicas" << std::endl;
       replicasReadyEvent->wait();
     }
   }
@@ -98,18 +108,23 @@ void ReplicaThread(
 
     // Using a try_lock here because a scoped lock has too much overhead
     // Just keep  trying and breaking until we get it
-    while (!STATE_DATA_MUTEX.try_lock());
-    std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
-    STATE_DATA_MUTEX.unlock();
+    //while (!STATE_DATA_MUTEX.try_lock());
+    //std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
+    //STATE_DATA_MUTEX.unlock();
 
+    std::cout << "wait on primary" << std::endl;
     if(ROS_RUNNING){
       primary->sampleComplete->wait();
     }
 
+    SHARED_STATE_DATA_BUFFER = SHARED_STATE_DATA;
+
     if (SHARED_STATE_DATA_BUFFER == "") {
+      std::cout << "primary signalled but no data" << std::endl;
       continue;
     }
 
+    std::cout << "replicas sample" << std::endl;
     for (auto& server : servers) {
       server->sample(&SHARED_STATE_DATA_BUFFER);
     }
@@ -120,6 +135,7 @@ void ReplicaThread(
       // signal complete
       replicasReadyEvent->notify();
     }
+    std::cout << "replicas complete" << std::endl;
 
     sample_time +=
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -167,12 +183,12 @@ int main(int argc, char **argv)
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
       // machine 1 instance 1
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "192.168.2.8", 8999),
+                                                 "192.168.86.41", 8998),
       // machine 1 instance 2
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.8", 9000),
+                                                 "192.168.86.41", 8999),
       // machine 2 instance 3
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      /*std::make_shared<ReplicaDistributedServer>(replica_radar_config,
                                                  "192.168.2.9", 8999),
       // machine 2 instance 4
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
@@ -200,7 +216,7 @@ int main(int argc, char **argv)
                                                  "192.168.2.13", 8999),
       // machine 6 instance 12
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.13", 9000),
+                                                 "192.168.2.13", 9000),*/
   };
 
   primaryServer->loadSensors();
@@ -225,7 +241,7 @@ int main(int argc, char **argv)
         };
       } else if (sensor->config->type == "Radar") {
         std::shared_ptr<ros::NodeHandle> node_handle_radar = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
-        ros::Publisher pub_radar = node_handle_state->advertise<monodrive_msgs::Radar>("/monodrive/radar", 1);
+        ros::Publisher pub_radar = node_handle_radar->advertise<monodrive_msgs::Radar>("/monodrive/radar", 1);
         sensor->sampleCallback = [pub_radar](DataFrame *frame) {
           auto& data = *static_cast<RadarFrame*>(frame);
           monodrive_msgs::Radar msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);

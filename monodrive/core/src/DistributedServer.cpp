@@ -143,10 +143,10 @@ bool PrimaryDistributedServer::sample(std::string* stateData) {
   // Store the pointer for output in the callback
   stateDataString = stateData;
   // For primaries, always wait for the state data to come back
-  bool success = sim->sampleAllAsync(sensors);
-  if (success) {
+  bool success = sim->sampleAll(sensors);
+/*  if (success) {
     sampleComplete->wait();
-  }
+  }*/
 
   return success;
 }

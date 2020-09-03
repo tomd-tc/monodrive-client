@@ -20,15 +20,13 @@ namespace monodrive_msgs
     public:
         static monodrive_msgs::Complex complexToROSComplex(const std::complex<float> value) {
             monodrive_msgs::Complex result;
-            result.real = value.real;
-            result.imag = value.imag;
+            result.real = std::real(value);
+            result.imag = std::imag(value);
             return result;
         }
 
         static std::complex<float> ROSComplexTocomplex(const monodrive_msgs::Complex& value) {
-            std::complex<float> result;
-            result.real = value.real;
-            result.imag = value.imag;
+            std::complex<float> result(value.real,value.imag);
             return result;
         }
 
@@ -296,10 +294,7 @@ namespace monodrive_msgs
         }
 
         static ::RadarCubeFrame ROSRadarCubeToRadarCubeFrame(const monodrive_msgs::RadarCube& radarCube) {
-            ::RadarCubeFrame result;
-            result.numSweeps = radarCube.num_sweeps;
-            result.numSamplesPerSweep = radarCube.num_samples_per_sweep;
-            result.numElements = radarCube.num_elements;
+            ::RadarCubeFrame result(radarCube.num_sweeps, radarCube.num_samples_per_sweep, radarCube.num_elements);
             for (auto& value : radarCube.radar_cube) {
                 result.radar_cube.push_back(ROSComplexTocomplex(value));
             }
@@ -322,7 +317,7 @@ namespace monodrive_msgs
             for (auto& target : radarTargetList.targets) {
                 result.targets.push_back(ROSRadarTargetToRadarTarget(target));
             }
-            for (auto& target : radarTargetListFrame.gt_targets) {
+            for (auto& target : radarTargetList.gt_targets) {
                 result.gt_targets.push_back(ROSRadarTargetToRadarTarget(target));
             }
             return result;
@@ -402,7 +397,6 @@ namespace monodrive_msgs
 
         static sensor_msgs::NavSatFix FromMonoDriveFrame(const GPSFrame& frame) {
             sensor_msgs::NavSatFix message;
-            message.header.stamp.sec = long(frame.time / 1000.0);
             message.latitude = frame.lattitude;
             message.longitude = frame.longitude;
             message.altitude = frame.elevation;
@@ -426,16 +420,18 @@ namespace monodrive_msgs
             message.has_radar_cube = frame.bSendRadarCube;
             message.current_frame_index = frame.currentFrameIndex;
             message.radar_target_list_frame = RadarTargetListFrameToROSRadarTargetList(*frame.radarTargetListFrame);
-            message.radar_cube_frame = ROSRadarCubeToRadarCubeFrame(*frame.radarCubeFrame);
+            message.radar_cube_frame = RadarCubeFrameToROSRadarCube(*frame.radarCubeFrame);
             return message;
         }
 
         static RadarFrame ToMonoDriveFrame(const monodrive_msgs::Radar& message) {
-            RadarFrame frame;
-            message.bSendRadarCube = frame.has_radar_cube;
-            message.currentFrameIndex = frame.current_frame_index;
-            *message.radarTargetListFrame = RadarTargetListFrameToROSRadarTargetList(frame.radar_target_list_frame);
-            *message.radarCubeFrame = ROSRadarCubeToRadarCubeFrame(frame.radar_cube_frame);
+            RadarFrame frame(message.has_radar_cube, 
+                message.radar_cube_frame.num_sweeps, 
+                message.radar_cube_frame.num_samples_per_sweep, 
+                message.radar_cube_frame.num_elements);
+            frame.currentFrameIndex = message.current_frame_index;
+            *frame.radarTargetListFrame = ROSRadarTargetListToRadarTargetListFrame(message.radar_target_list_frame);
+            *frame.radarCubeFrame = ROSRadarCubeToRadarCubeFrame(message.radar_cube_frame);
             return frame;
         }
 

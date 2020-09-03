@@ -46,10 +46,9 @@ public:
     /// When the event is triggered, eventCount is reset to the original value
     inline bool notify() {
         bool signalled;
-        mutex.lock();
+        std::lock_guard<std::mutex> lock{mutex};
         eventCount--;
         signalled = eventCount <= 0;
-        mutex.unlock();
 
         if (eventCount <= 0) {
             condition.notify_all();
