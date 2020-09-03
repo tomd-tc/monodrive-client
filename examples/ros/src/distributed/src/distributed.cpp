@@ -28,7 +28,7 @@ std::string SHARED_STATE_DATA("");
 // the primary server and we don't have to do a full copy
 std::string SHARED_STATE_DATA_BUFFER("");
 // A mutex to protect the read/write state of the SHARED_STATE_DATA
-//std::mutex STATE_DATA_MUTEX;
+std::mutex STATE_DATA_MUTEX;
 // Flag to tell all threads if we are still running
 std::atomic<bool> ROS_RUNNING{true};
 
@@ -45,8 +45,7 @@ void rosLoop(float fps) {
   ROS_RUNNING.store(false, std::memory_order_relaxed);
 }
 
-void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server,
-                   std::shared_ptr<Event> replicasReadyEvent) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
@@ -57,8 +56,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server,
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
 
     {
-//      std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
-      std::cout << "primary sample" << std::endl;
+      std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
       server->sample(&SHARED_STATE_DATA);
     }
 
@@ -82,19 +80,12 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server,
       frame_count = 0;
       control_time = 0;
     }
-
-    // wait for replicas to finish
-    if(ROS_RUNNING) {
-      std::cout << "wait on replicas" << std::endl;
-      replicasReadyEvent->wait();
-    }
   }
 }
 
 void ReplicaThread(
   std::shared_ptr<PrimaryDistributedServer> primary,
-    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers, 
-    std::shared_ptr<Event> replicasReadyEvent) {
+    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -108,34 +99,21 @@ void ReplicaThread(
 
     // Using a try_lock here because a scoped lock has too much overhead
     // Just keep  trying and breaking until we get it
-    //while (!STATE_DATA_MUTEX.try_lock());
-    //std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
-    //STATE_DATA_MUTEX.unlock();
-
-    std::cout << "wait on primary" << std::endl;
-    if(ROS_RUNNING){
-      primary->sampleComplete->wait();
-    }
-
-    SHARED_STATE_DATA_BUFFER = SHARED_STATE_DATA;
+    while (!STATE_DATA_MUTEX.try_lock());
+    std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
+    STATE_DATA_MUTEX.unlock();
 
     if (SHARED_STATE_DATA_BUFFER == "") {
-      std::cout << "primary signalled but no data" << std::endl;
       continue;
     }
 
-    std::cout << "replicas sample" << std::endl;
     for (auto& server : servers) {
       server->sample(&SHARED_STATE_DATA_BUFFER);
     }
 
     for (auto& server : servers) {
       while (server->isSampling());
-
-      // signal complete
-      replicasReadyEvent->notify();
     }
-    std::cout << "replicas complete" << std::endl;
 
     sample_time +=
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -179,44 +157,44 @@ int main(int argc, char **argv)
 
   // Set up all the server
   auto primaryServer = std::make_shared<PrimaryDistributedServer>(
-      primary_config, "127.0.0.1", 8999);
+      primary_config, "10.100.11.151", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
       // machine 1 instance 1
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "192.168.86.41", 8998),
+                                                 "10.100.11.154", 8998),
       // machine 1 instance 2
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.86.41", 8999),
+                                                 "10.100.11.154", 8999),
       // machine 2 instance 3
-      /*std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.9", 8999),
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "10.100.11.160", 8999),
       // machine 2 instance 4
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.9", 9000),
+                                                 "10.100.11.160", 9000),
       // machine 3 instance 5
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.10", 8999),
+                                                 "10.100.11.163", 8999),
       // machine 3 instance 6
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.10", 9000),
+                                                 "10.100.11.163", 9000),
       // machine 4 instance 7
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.11", 8999),
+                                                 "10.100.11.159", 8999),
       // machine 4 instance 8
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.11", 9000),
+                                                 "10.100.11.159", 9000), 
       // machine 5 instance 9
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.12", 8999),
+                                                 "10.100.11.153", 8999),
       // machine 5 instance 10
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.12", 9000),
+                                                 "10.100.11.153", 9000),
       // machine 6 instance 11
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.13", 8999),
+                                                 "10.100.11.138", 8999),
       // machine 6 instance 12
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "192.168.2.13", 9000),*/
+                                                 "10.100.11.138", 9000),
   };
 
   primaryServer->loadSensors();
@@ -304,9 +282,8 @@ int main(int argc, char **argv)
   }
 
   // Bench marking stuff
-  std::shared_ptr<Event> replicasReadyEvent = std::shared_ptr<Event>(new Event(replicaServers.size()));
-  std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
-  std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
+  std::thread replicaThread(ReplicaThread, primaryServer, replicaServers);
+  std::thread primaryThread(PrimaryThread, primaryServer);
 
   float fps = 100.f;
   rosLoop(fps);

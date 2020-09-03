@@ -22,7 +22,7 @@ class Event
 public:
     /// @brief constructor
     /// @param count - the number of times notify needs to get called in order to trigger event
-    inline Event(int count = 0) :
+    inline Event(int count = 1) :
         eventCount(count), 
         eventNumber(count) 
     {}
@@ -45,27 +45,24 @@ public:
     /// triggered and any threads waiting on the condition get signaled.
     /// When the event is triggered, eventCount is reset to the original value
     inline bool notify() {
-        bool signalled;
         std::lock_guard<std::mutex> lock{mutex};
         eventCount--;
-        signalled = eventCount <= 0;
+        bool signalled = eventCount <= 0;
 
         if (eventCount <= 0) {
             condition.notify_all();
             reset();
         }
-        
         return signalled;
     }
 	
     /// @brief resets the event to initial state
     inline void reset(int newCount = -1) {
-        mutex.lock();
+        //std::lock_guard<std::mutex> lock{mutex};
         if (newCount > 0) {
             eventNumber = newCount;
         }
         eventCount = eventNumber;
-        mutex.unlock();
     }
 
     /// @brief returns true if event has pending items before it triggers
@@ -94,10 +91,6 @@ public:
                       const int& port,
                       const int& simulationMode);
                       
-    /// @brief destructor
-    virtual ~DistributedServer() {
-        delete sampleComplete;
-    }
     
     /// @brief create the specified sensors for the server
     /// @return true if all sensors were created successfully
@@ -117,10 +110,6 @@ public:
     /// @brief Send command to server and return immediately
     virtual bool sendCommandAsync(ApiMessage message, nlohmann::json* response=nullptr);
 
-
-    /// @brief Event that triggers when a sample send is completed
-    Event* sampleComplete = nullptr;
-
     /// The array of sensors that is configured for this server
     std::vector<std::shared_ptr<Sensor>> sensors;
 
@@ -130,7 +119,7 @@ public:
     /// @return the callback for the sensor that calls sampleComplete->notify() 
     /// to signal sample completion, and to forward the sensor data to any
     /// callback registered with the sensor
-    virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor);
+    //virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor);
     /// @brief returns the number of streaming sensors in the sensors array
     int getStreamingSensorsCount();
     /// @brief Create the UID for the port for insertion into the global set
@@ -142,6 +131,9 @@ public:
     Simulator* sim = nullptr;
     /// @brief The set of configuration items for this server
     Configuration serverConfig;
+
+    /// @brief Flag that is set when a sample send is completed
+    std::atomic<bool> sampleComplete;
  };
 
 /// @class Class for managing a remote Simulator that collects state data
@@ -163,11 +155,9 @@ class PrimaryDistributedServer : public DistributedServer {
     /// @return true if the configuration was successful
     bool configure() override final;
 
-protected:
-    virtual std::function<void(DataFrame*)> setupCallback(std::shared_ptr<Sensor> sensor) override;
 private:
     std::string* stateDataString = nullptr;
-    std::shared_ptr<Sensor> binaryStateSensor;
+    std::atomic<bool> stateSensorDataUpdated{false};
 };
 
 /// @class Class for managing a remote Simulator that collects state data

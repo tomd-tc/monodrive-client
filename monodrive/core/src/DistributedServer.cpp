@@ -48,12 +48,6 @@ bool DistributedServer::loadSensors() {
     return false;
   }
 
-  if (sampleComplete) {
-    delete sampleComplete;
-  }
-  
-  
-  sampleComplete = new Event(getStreamingSensorsCount());
   return true;
 }
 
@@ -71,11 +65,6 @@ bool DistributedServer::configure(){
   }
 
   for(auto& sensor : sensors) {
-    // chain callback
-    if (sensor->config->enable_streaming) {
-        sensor->sampleCallback = setupCallback(sensor);
-    }
-
     // Actually configure the sensor to start streaming
     if(!sensor->configure()) {
       std::cerr << "DistributedServer::configure: ERROR! Unable to configure "
@@ -104,19 +93,8 @@ bool DistributedServer::configure(){
 }
 
 bool DistributedServer::isSampling() {
-  return sampleComplete->hasPending() ||
+    return !sampleComplete.load(std::memory_order_relaxed) ||
          sim->sampleInProgress(sensors);
-}
-
-std::function<void(DataFrame*)> DistributedServer::setupCallback(std::shared_ptr<Sensor> sensor) {
-  auto sensorCallback = sensor->sampleCallback;
-  return [this, sensor, sensorCallback](DataFrame* frame){
-      sampleComplete->notify();
-
-      if (sensorCallback) {
-      sensorCallback(frame);
-    } 
-  };
 }
 
 bool DistributedServer::sendCommand(ApiMessage message, nlohmann::json* response) {
@@ -144,9 +122,12 @@ bool PrimaryDistributedServer::sample(std::string* stateData) {
   stateDataString = stateData;
   // For primaries, always wait for the state data to come back
   bool success = sim->sampleAll(sensors);
-/*  if (success) {
-    sampleComplete->wait();
-  }*/
+  if (success) {
+    //sampleComplete->wait();
+    while(!stateSensorDataUpdated.load(std::memory_order_relaxed));
+    stateSensorDataUpdated = false;
+  }
+  sampleComplete.store(true, std::memory_order_relaxed);
 
   return success;
 }
@@ -171,9 +152,14 @@ bool PrimaryDistributedServer::configure() {
     sConfig.include_obb = false;
     sConfig.debug_drawing = false;
     sConfig.enable_streaming = true;
-    binaryStateSensor = std::make_shared<Sensor>(std::make_unique<StateConfig>(sConfig), false);
+    auto binaryStateSensor = std::make_shared<Sensor>(std::make_unique<StateConfig>(sConfig), false);
     binaryStateSensor->parseBinaryData = false;
-    binaryStateSensor->sampleCallback = setupCallback(binaryStateSensor);
+    binaryStateSensor->sampleCallback = [this](DataFrame* frame) {
+            if (stateDataString != nullptr) {
+              *stateDataString = static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
+            }            
+            stateSensorDataUpdated.store(true, std::memory_order_relaxed);
+    };
     sensors.emplace_back(binaryStateSensor);
 
     if(!binaryStateSensor->configure()) {
@@ -183,21 +169,7 @@ bool PrimaryDistributedServer::configure() {
       return false;
     }
 
-    sampleComplete->reset(getStreamingSensorsCount());
-
   return true;
-}
-
-std::function<void(DataFrame*)> PrimaryDistributedServer::setupCallback(std::shared_ptr<Sensor> sensor) {
-  if (sensor == binaryStateSensor) {
-    return [this](DataFrame* frame) {
-            if (stateDataString != nullptr) {
-              *stateDataString = static_cast<BinaryDataFrame*>(frame)->data_frame.as_string();
-            }            
-            sampleComplete->notify();
-    };
-  }
-  return DistributedServer::setupCallback(sensor);
 }
 
 bool ReplicaDistributedServer::sample(std::string* state_data) {
@@ -205,5 +177,6 @@ bool ReplicaDistributedServer::sample(std::string* state_data) {
   nlohmann::json state_data_json;
   state_data_json["state_data_as_string"] = *state_data;
   bool success = sim->stateStepAll(sensors, state_data_json);
+  sampleComplete.store(true, std::memory_order_relaxed);
   return success;
 }

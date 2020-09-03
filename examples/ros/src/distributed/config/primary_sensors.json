@@ -64,5 +64,19 @@
     "max_shutter": 0.001400,
     "sensor_size": 9.07,
     "channels": "bgra"
+  },
+  {
+    "type": "GPS",
+    "listen_port": 8102,
+    "location": {
+      "x": -75.0,
+      "y": -25.0,
+      "z": 245.0
+    },
+    "rotation": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0
+    }
   }
 ]
