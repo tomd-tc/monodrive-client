@@ -157,44 +157,44 @@ int main(int argc, char **argv)
 
   // Set up all the server
   auto primaryServer = std::make_shared<PrimaryDistributedServer>(
-      primary_config, "10.100.11.151", 8999);
+      primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
       // machine 1 instance 1
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "10.100.11.154", 8998),
+                                                 "192.168.86.41", 8998),
       // machine 1 instance 2
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.154", 8999),
+                                                 "192.168.86.41", 8999),
       // machine 2 instance 3
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.160", 8999),
+      /*std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "10.100.11.160", 8998),
       // machine 2 instance 4
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.160", 9000),
+                                                 "10.100.11.160", 8999),
       // machine 3 instance 5
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.163", 8999),
+                                                 "10.100.11.163", 8998),
       // machine 3 instance 6
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.163", 9000),
+                                                 "10.100.11.163", 8999),
       // machine 4 instance 7
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.159", 8999),
+                                                 "10.100.11.159", 8998),
       // machine 4 instance 8
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.159", 9000), 
+                                                 "10.100.11.159", 8999), 
       // machine 5 instance 9
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.153", 8999),
+                                                 "10.100.11.153", 8998),
       // machine 5 instance 10
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.153", 9000),
+                                                 "10.100.11.153", 8999),
       // machine 6 instance 11
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.138", 8999),
+                                                 "10.100.11.138", 8998),
       // machine 6 instance 12
       std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "10.100.11.138", 9000),
+                                                 "10.100.11.138", 8999),*/
   };
 
   primaryServer->loadSensors();
