@@ -23,8 +23,10 @@ int main(int argc, char** argv)
     Configuration config(
         "examples/config/simulator.json",
         "examples/config/weather.json",
-        "examples/config/scenario.json"
+        "examples/config/trajectories/Car-to-Car-Cut-In.json"
     );
+    config.simulator["map"] = "Straightaway5k";
+    config.simulator["simulation_mode"] = 2;
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     if(!sim0.configure()){
@@ -48,8 +50,9 @@ int main(int argc, char** argv)
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = server0_ip;
-    vp_config.location.x = -750;
+    vp_config.location.x = -800;
     vp_config.location.z = 400;
+    vp_config.rotation.pitch = -15;
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     std::cout<<"***********ALL SENSOR's CONFIGS*******"<<std::endl;

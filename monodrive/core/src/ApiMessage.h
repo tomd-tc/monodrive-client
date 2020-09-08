@@ -16,10 +16,13 @@
 
 #pragma push_macro("TEXT")
 #undef TEXT
+#ifdef _WIN32
 #pragma warning( push )
 #pragma warning( disable: 4668 4191 4834 4267)
-#ifdef _WIN32
 #include <SDKDDKVer.h>
+#elif __linux__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 #endif
 #include <boost/asio.hpp>
 #undef UpdateResource
@@ -27,7 +30,12 @@
 #undef MoveFile
 #undef CreateDirectory
 #undef CopyFile
+#ifdef _WIN32
 #pragma warning( pop)
+#elif __linux__
+#pragma GCC diagnostic pop
+#endif
+
 #pragma pop_macro("TEXT")
 
 using boost::asio::ip::tcp;
@@ -86,9 +94,9 @@ public:
 	}
 
 	void asyncRead(tcp::socket& socket) {
-		asyncRead(socket, [](std::error_code ec, ApiMessage& message){
+		asyncRead(socket, [](std::error_code ec, ApiMessage& msg){
 			if(ec){
-				std::cerr << "ApiMessage::asyncWrite: Unable to read message. Error code: " << ec << std::endl;
+				std::cerr << "ApiMessage::asyncRead: Unable to read message. Error code: " << ec << std::endl;
 			}
 		});
 	}
@@ -150,7 +158,7 @@ public:
 	}
 
 	void asyncWrite(tcp::socket& socket) {
-		asyncWrite(socket, [](std::error_code ec, ApiMessage& message){
+		asyncWrite(socket, [](std::error_code ec, ApiMessage& msg){
 			if(ec){
 				std::cerr << "ApiMessage::asyncWrite: Unable to write message. Error code: " << ec << std::endl;
 			}

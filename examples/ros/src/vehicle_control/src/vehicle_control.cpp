@@ -14,6 +14,7 @@
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
 #include "monodrive_msgs/WaypointSensor.h"
+#include "MessageFactory.h"
 
 using namespace lane_spline;
 LaneSpline lanespline;
