@@ -1,3 +1,4 @@
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
 
 #include "DataFrame.h"
@@ -15,6 +16,9 @@
 namespace monodrive_msgs
 {
 
+    // This class provides a number of static methods that help convert
+    // monoDrive sensor frame data messages to their ROS counterparts, and 
+    // vice-versa
     class MessageFactory 
     {
     public:
@@ -325,8 +329,6 @@ namespace monodrive_msgs
 
         static sensor_msgs::Imu FromMonoDriveFrame(const ImuFrame& frame) {
             sensor_msgs::Imu message;
-//            message.header.stamp.sec = frame.timer / 19660800;
-//            message.orientation
             message.orientation_covariance = {0,0,0,0,0,0,0,0,0}; 
             message.angular_velocity = Vec3fToROSVector3(frame.angular_velocity);
             message.angular_velocity_covariance = { 0,0,0,0,0,0,0,0,0 };
