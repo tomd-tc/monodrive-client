@@ -1,0 +1,516 @@
+{
+  "trigger_boxes": [
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 37560.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox17",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 20.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 19170.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox_3",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 48.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 20790.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox4",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 46.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 22150.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox5",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 44.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 23340.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox6",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 42.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 24730.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox7",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 40.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 25910.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox8",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 38.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 27130.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox9",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 36.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 28300.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox10",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 34.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 29580.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox11",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 32.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 30890.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox12",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 30.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 32200.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox13",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 28.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 33450.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox14",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 26.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 34840.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox15",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 24.0,
+      "tags": []
+    },
+    {
+      "can_stay_in_lane": false,
+      "center_turn_allowed": false,
+      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
+      "lane_change_left_requested": false,
+      "lane_change_right_requested": false,
+      "left_turn_allowed": false,
+      "location": {
+        "x": 36140.0,
+        "y": 170.0,
+        "z": 50.0
+      },
+      "name": "VehicleBehaviorTriggerBox16",
+      "right_turn_allowed": false,
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.0
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "speed_change_request": 22.0,
+      "tags": []
+    }
+  ],
+  "vehicles": [
+    {
+      "behavior_settings": {
+        "destroy_on_collision": false,
+        "ignore_lane_change_boxes": true,
+        "ignore_other_vehicles": false,
+        "ignore_traffic_signals": false,
+        "initial_speed_is_delta": true,
+        "limit_speed_in_curves": true,
+        "obey_road_speed_limits": false,
+        "overtake_slower_vehicles": false,
+        "snap_to_lane": true
+      },
+      "body_color": "Carpaint_Silver",
+      "class_path": "/Game/Vehicles/compact_monoDrive_01.compact_monoDrive_01_C",
+      "controller_settings": {
+        "delayed_start": 0.0,
+        "distance_to_stop_sign": 400.0,
+        "initial_speed": 50.0,
+        "lane_offset": 0.0,
+        "rolling_stop_speed": 0.0010000000474974513,
+        "search_forward_distance": 10000.0,
+        "set_speed": 50.0,
+        "spawn_offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "steer_forward_distance": 550.0,
+        "steer_forward_distance_lane_change": 1500.0
+      },
+      "location": {
+        "x": 10505.736328125,
+        "y": 174.95162963867188,
+        "z": 29.186630249023438
+      },
+      "name": "compact_monoDrive_01_C_0",
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": -0.0752258151769638
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "car",
+        "ego"
+      ]
+    },
+    {
+      "behavior_settings": {
+        "destroy_on_collision": false,
+        "ignore_lane_change_boxes": false,
+        "ignore_other_vehicles": false,
+        "ignore_traffic_signals": false,
+        "initial_speed_is_delta": true,
+        "limit_speed_in_curves": true,
+        "obey_road_speed_limits": false,
+        "overtake_slower_vehicles": false,
+        "snap_to_lane": true
+      },
+      "body_color": "Carpaint_Beige",
+      "class_path": "/Game/Vehicles/sedan_monoDrive_01.sedan_monoDrive_01_C",
+      "controller_settings": {
+        "delayed_start": 0.0,
+        "distance_to_stop_sign": 400.0,
+        "initial_speed": 50.0,
+        "lane_offset": 0.0,
+        "rolling_stop_speed": 0.0010000000474974513,
+        "search_forward_distance": 10000.0,
+        "set_speed": 50.0,
+        "spawn_offset": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "steer_forward_distance": 550.0,
+        "steer_forward_distance_lane_change": 1500.0
+      },
+      "location": {
+        "x": 15074.7861328125,
+        "y": 187.65048217773438,
+        "z": 37.855743408203125
+      },
+      "name": "sedan_monoDrive_01_C_0",
+      "rotation": {
+        "pitch": 0.0,
+        "roll": 0.0,
+        "yaw": 0.7301412224769592
+      },
+      "scale": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "tags": [
+        "vehicle",
+        "dynamic",
+        "car"
+      ]
+    }
+  ]
+}

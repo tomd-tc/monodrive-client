@@ -9,8 +9,10 @@
 #include <iostream>
 #include <string>
 
+#include "UECompatability.h"
 
-#if defined UE_BUILD_DEBUG || defined UE_BUILD_DEVELOPMENT || defined UE_BUILD_TEST || defined UE_BUILD_SHIPPING
+
+#ifdef UE_BUILD
 #include "LogHelper.h"
 
 void MONODRIVECORE_API json_log(const FString& error_message);
@@ -25,6 +27,8 @@ void MONODRIVECORE_API to_json(nlohmann::json& j, const FRotator& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FRotator& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FQuat& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FQuat& v);
+void MONODRIVECORE_API to_json(nlohmann::json& j, const FIntPoint& v);
+void MONODRIVECORE_API from_json(const nlohmann::json& j, FIntPoint& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FVector& v);
 void MONODRIVECORE_API from_json(const nlohmann::json& j, FVector& v);
 void MONODRIVECORE_API to_json(nlohmann::json& j, const FVector2D& v);
@@ -44,6 +48,9 @@ void inline json_log(const std::string& error_message)
 
 #endif
 
+// update me, should do the at check and return false rather than rely on exception handling
+// this is nice for debugging but causes slow down on normal operations where we expect the 
+// at to fail but have a default or something that is used when this function returns false
 template <typename T>
 bool inline json_get(const nlohmann::json& data, const std::string& key, T& value) {
     T temp;

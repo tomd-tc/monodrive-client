@@ -20,8 +20,8 @@
 // #define IMG_WIDTH 4096
 // #define IMG_HEIGHT 2160
 
-#define IMG_WIDTH 1920
-#define IMG_HEIGHT 1080
+#define IMG_WIDTH 1080
+#define IMG_HEIGHT 720
 
 
 int main(int argc, char** argv)

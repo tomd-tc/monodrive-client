@@ -95,7 +95,8 @@ class Sensor
 public:
 	//Constructors
 	~Sensor();
-	Sensor(std::unique_ptr<SensorBaseConfig> sensorConfig);
+	Sensor(std::unique_ptr<SensorBaseConfig> sensorConfig,
+			bool parseBinaryData = true);
 	Sensor(const Sensor& ) = delete;
 	Sensor& operator=(const Sensor& ) = delete;
 
@@ -111,6 +112,7 @@ public:
 	ByteBuffer recvBuffer;
 	std::unique_ptr<SensorBaseConfig> config = nullptr;
 	DataFrame* frame = nullptr;
+	bool parseBinaryData = true;
 	std::atomic<bool> sampleInProgress{false};
 	std::function<void(DataFrame*)> sampleCallback;
 	
