@@ -246,7 +246,17 @@ public:
     {
         type = "FisheyeCamera";
         fov = 180.f;
+        fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
     }
+    FisheyeCameraConfig(Resolution res) : Camera360Config(){
+        type = "FisheyeCamera";
+        fov = 180.f;
+        resolution = res;
+        fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
+    }
+    float fisheye_pixel_diameter;
+    float vignette_radius_start = 0.95f;
+    float vignette_bias = 0.5f;
 };
 
 class SemanticCameraConfig : public CameraConfig
