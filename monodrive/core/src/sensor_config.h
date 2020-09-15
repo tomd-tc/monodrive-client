@@ -207,6 +207,7 @@ public:
         bool cull_partial_frame{false};
         bool debug_draw{false};
     } annotation;
+    Viewport viewport;
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
         if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
@@ -372,6 +373,7 @@ public:
     }
 };
 
+
 class ViewportCameraConfig : public CameraConfig
 {
 public:
@@ -380,11 +382,8 @@ public:
         type = "ViewportCamera";
         enable_streaming = false;
     }
-    bool enable_hud{false};
-    Resolution window_size{0, 0};
-    Resolution window_offset{0, 0};
-    bool fullscreen{false};
-    int monitor_number{0};
+    bool enable_hud;
+
     virtual DataFrame* DataFrameFactory() override {
         return nullptr;
     }
@@ -439,6 +438,29 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
 }
 /// End SensorBaseConfig JSON Parsing
 
+/// StateConfig JSON Parsing
+void inline to_json(nlohmann::json& j, const StateConfig& config)
+{
+    j = static_cast<SensorBaseConfig>(config);
+    j["desired_tags"] = config.desired_tags;
+    j["undesired_tags"] = config.undesired_tags;
+    j["debug_drawing"] = config.debug_drawing;
+    j["include_obb"] = config.include_obb;
+}
+
+void inline from_json(const nlohmann::json& j, StateConfig& config)
+{
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "include_obb", config.include_obb);
+    json_get(j, "debug_drawing", config.debug_drawing);
+    json_get(j, "desired_tags", config.desired_tags);
+    json_get(j, "undesired_tags", config.undesired_tags);
+}
+/// End StateConfig JSON Parsing
+
+/// Camera Config JSON Parsing
 void inline to_json(nlohmann::json& j, const CameraConfig::Annotation& annotation){
     j = nlohmann::json{
         {"include_annotation", annotation.include_annotation},
@@ -462,32 +484,6 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
     json_get(j, "debug_draw", annotation.debug_draw);
 }
 
-
-/// Camera Config JSON Parsing
-void inline to_json(nlohmann::json& j, const StateConfig& config){
-    j = static_cast<SensorBaseConfig>(config);
-    j["desired_tags"] = config.desired_tags;
-    j["undesired_tags"] = config.undesired_tags;
-    j["debug_drawing"] = config.debug_drawing;
-    j["include_obb"] = config.include_obb;
-}
-
-void inline from_json(const nlohmann::json& j, StateConfig& config)
-{
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
-    from_json(j, *base);
-
-    json_get(j, "include_obb", config.include_obb);
-    json_get(j, "debug_drawing", config.debug_drawing);
-    json_get(j, "desired_tags", config.desired_tags);
-    json_get(j, "undesired_tags", config.undesired_tags);
-}
-
-void inline to_json(nlohmann::json& j, const Camera360Config& config){
-    j = static_cast<CameraConfig>(config);
-    j["face_size"] = config.face_size;
-}
-
 void inline to_json(nlohmann::json& j, const CameraConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
@@ -503,6 +499,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["channels"] = config.channels;
     j["channel_depth"] = config.channel_depth;
     j["annotation"] = config.annotation;
+    j["viewport"] = config.viewport;
 }
 
 void inline from_json(const nlohmann::json& j, CameraConfig& config)
@@ -522,6 +519,13 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "channels", config.channels);         
     json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
+    json_get(j, "viewport", config.viewport);
+}
+
+void inline to_json(nlohmann::json& j, const Camera360Config& config)
+{
+    j = static_cast<CameraConfig>(config);
+    j["face_size"] = config.face_size;
 }
 
 void inline from_json(const nlohmann::json& j, Camera360Config& config)
@@ -536,23 +540,13 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
 {
     j = static_cast<CameraConfig>(config);
     j["use_vehicle_hud"] = config.enable_hud;
-    j["window_size"] = config.window_size;
-    j["window_offset"] = config.window_offset;
-    j["fullscreen"] = config.fullscreen;
-    j["monitor_number"] = config.monitor_number;
 }
-
 
 void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
 {
     CameraConfig* base = static_cast<CameraConfig*>(&config);
     from_json(j, *base);
-
     json_get(j, "use_vehicle_hud", config.enable_hud);
-    json_get(j, "window_size", config.window_size);
-    json_get(j, "window_offset", config.window_offset);
-    json_get(j, "fullscreen", config.fullscreen);
-    json_get(j, "monitor_number", config.monitor_number);
 }
 
 /// END Camera Config JSON Parsing
