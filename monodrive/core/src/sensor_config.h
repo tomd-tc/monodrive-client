@@ -179,15 +179,6 @@ public:
     }
 };
 
-struct ViewportConfig
-{
-    bool enable_viewport{false};
-    Resolution window_size{0, 0};
-    Resolution window_offset{0, 0};
-    bool fullscreen{false};
-    int monitor_number{0};
-};
-
 class CameraConfig : public SensorBaseConfig
 {
 public:
@@ -216,7 +207,7 @@ public:
         bool cull_partial_frame{false};
         bool debug_draw{false};
     } annotation;
-    ViewportConfig viewport;
+    Viewport viewport;
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
         if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
@@ -491,24 +482,6 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
     json_get(j, "include_obb", annotation.include_oob);
     json_get(j, "include_tags", annotation.include_tags);
     json_get(j, "debug_draw", annotation.debug_draw);
-}
-
-void inline to_json(nlohmann::json& j, const ViewportConfig& config)
-{
-    j["enable_viewport"] = config.enable_viewport;
-    j["window_size"] = config.window_size;
-    j["window_offset"] = config.window_offset;
-    j["fullscreen"] = config.fullscreen;
-    j["monitor_number"] = config.monitor_number;
-}
-
-void inline from_json(const nlohmann::json& j, ViewportConfig& config)
-{
-    json_get(j, "enable_viewport", config.enable_viewport);
-    json_get(j, "window_size", config.window_size);
-    json_get(j, "window_offset", config.window_offset);
-    json_get(j, "fullscreen", config.fullscreen);
-    json_get(j, "monitor_number", config.monitor_number);
 }
 
 void inline to_json(nlohmann::json& j, const CameraConfig& config)
