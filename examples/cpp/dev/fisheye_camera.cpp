@@ -16,8 +16,8 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-#define IMG_WIDTH 1280
-#define IMG_HEIGHT 1280
+#define IMG_WIDTH 1920
+#define IMG_HEIGHT 1080
 
 int main(int argc, char** argv)
 {
@@ -40,16 +40,15 @@ int main(int argc, char** argv)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
 
-    FisheyeCameraConfig fc_config;
+    FisheyeCameraConfig fc_config(Resolution(IMG_WIDTH, IMG_HEIGHT));
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
-    fc_config.resolution = Resolution(IMG_WIDTH,IMG_WIDTH);
     fc_config.fov = 180.f;
     fc_config.rotation.yaw = -90.f;
-    // face_size should be smaller than the largest resolution
-    // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
+    /// face_size should be smaller than the largest resolution
+    /// increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
     fc_config.face_size = 1024;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<FisheyeCameraConfig>(fc_config)));
 
