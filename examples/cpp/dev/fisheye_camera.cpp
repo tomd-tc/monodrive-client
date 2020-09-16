@@ -47,8 +47,16 @@ int main(int argc, char** argv)
     fc_config.location.z = 225;
     fc_config.fov = 180.f;
     fc_config.rotation.yaw = -90.f;
-    /// face_size should be smaller than the largest resolution
-    /// increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
+    // before the hard mechanical vignette at what point should the fade start normalized with respect to the diameter of the fisheye
+    fc_config.vignette_radius_start = 0.95f;
+    // in the transition to black at the start of the mechanical vignette start with this value of black before the linear fade
+    fc_config.vignette_bias = 0.5f;
+    // for a bounded fisheye set the pixel diameter to the smallest axis, or to the measured real pixel diameter limit from the image
+    // for a diagonal bounded fisheye set the pixel diameter to the hypotenuse of the image
+    // for a fisheye that is greater than the image plane use the value from your model
+    fc_config.fisheye_pixel_diameter = std::min(fc_config.resolution.x, fc_config.resolution.y);
+    // face_size should be smaller than the largest resolution
+    // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
     fc_config.face_size = 1024;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<FisheyeCameraConfig>(fc_config)));
 
