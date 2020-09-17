@@ -33,6 +33,7 @@ struct Viewport
     Resolution window_offset{0, 0};
     bool fullscreen{false};
     int monitor_number{0};
+    std::string monitor_name{""};
 };
 
 void inline to_json(nlohmann::json& j, const Location& location)
