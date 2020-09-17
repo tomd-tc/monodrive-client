@@ -16,8 +16,8 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-#define IMG_WIDTH 1280
-#define IMG_HEIGHT 1280
+#define IMG_WIDTH 1920
+#define IMG_HEIGHT 1080
 
 int main(int argc, char** argv)
 {
@@ -40,14 +40,21 @@ int main(int argc, char** argv)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
 
-    FisheyeCameraConfig fc_config;
+    FisheyeCameraConfig fc_config(Resolution(IMG_WIDTH, IMG_HEIGHT));
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
-    fc_config.resolution = Resolution(IMG_WIDTH,IMG_WIDTH);
     fc_config.fov = 180.f;
     fc_config.rotation.yaw = -90.f;
+    // before the hard mechanical vignette at what point should the fade start normalized with respect to the diameter of the fisheye
+    fc_config.vignette_radius_start = 0.95f;
+    // in the transition to black at the start of the mechanical vignette start with this value of black before the linear fade
+    fc_config.vignette_bias = 0.5f;
+    // for a bounded fisheye set the pixel diameter to the smallest axis, or to the measured real pixel diameter limit from the image
+    // for a diagonal bounded fisheye set the pixel diameter to the hypotenuse of the image
+    // for a fisheye that is greater than the image plane use the value from your model
+    fc_config.fisheye_pixel_diameter = std::min(fc_config.resolution.x, fc_config.resolution.y);
     // face_size should be smaller than the largest resolution
     // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
     fc_config.face_size = 1024;

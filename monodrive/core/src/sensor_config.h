@@ -157,7 +157,7 @@ public:
     }
     double fc{40000.0};
     double pwm_factor{2.5};
-    float period{60.0 / 1000.0f};
+    float period{60.0f / 1000.0f};
     int max_ultrasonic_returns{93};
     bool send_processed_data{true};
     struct SBR
@@ -247,6 +247,19 @@ public:
     {
         type = "FisheyeCamera";
         fov = 180.f;
+        fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
+    }
+    FisheyeCameraConfig(Resolution res) : Camera360Config(){
+        type = "FisheyeCamera";
+        fov = 180.f;
+        resolution = res;
+        fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
+    }
+    int fisheye_pixel_diameter;
+    float vignette_radius_start = 0.95f;
+    float vignette_bias = 0.5f;
+    virtual nlohmann::json dump() {
+        return *this;
     }
 };
 
@@ -484,6 +497,8 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
     json_get(j, "debug_draw", annotation.debug_draw);
 }
 
+/// Camera Config JSON Parsing
+
 void inline to_json(nlohmann::json& j, const CameraConfig& config)
 {
     j = static_cast<SensorBaseConfig>(config);
@@ -534,6 +549,15 @@ void inline from_json(const nlohmann::json& j, Camera360Config& config)
     from_json(j, *base);
 
     json_get(j, "face_size", config.face_size);
+}
+
+void inline from_json(const nlohmann::json& j, FisheyeCameraConfig& config){
+    Camera360Config* base = static_cast<Camera360Config*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "fisheye_pixel_diameter", config.fisheye_pixel_diameter);
+    json_get(j, "vignette_bias", config.vignette_bias);
+    json_get(j, "vignette_radius_start", config.vignette_radius_start);
 }
 
 void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
