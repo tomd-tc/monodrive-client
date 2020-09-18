@@ -395,7 +395,7 @@ public:
         type = "ViewportCamera";
         enable_streaming = false;
     }
-    bool enable_hud;
+    bool enable_hud = false;
 
     virtual DataFrame* DataFrameFactory() override {
         return nullptr;
@@ -551,7 +551,16 @@ void inline from_json(const nlohmann::json& j, Camera360Config& config)
     json_get(j, "face_size", config.face_size);
 }
 
-void inline from_json(const nlohmann::json& j, FisheyeCameraConfig& config){
+void inline to_json(nlohmann::json& j, const FisheyeCameraConfig& config)
+{
+    j = static_cast<Camera360Config>(config);
+    j["fisheye_pixel_diameter"] = config.fisheye_pixel_diameter;
+    j["vignette_bias"] = config.vignette_bias;
+    j["vignette_radius_start"] = config.vignette_radius_start;
+}
+
+void inline from_json(const nlohmann::json& j, FisheyeCameraConfig& config)
+{
     Camera360Config* base = static_cast<Camera360Config*>(&config);
     from_json(j, *base);
 
