@@ -87,6 +87,7 @@ void inline to_json(nlohmann::json& j, const Viewport& config)
     j["window_offset"] = config.window_offset;
     j["fullscreen"] = config.fullscreen;
     j["monitor_number"] = config.monitor_number;
+    j["monitor_name"] = config.monitor_name;
 }
 
 void inline from_json(const nlohmann::json& j, Viewport& config)
@@ -96,4 +97,5 @@ void inline from_json(const nlohmann::json& j, Viewport& config)
     json_get(j, "window_offset", config.window_offset);
     json_get(j, "fullscreen", config.fullscreen);
     json_get(j, "monitor_number", config.monitor_number);
+    json_get(j, "monitor_name", config.monitor_name);
 }
