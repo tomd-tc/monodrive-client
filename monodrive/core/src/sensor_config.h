@@ -404,6 +404,19 @@ public:
         return *this;
     }
 };
+
+class LEDConfig : public SensorBaseConfig 
+{
+public:
+
+};
+
+class LEDArrayConfig : public SensorBaseConfig
+{
+public:
+
+};
+
 /// SensorBaseConfig
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 {
