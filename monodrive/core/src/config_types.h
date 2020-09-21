@@ -26,6 +26,15 @@ struct Resolution {
   int y{512};
 };
 
+struct Color {
+    Color() {}
+    Color(int a, int r, int g, int b) : a(a), r(r), g(g), b(b) {}
+    int a{255};
+    int r{0};
+    int g{0};
+    int b{0};
+;
+
 struct Viewport
 {
     bool enable_viewport{false};

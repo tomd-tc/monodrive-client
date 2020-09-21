@@ -408,13 +408,20 @@ public:
 class LEDConfig : public SensorBaseConfig 
 {
 public:
-
+    int led = 0;
+    float inner_cone_angle = 0.0f;
+    float outer_cone_angle = 0.0f;
+    float intensity = 0.0f;
+    Color color;
+    float attenuation_radius = 0.0f;
+    float temperature = 0.0f;
 };
 
 class LEDArrayConfig : public SensorBaseConfig
 {
 public:
-
+    int array_id = 0;
+    std::vector<LEDConfig> lights;
 };
 
 /// SensorBaseConfig
