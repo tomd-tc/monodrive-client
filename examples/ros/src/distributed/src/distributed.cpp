@@ -203,6 +203,17 @@ int main(int argc, char **argv)
     }
   }
 
+  auto egoControlServer = std::make_unique<Server>(primaryServer->GetSimulator()->getServerPort(), primaryServer->GetSimulator()->getServerIp());
+  ros::NodeHandle ego_control_node_handle;
+  ros::Subscriber ego_control_sub = ego_control_node_handle->subscribe("/your_controller_topic/vehicle_control", 1, [egoControlServer = std::move(egoControlServer)](const monodrive_msgs::VehicleControl &vehicle_control){
+    EgoControlConfig egoControl;
+    egoControl.forward_amount = vehicle_control.throttle;
+    egoControl.brake_amount = vehicle_control.brake;
+    egoControl.drive_mode = vehicle_control.drive_mode;
+    egoControl.right_amount = vehicle_control.steer;
+    egoControlServer->sendCommand(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
+  });
+
   // Configure the primary 
   if (!primaryServer->configure()){
     std::cerr << "Unable to configure primary server!" << std::endl;
