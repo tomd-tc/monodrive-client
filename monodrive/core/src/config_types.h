@@ -29,11 +29,11 @@ struct Resolution {
 struct Color {
     Color() {}
     Color(int a, int r, int g, int b) : a(a), r(r), g(g), b(b) {}
-    int a{255};
-    int r{0};
-    int g{0};
-    int b{0};
-;
+    int a{ 255 };
+    int r{ 0 };
+    int g{ 0 };
+    int b{ 0 };
+};
 
 struct Viewport
 {
@@ -107,4 +107,21 @@ void inline from_json(const nlohmann::json& j, Viewport& config)
     json_get(j, "fullscreen", config.fullscreen);
     json_get(j, "monitor_number", config.monitor_number);
     json_get(j, "monitor_name", config.monitor_name);
+}
+
+void inline to_json(nlohmann::json& j, const Color& color)
+{
+    j = nlohmann::json{
+        {"a", color.a},
+        {"r", color.r},
+        {"g", color.g},
+        {"b", color.b}
+    };
+}
+void inline from_json(const nlohmann::json& j, Color& color)
+{
+    json_get(j, "a", color.a);
+    json_get(j, "r", color.r);
+    json_get(j, "g", color.g);
+    json_get(j, "b", color.b);
 }

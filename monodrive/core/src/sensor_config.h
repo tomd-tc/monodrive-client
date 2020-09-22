@@ -420,7 +420,7 @@ public:
 class LEDArrayConfig : public SensorBaseConfig
 {
 public:
-    int array_id = 0;
+    std::string array_id;
     std::vector<LEDConfig> lights;
 };
 
@@ -878,6 +878,44 @@ void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
 }
 /// END Waypoint Sensor JSON parsing
 
+/// LED JSON parsing
+void inline to_json(nlohmann::json& j, const LEDConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["led"] = config.led;
+    j["inner_cone_angle"] = config.inner_cone_angle;
+    j["outer_cone_angle"] = config.outer_cone_angle;
+    j["intensity"] = config.intensity;
+    j["color"] = config.color;
+    j["attenuation_radius"] = config.attenuation_radius;
+    j["temperature"] = config.temperature;
+
+}
+void inline from_json(const nlohmann::json& j, LEDConfig& config) {
+    json_get(j, "led", config.led);
+    json_get(j, "inner_cone_angle", config.inner_cone_angle);
+    json_get(j, "outer_cone_angle", config.outer_cone_angle);
+    json_get(j, "intensity", config.intensity);
+    json_get(j, "color", config.color);
+    json_get(j, "attenuation_radius", config.attenuation_radius);
+    json_get(j, "temperature", config.temperature);
+}
+/// END Waypoint Sensor JSON parsing
+
+/// LEDArray Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const LEDArrayConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["array_id"] = config.array_id;
+    j["lights"] = nlohmann::json::array();
+    for (auto& led : config.lights) {
+        j["lights"].push_back(led);
+    }
+
+}
+void inline from_json(const nlohmann::json& j, LEDArrayConfig& config) {
+    json_get(j, "array_id", config.array_id);
+    json_get(j, "lights", config.lights);
+}
+/// END Waypoint Sensor JSON parsing
 
 std::unique_ptr<SensorBaseConfig> inline sensorConfigFactory(const nlohmann::json& j)
 {
