@@ -415,6 +415,10 @@ public:
     Color color;
     float attenuation_radius = 0.0f;
     float temperature = 0.0f;
+
+    virtual nlohmann::json dump() {
+        return *this;
+    }
 };
 
 class LEDArrayConfig : public SensorBaseConfig
@@ -422,6 +426,10 @@ class LEDArrayConfig : public SensorBaseConfig
 public:
     std::string array_id;
     std::vector<LEDConfig> lights;
+
+    virtual nlohmann::json dump() {
+        return *this;
+    }
 };
 
 /// SensorBaseConfig
