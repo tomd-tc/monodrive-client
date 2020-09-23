@@ -82,7 +82,7 @@
 /*
  * Vehicle lights configuration command
  */
-#define VehicleLightsConfigCommand_ID           "VehicleLightsConfig_ID"
+#define VehicleLightsConfigCommand_ID           "VehicleLightsConfig"
 
  /*
   * EGO autopilot control command

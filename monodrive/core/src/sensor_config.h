@@ -871,6 +871,9 @@ void inline to_json(nlohmann::json& j, const WaypointConfig& config) {
 
 }
 void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "distance", config.distance);
     json_get(j, "frequency", config.frequency);
     json_get(j, "draw_debug", config.draw_debug);
@@ -891,6 +894,8 @@ void inline to_json(nlohmann::json& j, const LEDConfig& config) {
 
 }
 void inline from_json(const nlohmann::json& j, LEDConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
     json_get(j, "led", config.led);
     json_get(j, "inner_cone_angle", config.inner_cone_angle);
     json_get(j, "outer_cone_angle", config.outer_cone_angle);
@@ -912,6 +917,9 @@ void inline to_json(nlohmann::json& j, const LEDArrayConfig& config) {
 
 }
 void inline from_json(const nlohmann::json& j, LEDArrayConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "array_id", config.array_id);
     json_get(j, "lights", config.lights);
 }
