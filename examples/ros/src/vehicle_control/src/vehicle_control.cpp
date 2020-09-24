@@ -36,11 +36,17 @@ monodrive_msgs::WaypointSensor waypoint_data;
 sensor_msgs::Imu imu_data;
 
 void control_vehicle(){
+    bool found_vehicle = false;
     monodrive_msgs::VehicleState vs;
     for(auto& vehicle : state_data.vehicles){
-        if(vehicle.name == vehicle_name) {
+        if(vehicle.name.find(vehicle_name) != std::string::npos){
             vs = vehicle;
+            found_vehicle = true;
+            break;
         }
+    }
+    if(found_vehicle == false){
+        std::cout << "Failed to find vehicle " << vehicle_name << std::endl;
     }
     Eigen::VectorXd position(3);
     position << vs.pose.pose.position.x,
@@ -83,13 +89,6 @@ void control_vehicle(){
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
     state_data = state_sensor_msg;
-    for(auto& vehicle : state_data.vehicles) {
-        for(auto& tag : vehicle.tags) {
-            if(tag == "ego") {
-                vehicle_name = vehicle.name;
-            }
-        }
-    }
 }
 
 void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
