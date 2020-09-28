@@ -8,7 +8,7 @@
       "lane_change_right_requested": true,
       "left_turn_allowed": false,
       "location": {
-        "x": 10190.0,
+        "x": 14190.0,
         "y": -210.0,
         "z": 30.0
       },
@@ -42,7 +42,7 @@
         "snap_to_lane": true
       },
       "body_color": "Carpaint_White",
-      "class_path": "/Game/Vehicles/subcompact_monoDrive_01.subcompact_monoDrive_01_C",
+      "class_path": "/Game/Vehicles/compact_monoDrive_01.compact_monoDrive_01_C",
       "controller_settings": {
         "delayed_start": 0.0,
         "distance_to_stop_sign": 400.0,

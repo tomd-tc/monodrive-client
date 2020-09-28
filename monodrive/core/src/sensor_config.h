@@ -415,6 +415,7 @@ public:
     Color color;
     float attenuation_radius = 0.0f;
     float temperature = 0.0f;
+    std::string ies_profile;
 
     virtual nlohmann::json dump() {
         return *this;
@@ -899,7 +900,7 @@ void inline to_json(nlohmann::json& j, const LEDConfig& config) {
     j["color"] = config.color;
     j["attenuation_radius"] = config.attenuation_radius;
     j["temperature"] = config.temperature;
-
+    j["ies_profile"] = config.ies_profile;
 }
 void inline from_json(const nlohmann::json& j, LEDConfig& config) {
     SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
@@ -911,6 +912,7 @@ void inline from_json(const nlohmann::json& j, LEDConfig& config) {
     json_get(j, "color", config.color);
     json_get(j, "attenuation_radius", config.attenuation_radius);
     json_get(j, "temperature", config.temperature);
+    json_get(j, "ies_profile", config.ies_profile);
 }
 /// END Waypoint Sensor JSON parsing
 

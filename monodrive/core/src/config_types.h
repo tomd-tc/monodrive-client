@@ -30,9 +30,9 @@ struct Color {
     Color() {}
     Color(int a, int r, int g, int b) : a(a), r(r), g(g), b(b) {}
     int a{ 255 };
-    int r{ 0 };
-    int g{ 0 };
-    int b{ 0 };
+    int r{ 255 };
+    int g{ 255 };
+    int b{ 255 };
 };
 
 struct Viewport
