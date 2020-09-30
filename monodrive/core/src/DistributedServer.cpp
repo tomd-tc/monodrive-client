@@ -3,7 +3,6 @@
 #include "DistributedServer.h"
 #include "Util.h"
 
-#pragma optimize("", off)
 
 DistributedServer::DistributedServer(const Configuration& config,
                                      const std::string& ipAddress,
@@ -123,7 +122,6 @@ bool PrimaryDistributedServer::sample(std::string* stateData) {
   // For primaries, always wait for the state data to come back
   bool success = sim->sampleAll(sensors);
   if (success) {
-    //sampleComplete->wait();
     while(!stateSensorDataUpdated.load(std::memory_order_relaxed));
     stateSensorDataUpdated = false;
   }

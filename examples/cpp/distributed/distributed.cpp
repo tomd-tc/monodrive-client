@@ -139,8 +139,8 @@ int main(int argc, char** argv) {
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
                                                  "127.0.0.1", 9000),
-      // std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-      //                                            "127.0.0.1", 9001),
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "127.0.0.1", 9001),
   };
 
   // Configure the primary first
@@ -162,7 +162,6 @@ int main(int argc, char** argv) {
   signal(SIGINT, sig_handler);
 
   // Kick off the orchestration threads
-  Event* replicasReadyEvent = new Event(int(replicaServers.size()));
   std::thread replicaThread(ReplicaThread, primaryServer, replicaServers);
   std::thread primaryThread(PrimaryThread, primaryServer);
 
