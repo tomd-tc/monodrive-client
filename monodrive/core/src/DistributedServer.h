@@ -109,6 +109,9 @@ public:
     virtual bool sendCommand(ApiMessage message, nlohmann::json* response=nullptr);
     /// @brief Send command to server and return immediately
     virtual bool sendCommandAsync(ApiMessage message, nlohmann::json* response=nullptr);
+    inline Simulator* getSimulator(){
+        return sim; 
+    }
 
     /// The array of sensors that is configured for this server
     std::vector<std::shared_ptr<Sensor>> sensors;

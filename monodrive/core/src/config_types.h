@@ -3,13 +3,6 @@
 
 #include "JsonHelpers.h"
 
-struct Resolution {
-  Resolution() {}
-  Resolution(int x, int y) : x(x), y(y) {}
-  int x{512};
-  int y{512};
-};
-
 struct Location {
     Location() {}
     Location(float x, float y, float z) : x(x), y(y), z(z) {}
@@ -24,6 +17,23 @@ struct Rotation {
     float yaw{0.0f};
     float pitch{0.0f};
     float roll{0.0f};
+};
+
+struct Resolution {
+  Resolution() {}
+  Resolution(int x, int y) : x(x), y(y) {}
+  int x{512};
+  int y{512};
+};
+
+struct Viewport
+{
+    bool enable_viewport{false};
+    Resolution window_size{0, 0};
+    Resolution window_offset{0, 0};
+    bool fullscreen{false};
+    int monitor_number{0};
+    std::string monitor_name{""};
 };
 
 void inline to_json(nlohmann::json& j, const Location& location)
@@ -68,4 +78,24 @@ void inline from_json(const nlohmann::json& j, Resolution& resolution)
 {
     json_get(j, "x", resolution.x);
     json_get(j, "y", resolution.y);
+}
+
+void inline to_json(nlohmann::json& j, const Viewport& config)
+{
+    j["enable_viewport"] = config.enable_viewport;
+    j["window_size"] = config.window_size;
+    j["window_offset"] = config.window_offset;
+    j["fullscreen"] = config.fullscreen;
+    j["monitor_number"] = config.monitor_number;
+    j["monitor_name"] = config.monitor_name;
+}
+
+void inline from_json(const nlohmann::json& j, Viewport& config)
+{
+    json_get(j, "enable_viewport", config.enable_viewport);
+    json_get(j, "window_size", config.window_size);
+    json_get(j, "window_offset", config.window_offset);
+    json_get(j, "fullscreen", config.fullscreen);
+    json_get(j, "monitor_number", config.monitor_number);
+    json_get(j, "monitor_name", config.monitor_name);
 }

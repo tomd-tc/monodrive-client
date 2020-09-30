@@ -51,6 +51,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server) {
   mono::precise_stopwatch primary_stopwatch;
 
   std::cout << "Primary thread starting..." << std::endl;
+
   while (ROS_RUNNING) {
     auto control_start_time =
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
@@ -59,14 +60,6 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server) {
       std::lock_guard<std::mutex> lock(STATE_DATA_MUTEX);
       server->sample(&SHARED_STATE_DATA);
     }
-
-    // apply controls
-    EgoControlConfig ego_control_config;
-    ego_control_config.forward_amount = 0.3f;
-    ego_control_config.right_amount = 0.0f;
-    ego_control_config.brake_amount = 0.0f;
-    ego_control_config.drive_mode = 1;
-    server->sendCommand(ego_control_config.message());
 
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -268,6 +261,23 @@ int main(int argc, char **argv)
     }
   }
 
+  // create a separate connection for the control command so that it can be called asynchronosouly without contention
+  // on the command channel
+  auto egoControlServer = new Simulator(primaryServer->getSimulator()->getServerIp(), primaryServer->getSimulator()->getServerPort());
+
+  egoControlServer->connect();
+  ros::NodeHandle ego_control_node_handle;
+  ros::Subscriber ego_control_sub = ego_control_node_handle.subscribe<monodrive_msgs::VehicleControl>(
+    "/your_controller_topic/vehicle_control", 1,
+    [&](const monodrive_msgs::VehicleControlConstPtr &vehicle_control){
+        EgoControlConfig egoControl;
+        egoControl.forward_amount = vehicle_control->throttle;
+        egoControl.brake_amount = vehicle_control->brake;
+        egoControl.drive_mode = vehicle_control->drive_mode;
+        egoControl.right_amount = vehicle_control->steer;
+        egoControlServer->sendCommand(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
+  });
+
   // Configure the primary 
   if (!primaryServer->configure()){
     std::cerr << "Unable to configure primary server!" << std::endl;
@@ -290,6 +300,7 @@ int main(int argc, char **argv)
 
   primaryThread.join();
   replicaThread.join();
+  delete egoControlServer;
 
   return 0;
 }
