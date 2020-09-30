@@ -111,6 +111,8 @@ int main(int argc, char** argv)
             sim0.sampleAll(sensors);
         }
     });
+    // create a separate connection for the control command so that it can be called asynchronosouly without contention
+    // on the command channel
     auto egoControlServer = std::make_unique<Simulator>(sim0.getServerIp(), sim0.getServerPort());
     egoControlServer->connect();
     std::thread t2([egoControlServer_ = std::move(egoControlServer)](){
