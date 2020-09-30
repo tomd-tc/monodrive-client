@@ -205,16 +205,19 @@ int main(int argc, char **argv)
 
   // create a separate connection for the control command so that it can be called asynchronosouly without contention
   // on the command channel
-  auto egoControlServer = std::make_unique<Server>(primaryServer->getSimulator()->getServerIp(), primaryServer->getSimulator()->getServerPort());
+  auto egoControlServer = new Simulator(primaryServer->getSimulator()->getServerIp(), primaryServer->getSimulator()->getServerPort());
+
   egoControlServer->connect();
   ros::NodeHandle ego_control_node_handle;
-  ros::Subscriber ego_control_sub = ego_control_node_handle->subscribe("/your_controller_topic/vehicle_control", 1, [egoControlServer = std::move(egoControlServer)](const monodrive_msgs::VehicleControl &vehicle_control){
-    EgoControlConfig egoControl;
-    egoControl.forward_amount = vehicle_control.throttle;
-    egoControl.brake_amount = vehicle_control.brake;
-    egoControl.drive_mode = vehicle_control.drive_mode;
-    egoControl.right_amount = vehicle_control.steer;
-    egoControlServer->sendCommand(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
+  ros::Subscriber ego_control_sub = ego_control_node_handle.subscribe<monodrive_msgs::VehicleControl>(
+    "/your_controller_topic/vehicle_control", 1,
+    [&](const monodrive_msgs::VehicleControlConstPtr &vehicle_control){
+        EgoControlConfig egoControl;
+        egoControl.forward_amount = vehicle_control->throttle;
+        egoControl.brake_amount = vehicle_control->brake;
+        egoControl.drive_mode = vehicle_control->drive_mode;
+        egoControl.right_amount = vehicle_control->steer;
+        egoControlServer->sendCommand(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
   });
 
   // Configure the primary 
@@ -240,6 +243,7 @@ int main(int argc, char **argv)
 
   primaryThread.join();
   replicaThread.join();
+  delete egoControlServer;
 
   return 0;
 }
