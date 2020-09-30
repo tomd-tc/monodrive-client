@@ -13,7 +13,6 @@
 #include "DistributedServer.h"
 #include "sensor_config.h"
 
-#pragma optimize("", off)
 
 // The shared state data object that the primary will populate and the replicas
 // will use
