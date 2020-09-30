@@ -113,6 +113,9 @@ public:
     virtual bool sendCommand(ApiMessage message, nlohmann::json* response=nullptr);
     /// @brief Send command to server and return immediately
     virtual bool sendCommandAsync(ApiMessage message, nlohmann::json* response=nullptr);
+    inline Simulator* getSimulator(){
+        return sim; 
+    }
 
 
     /// @brief Event that triggers when a sample send is completed

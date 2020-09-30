@@ -32,6 +32,10 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
   mono::precise_stopwatch primary_stopwatch;
 
   std::cout << "Primary thread starting..." << std::endl;
+  // create a separate connection for the control command so that it can be called asynchronosouly without contention
+  // on the command channel
+  auto egoControlServer = std::make_unique<Simulator>(server->getSimulator()->getServerIp(), server->getSimulator()->getServerPort());
+  egoControlServer->connect();
   while (RUN_EXAMPLE) {
     auto control_start_time =
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
@@ -47,7 +51,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
     ego_control_config.right_amount = 0.0f;
     ego_control_config.brake_amount = 0.0f;
     ego_control_config.drive_mode = 1;
-    server->sendCommandAsync(ego_control_config.message());
+    egoControlServer->sendCommandAsync(ego_control_config.message());
 
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
