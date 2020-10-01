@@ -51,8 +51,9 @@
     }
   },
   {
-    "type": "ViewportCamera",
-    "listen_port": 0,
+    "type": "Camera",
+    "listen_port": 8002,
+    "enable_streaming": false,
     "location": {
       "x": -800.0,
       "y": 0.0,
@@ -75,6 +76,15 @@
     "min_shutter": 0.000500,
     "max_shutter": 0.001400,
     "sensor_size": 9.07,
-    "channels": "bgra"
+    "channels": "bgra",
+    "viewport": {
+      "enable_viewport": true,
+      "monitor_name": "",
+      "monitor_number": -1,
+      "fullscreen": false,
+      "window offset": {
+        "x": 512.0
+      }
+    }
   }
 ]
