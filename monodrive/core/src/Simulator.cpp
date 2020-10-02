@@ -291,6 +291,7 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
+	
 	if(sendCommand(sampleMessage)){
 		waitForSamples(sensors);
 	}
@@ -299,6 +300,19 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 		return false;
 	}
 	return true;
+}
+
+bool Simulator::sampleAllAsync(std::vector<std::shared_ptr<Sensor>>& sensors)
+{
+	ApiMessage sampleMessage(999, SampleSensorsCommand_ID, true, {});
+	for (auto& sensor : sensors) {
+		if (!sensor->config->enable_streaming) {
+			continue;
+		}
+		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+	}
+
+	return sendCommandAsync(sampleMessage);
 }
 
 bool Simulator::sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors)

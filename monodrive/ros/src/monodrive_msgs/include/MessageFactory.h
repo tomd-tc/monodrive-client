@@ -1,3 +1,4 @@
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
 
 #include "DataFrame.h"
@@ -5,17 +6,34 @@
 #include "geometry_msgs/TwistWithCovariance.h"
 #include "geometry_msgs/Vector3.h"
 #include "sensor_msgs/Imu.h"
+#include "sensor_msgs/NavSatFix.h"
 #include "monodrive_msgs/VehicleControl.h"
 #include "monodrive_msgs/StateSensor.h"
 #include "monodrive_msgs/WaypointSensor.h"
+#include "monodrive_msgs/Radar.h"
 
 
 namespace monodrive_msgs
 {
 
+    // This class provides a number of static methods that help convert
+    // monoDrive sensor frame data messages to their ROS counterparts, and 
+    // vice-versa
     class MessageFactory 
     {
     public:
+        static monodrive_msgs::Complex complexToROSComplex(const std::complex<float> value) {
+            monodrive_msgs::Complex result;
+            result.real = std::real(value);
+            result.imag = std::imag(value);
+            return result;
+        }
+
+        static std::complex<float> ROSComplexTocomplex(const monodrive_msgs::Complex& value) {
+            std::complex<float> result(value.real,value.imag);
+            return result;
+        }
+
         static geometry_msgs::Vector3 Vec3fToROSVector3(const Vec3f& vec) {
             geometry_msgs::Vector3 result;
             result.x = vec.x;
@@ -123,8 +141,9 @@ namespace monodrive_msgs
             monodrive_msgs::ActorLane result;
             result.road_id = actorLane.road_id;
             result.lane_id = actorLane.lane_id;
-            for (auto& waypoint : actorLane.waypoints) {
-                result.waypoints.push_back(WaypointToROSWaypoint(waypoint));
+            result.waypoints.resize(actorLane.waypoints.size());
+            for (int i = 0; i < actorLane.waypoints.size(); i++) {
+                result.waypoints[i] = WaypointToROSWaypoint(actorLane.waypoints[i]);
             }
             return result;
         }
@@ -133,8 +152,9 @@ namespace monodrive_msgs
             ::ActorLane result;
             result.road_id = actorLane.road_id;
             result.lane_id = actorLane.lane_id;
-            for (auto& waypoint : actorLane.waypoints) {
-                result.waypoints.push_back(ROSWaypointToWaypoint(waypoint));
+            result.waypoints.resize(actorLane.waypoints.size());
+            for (int i = 0; i < actorLane.waypoints.size(); i++) {
+                result.waypoints[i] = ROSWaypointToWaypoint(actorLane.waypoints[i]);
             }
             return result;
         }
@@ -146,14 +166,19 @@ namespace monodrive_msgs
             result.actor_lane_id = waypoint.actor_lane_id;
             result.actor_waypoint = WaypointToROSWaypoint(waypoint.actor_waypoint);
             
-            for (auto& lane : waypoint.lanes) {
-                result.lanes.push_back(ActorLaneToROSActorLane(lane));
+            result.lanes.resize(waypoint.lanes.size());
+            for (int i = 0; i < waypoint.lanes.size(); i++) {
+                result.lanes[i] = ActorLaneToROSActorLane(waypoint.lanes[i]);
             }
-            for (auto& lane : waypoint.left_lanes) {
-                result.left_lanes.push_back(ActorLaneToROSActorLane(lane));
+
+            result.left_lanes.resize(waypoint.left_lanes.size());
+            for (int i = 0; i < waypoint.left_lanes.size(); i++) {
+                result.left_lanes[i] = ActorLaneToROSActorLane(waypoint.left_lanes[i]);
             }
-            for (auto& lane : waypoint.right_lanes) {
-                result.right_lanes.push_back(ActorLaneToROSActorLane(lane));
+
+            result.right_lanes.resize(waypoint.right_lanes.size());
+            for (int i = 0; i < waypoint.right_lanes.size(); i++) {
+                result.right_lanes[i] = ActorLaneToROSActorLane(waypoint.right_lanes[i]);
             }
             return result;
         }
@@ -165,14 +190,19 @@ namespace monodrive_msgs
             result.actor_lane_id = waypoint.actor_lane_id;
             result.actor_waypoint = ROSWaypointToWaypoint(waypoint.actor_waypoint);
             
-            for (auto& lane : waypoint.lanes) {
-                result.lanes.push_back(ROSActorLaneToActorLane(lane));
+            result.lanes.resize(waypoint.lanes.size());
+            for (int i = 0; i < waypoint.lanes.size(); i++) {
+                result.lanes[i] = ROSActorLaneToActorLane(waypoint.lanes[i]);
             }
-            for (auto& lane : waypoint.left_lanes) {
-                result.left_lanes.push_back(ROSActorLaneToActorLane(lane));
+
+            result.left_lanes.resize(waypoint.left_lanes.size());
+            for (int i = 0; i < waypoint.left_lanes.size(); i++) {
+                result.left_lanes[i] = ROSActorLaneToActorLane(waypoint.left_lanes[i]);
             }
-            for (auto& lane : waypoint.right_lanes) {
-                result.right_lanes.push_back(ROSActorLaneToActorLane(lane));
+
+            result.right_lanes.resize(waypoint.right_lanes.size());
+            for (int i = 0; i < waypoint.right_lanes.size(); i++) {
+                result.right_lanes[i] = ROSActorLaneToActorLane(waypoint.right_lanes[i]);
             }
             return result;
         }
@@ -220,12 +250,14 @@ namespace monodrive_msgs
             result.twist = Vec3ToTwist(vehicleState.state.odometry.linear_velocity, vehicleState.state.odometry.angular_velocity);
             result.tags = vehicleState.state.tags;
 
-            for (auto& wheel : vehicleState.wheels) {
-                result.wheels.push_back(WheelStateToROSWheelState(wheel));
+            result.wheels.resize(vehicleState.wheels.size());
+            for (int i = 0; i < vehicleState.wheels.size(); i++) {
+                result.wheels[i] = WheelStateToROSWheelState(vehicleState.wheels[i]);
             }
             
-            for (auto& oobb : vehicleState.state.oobbs) {
-                result.oobbs.push_back(OOBBToROSOOBB(oobb));
+            result.oobbs.resize(vehicleState.state.oobbs.size());
+            for (int i = 0; i < vehicleState.state.oobbs.size(); i++) {
+                result.oobbs[i] = OOBBToROSOOBB(vehicleState.state.oobbs[i]);
             }
             return result;
         }
@@ -238,20 +270,93 @@ namespace monodrive_msgs
             result.state.odometry.angular_velocity = ROSVector3ToVec3f(vehicleState.twist.twist.angular);
             result.state.tags = vehicleState.tags;
 
-            for (auto& wheel : vehicleState.wheels) {
-                result.wheels.push_back(ROSWheelStateToWheelState(wheel));
+            result.wheels.resize(vehicleState.wheels.size());
+            for (int i = 0; i < vehicleState.wheels.size(); i++) {
+                result.wheels[i] = ROSWheelStateToWheelState(vehicleState.wheels[i]);
             }
             
-            for (auto& oobb : vehicleState.oobbs) {
-                result.state.oobbs.push_back(ROSOOBBToOOBB(oobb));
+            result.state.oobbs.resize(vehicleState.oobbs.size());
+            for (int i = 0; i < vehicleState.oobbs.size(); i++) {
+                result.state.oobbs[i] = ROSOOBBToOOBB(vehicleState.oobbs[i]);
+            }
+            return result;
+        }
+
+        static monodrive_msgs::RadarTarget RadarTargetToROSRadarTarget(const ::RadarTarget& radarTarget) {
+            monodrive_msgs::RadarTarget result;
+            result.range = radarTarget.range;
+            result.aoa = radarTarget.aoa;
+            result.velocity = radarTarget.velocity;
+            result.rcs = radarTarget.rcs;
+            result.target_ids = radarTarget.target_ids;
+            return result;
+        }
+
+        static ::RadarTarget ROSRadarTargetToRadarTarget(const monodrive_msgs::RadarTarget& radarTarget) {
+            ::RadarTarget result;
+            result.range = radarTarget.range;
+            result.aoa = radarTarget.aoa;
+            result.velocity = radarTarget.velocity;
+            result.rcs = radarTarget.rcs;
+            result.target_ids = radarTarget.target_ids;
+            return result;
+        }
+
+        static monodrive_msgs::RadarCube RadarCubeFrameToROSRadarCube(const ::RadarCubeFrame& radarCubeFrame) {
+            monodrive_msgs::RadarCube result;
+            result.num_sweeps = radarCubeFrame.numSweeps;
+            result.num_samples_per_sweep = radarCubeFrame.numSamplesPerSweep;
+            result.num_elements = radarCubeFrame.numElements;
+
+            result.radar_cube.resize(radarCubeFrame.radar_cube.size());
+            for (int i = 0; i < radarCubeFrame.radar_cube.size(); i++) {
+                result.radar_cube[i] = complexToROSComplex(radarCubeFrame.radar_cube[i]);
+            }
+            return result;
+        }
+
+        static ::RadarCubeFrame ROSRadarCubeToRadarCubeFrame(const monodrive_msgs::RadarCube& radarCube) {
+            ::RadarCubeFrame result(radarCube.num_sweeps, radarCube.num_samples_per_sweep, radarCube.num_elements);
+
+            result.radar_cube.resize(radarCube.radar_cube.size());
+            for (int i = 0; i < radarCube.radar_cube.size(); i++) {
+                result.radar_cube[i] = ROSComplexTocomplex(radarCube.radar_cube[i]);
+            }
+            return result;
+        }
+
+        static monodrive_msgs::RadarTargetList RadarTargetListFrameToROSRadarTargetList(const ::RadarTargetListFrame& radarTargetListFrame) {
+            monodrive_msgs::RadarTargetList result;
+
+            result.targets.resize(radarTargetListFrame.targets.size());
+            for (int i = 0; i < radarTargetListFrame.targets.size(); i++) {
+                result.targets[i] = RadarTargetToROSRadarTarget(radarTargetListFrame.targets[i]);
+            }
+
+            result.gt_targets.resize(radarTargetListFrame.gt_targets.size());
+            for (int i = 0; i < radarTargetListFrame.gt_targets.size(); i++) {
+                result.gt_targets[i] = RadarTargetToROSRadarTarget(radarTargetListFrame.gt_targets[i]);
+            }
+            return result;
+        }
+
+        static ::RadarTargetListFrame ROSRadarTargetListToRadarTargetListFrame(const monodrive_msgs::RadarTargetList& radarTargetList) {
+            ::RadarTargetListFrame result;
+
+            result.targets.resize(radarTargetList.targets.size());
+            for (int i = 0; i < radarTargetList.targets.size(); i++) {
+                result.targets[i] = ROSRadarTargetToRadarTarget(radarTargetList.targets[i]);
+            }
+
+            result.gt_targets.resize(radarTargetList.gt_targets.size());
+            for (int i = 0; i < radarTargetList.gt_targets.size(); i++) {
+                result.gt_targets[i] = ROSRadarTargetToRadarTarget(radarTargetList.gt_targets[i]);
             }
             return result;
         }
 
         static sensor_msgs::Imu FromMonoDriveFrame(const ImuFrame& frame) {
             sensor_msgs::Imu message;
-//            message.header.stamp.sec = frame.timer / 19660800;
-//            message.orientation
             message.orientation_covariance = {0,0,0,0,0,0,0,0,0}; 
             message.angular_velocity = Vec3fToROSVector3(frame.angular_velocity);
             message.angular_velocity_covariance = { 0,0,0,0,0,0,0,0,0 };
@@ -278,8 +383,10 @@ namespace monodrive_msgs
             message.time = frame.time;
             message.game_time = frame.game_time;
             message.sample_count = frame.sample_count;
-            for (auto& actor_wp : frame.actor_waypoints) {
-                message.actor_waypoints.push_back(ActorWaypointsToROSActorWaypoints(actor_wp));
+
+            message.actor_waypoints.resize(frame.actor_waypoints.size());
+            for (int i = 0; i < frame.actor_waypoints.size(); i++) {
+                message.actor_waypoints[i] = ActorWaypointsToROSActorWaypoints(frame.actor_waypoints[i]);
             }
             return message;
         }
@@ -289,8 +396,10 @@ namespace monodrive_msgs
             frame.time = message.time;
             frame.game_time = message.game_time;
             frame.sample_count = message.sample_count;
-            for (auto& actor_wp : message.actor_waypoints) {
-                frame.actor_waypoints.push_back(ROSActorWaypointsToActorWaypoints(actor_wp));
+
+            frame.actor_waypoints.resize(message.actor_waypoints.size());
+            for (int i = 0; i < message.actor_waypoints.size(); i++) {
+                frame.actor_waypoints[i] = ROSActorWaypointsToActorWaypoints(message.actor_waypoints[i]);
             }
             return frame;
         }
@@ -299,12 +408,16 @@ namespace monodrive_msgs
             monodrive_msgs::StateSensor message;
             message.time = frame.time;
             message.game_time = frame.game_time;
-            message.sample_count = frame.sample_count;            
-            for (auto& vs : frame.vehicles) {
-                message.vehicles.push_back(VehicleStateToROSVehicleState(vs));
+            message.sample_count = frame.sample_count;
+
+            message.vehicles.resize(frame.vehicles.size());
+            for (int i = 0; i < frame.vehicles.size(); i++) {
+                message.vehicles[i] = VehicleStateToROSVehicleState(frame.vehicles[i]);
             }
-            //for (auto& objs : frame.objects) {
-            //    message.objects.push_back(FromMonoDriveType(vobjs));
+
+            //message.objects.resize(frame.objects.size());
+            //for (int i = 0; i < frame.objects.size(); i++) {
+            //    message.objects[i] = FromMonoDriveType(frame.objects[i]);
             //}
             return message;
         }
@@ -314,11 +427,54 @@ namespace monodrive_msgs
             frame.time = message.time;
             frame.game_time = message.game_time;
             frame.sample_count = message.sample_count;
-            for (auto& vs : message.vehicles) {
-                frame.vehicles.push_back(ROSVehicleStateToVehicleState(vs));
+
+            frame.vehicles.resize(message.vehicles.size());
+            for (int i = 0; i < message.vehicles.size(); i++) {
+                frame.vehicles[i] = ROSVehicleStateToVehicleState(message.vehicles[i]);
             }
             return frame;
         }
+
+        static sensor_msgs::NavSatFix FromMonoDriveFrame(const GPSFrame& frame) {
+            sensor_msgs::NavSatFix message;
+            message.latitude = frame.lattitude;
+            message.longitude = frame.longitude;
+            message.altitude = frame.elevation;
+            message.position_covariance = {0,0,0,0,0,0,0,0,0};
+            message.position_covariance_type = sensor_msgs::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
+            message.status.status = sensor_msgs::NavSatStatus::STATUS_FIX;
+            message.status.service = sensor_msgs::NavSatStatus::SERVICE_GPS;
+            return message;
+        }
+
+        static GPSFrame ToMonoDriveFrame(const sensor_msgs::NavSatFix& message) {
+            GPSFrame frame;
+            frame.lattitude = message.latitude;
+            frame.longitude = message.longitude;
+            frame.elevation = message.altitude;
+            return frame;
+        }
+
+        static monodrive_msgs::Radar FromMonoDriveFrame(const RadarFrame& frame) {
+            monodrive_msgs::Radar message;
+            message.has_radar_cube = frame.bSendRadarCube;
+            message.current_frame_index = frame.currentFrameIndex;
+            message.radar_target_list_frame = RadarTargetListFrameToROSRadarTargetList(*frame.radarTargetListFrame);
+            message.radar_cube_frame = RadarCubeFrameToROSRadarCube(*frame.radarCubeFrame);
+            return message;
+        }
+
+        static RadarFrame ToMonoDriveFrame(const monodrive_msgs::Radar& message) {
+            RadarFrame frame(message.has_radar_cube, 
+                message.radar_cube_frame.num_sweeps, 
+                message.radar_cube_frame.num_samples_per_sweep, 
+                message.radar_cube_frame.num_elements);
+            frame.currentFrameIndex = message.current_frame_index;
+            *frame.radarTargetListFrame = ROSRadarTargetListToRadarTargetListFrame(message.radar_target_list_frame);
+            *frame.radarCubeFrame = ROSRadarCubeToRadarCubeFrame(message.radar_cube_frame);
+            return frame;
+        }
+
     };
 
 } // namespace monodrive_msgs
