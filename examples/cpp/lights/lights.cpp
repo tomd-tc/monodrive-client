@@ -5,6 +5,9 @@
 #include "sensor_config.h"
 #include "command_config.h"
 
+
+
+
 int main(int argc, char** argv)
 {
     //Single Simulator Example
@@ -17,6 +20,7 @@ int main(int argc, char** argv)
         "examples/config/weather.json",
         "examples/config/scenario_multi_vehicle_straightaway.json"
     );
+    config.simulator["map"] = "Straightaway5k_night";
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     // Configure simulator
@@ -26,6 +30,15 @@ int main(int argc, char** argv)
 
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
+    StateConfig state_config;
+    state_config.desired_tags = { "vehicle" };
+    state_config.undesired_tags = { "static" };
+    state_config.server_ip = sim0.getServerIp();
+    state_config.server_port = sim0.getServerPort();
+    state_config.listen_port = 8200;
+    state_config.debug_drawing = true;
+    state_config.undesired_tags = { "" };
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -45,49 +58,57 @@ int main(int argc, char** argv)
     std::vector<LEDArrayConfig> lights;
     LEDArrayConfig lf_light_config;
     lf_light_config.array_id = "LF";
-//    lf_light_config.location = Location(98, -48, 75);
-    lf_light_config.location = Location(171, -64.5, 81);
-    for (int i = 0; i < 1; i++) {
+    lf_light_config.location = Location(171, -54.5, 81);
+    int ledCount = 0;
+    int yaw = 6;
+    for (int i = 0; i < 8; i++) {
         LEDConfig led_config;
         led_config.led = i;
-        led_config.location = Location(0, i * -10, 0);
-        led_config.intensity = 1000;
-        led_config.inner_cone_angle = 15;
-        led_config.outer_cone_angle = 20;
-        led_config.attenuation_radius = 2000;
+        led_config.location = Location(0, i * -2, 0);
+        led_config.rotation = Rotation(yaw, -1, 0);
+        led_config.intensity = 1500;
+        led_config.backlight_intensity = 400;
+        led_config.inner_cone_angle = 2;
+        led_config.outer_cone_angle = 6;
+        led_config.attenuation_radius = 5000;
         led_config.temperature = 8000;
-//        led_config.ies_profile = "Materials/IES/parallel-beam.parallel-beam";
-        led_config.ies_profile = "Materials/IES/bollard.bollard";
+        led_config.backlight_temperature = 8000;
+        //led_config.ies_profile = "Materials/IES/parallel-beam.parallel-beam";
         lf_light_config.lights.push_back(led_config);
+        ledCount++;
+        yaw -= 3;
     }
     lights.push_back(lf_light_config);
 
     LEDArrayConfig rf_light_config;
     rf_light_config.array_id = "RF";
-//    rf_light_config.location = Location(98, 48, 75);
-    rf_light_config.location = Location(171, 64.5, 81);
-    for (int i = 0; i < 1; i++) {
+    rf_light_config.location = Location(171, 54.5, 81);
+    yaw = -6;
+    for (int i = 0; i < 8; i++) {
         LEDConfig led_config;
         led_config.led = i;
-        led_config.location = Location(0, i * 10, 0);
-        led_config.intensity = 1000;
-        led_config.inner_cone_angle = 15;
-        led_config.outer_cone_angle = 20;
-        led_config.attenuation_radius = 2000;
+        led_config.location = Location(0, i * 2, 0);
+        led_config.rotation = Rotation(yaw, -1, 0);
+        led_config.intensity = 1500;
+        led_config.backlight_intensity = 400;
+        led_config.inner_cone_angle = 2;
+        led_config.outer_cone_angle = 6;
+        led_config.attenuation_radius = 5000;
         led_config.temperature = 8000;
+        led_config.backlight_temperature = 8000;
 //        led_config.ies_profile = "Materials/IES/parallel-beam.parallel-beam";
-        led_config.ies_profile = "Materials/IES/ThreeLobeVee.ThreeLobeVee";
         rf_light_config.lights.push_back(led_config);
+        ledCount++;
+        yaw += 3;
     }
     lights.push_back(rf_light_config);
 
     sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lights));
 
-    std::cout << nlohmann::json(lights) << std::endl;
-
     std::cout << "Sampling sensor loop" << std::endl;
     int led_index = 0;
     int delta = 1;
+
     while (true)
     {
         sim0.sendControl(0.0, 0, 0, 1);
@@ -96,11 +117,12 @@ int main(int argc, char** argv)
         for (int i = 0; i < lights.size();  i++) {
             auto& lightArray = lights[i];
             for (int j = 0; j < lightArray.lights.size(); j++) {
-                int index = j + (i * lights.size());
-                //float intensity = /*(index >= led_index - 1 && index <= led_index + 1)*/index == led_index ? 0 : 1000;
+                int index = j + (i * lightArray.lights.size());
+
                 if (index == led_index) {
-                    float intensity = lightArray.lights[j].intensity > 0 ? 0 : 1000;
+                    float intensity = lightArray.lights[j].intensity > 0 ? 0 : 1500;
                     lightArray.lights[j].intensity = intensity;
+                    lightArray.lights[j].backlight_intensity = intensity > 0 ? 400 : 0;
                 }
                 std::cout << index << ": " << lightArray.lights[j].intensity << std::endl;
             }
@@ -108,7 +130,7 @@ int main(int argc, char** argv)
         }
         sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lights));
         led_index += delta;
-        if (led_index > 1)
+        if (led_index > ledCount)
             delta = -1;
         else if (led_index < 0)
             delta = 1;
