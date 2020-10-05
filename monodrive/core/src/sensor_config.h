@@ -409,13 +409,29 @@ class LEDConfig : public SensorBaseConfig
 {
 public:
     int led = 0;
-    float inner_cone_angle = 0.0f;
-    float outer_cone_angle = 0.0f;
-    float intensity = 0.0f;
+
+    float inner_cone_angle = 8.0f;
+    float outer_cone_angle = 16.0f;
+    float intensity = 2500.0f;
     Color color;
-    float attenuation_radius = 0.0f;
-    float temperature = 0.0f;
+    float attenuation_radius = 10000.0f;
+    float temperature = 8000.0f;
+    float source_radius = 0;
+    float soft_source_radius = 0;
+    float source_length = 1;
+    float indirect_lighting_intensity = 1.0;
+    float volumetric_scattering_intensity = 5;
     std::string ies_profile;
+
+    float backlight_intensity;
+    Color backlight_color;
+    float backlight_attenuation_radius = 10;
+    float backlight_source_radius = 1;
+    float backlight_soft_source_radius = 2;
+    float backlight_source_length = 1;
+    float backlight_temperature = 8000;
+    float backlight_indirect_lighting_intensity = 10;
+    float backlight_volumetric_scattering_intensity = 10;
 
     virtual nlohmann::json dump() {
         return *this;
@@ -900,7 +916,21 @@ void inline to_json(nlohmann::json& j, const LEDConfig& config) {
     j["color"] = config.color;
     j["attenuation_radius"] = config.attenuation_radius;
     j["temperature"] = config.temperature;
+    j["source_radius"] = config.source_radius;
+    j["soft_source_radius"] = config.soft_source_radius;
+    j["source_length"] = config.source_length;
+    j["indirect_lighting_intensity"] = config.indirect_lighting_intensity;
+    j["volumetric_scattering_intensity"] = config.volumetric_scattering_intensity;
     j["ies_profile"] = config.ies_profile;
+    j["backlight_intensity"] = config.backlight_intensity;
+    j["backlight_color"] = config.backlight_color;
+    j["backlight_attenuation_radius"] = config.backlight_attenuation_radius;
+    j["backlight_source_radius"] = config.backlight_source_radius;
+    j["backlight_soft_source_radius"] = config.backlight_soft_source_radius;
+    j["backlight_source_length"] = config.backlight_source_length;
+    j["backlight_temperature"] = config.backlight_temperature;
+    j["backlight_indirect_lighting_intensity"] = config.backlight_indirect_lighting_intensity;
+    j["backlight_volumetric_scattering_intensity"] = config.backlight_volumetric_scattering_intensity;
 }
 void inline from_json(const nlohmann::json& j, LEDConfig& config) {
     SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
@@ -912,7 +942,21 @@ void inline from_json(const nlohmann::json& j, LEDConfig& config) {
     json_get(j, "color", config.color);
     json_get(j, "attenuation_radius", config.attenuation_radius);
     json_get(j, "temperature", config.temperature);
+    json_get(j, "source_radius", config.source_radius);
+    json_get(j, "soft_source_radius", config.soft_source_radius);
+    json_get(j, "source_length", config.source_length);
+    json_get(j, "indirect_lighting_intensity", config.indirect_lighting_intensity);
+    json_get(j, "volumetric_scattering_intensity", config.volumetric_scattering_intensity);
     json_get(j, "ies_profile", config.ies_profile);
+    json_get(j, "backlight_intensity", config.backlight_intensity);
+    json_get(j, "backlight_color", config.backlight_color);
+    json_get(j, "backlight_attenuation_radius", config.backlight_attenuation_radius);
+    json_get(j, "backlight_source_radius", config.backlight_source_radius);
+    json_get(j, "backlight_soft_source_radius", config.backlight_soft_source_radius);
+    json_get(j, "backlight_source_length", config.backlight_source_length);
+    json_get(j, "backlight_temperature", config.backlight_temperature);
+    json_get(j, "backlight_indirect_lighting_intensity", config.backlight_indirect_lighting_intensity);
+    json_get(j, "backlight_volumetric_scattering_intensity", config.backlight_volumetric_scattering_intensity);
 }
 /// END Waypoint Sensor JSON parsing
 
