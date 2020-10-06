@@ -32,7 +32,7 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0)
     StateConfig state_config;
     state_config.server_ip = sim0.getServerIp();
     state_config.server_port = sim0.getServerPort();
-    state_config.desired_tags = {"vehicle", "ego"};
+    state_config.desired_tags = {"ego"};
     state_config.listen_port = 8101;
     state_config.debug_drawing = false;
     state_config.undesired_tags = {"static"};
@@ -94,9 +94,9 @@ int main(int argc, char** argv)
 
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        configPath / "simulator.json",
+        configPath / "simulator_infinity.json",
         configPath / "weather.json",
-        configPath / "scenario.json");
+        configPath / "scenario_correct_map.json");
     
     std::string server0_ip = config.simulator["server_ip"];
     int server_port = config.simulator["server_port"];

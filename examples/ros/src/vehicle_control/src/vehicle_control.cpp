@@ -48,6 +48,9 @@ void control_vehicle(){
     if(found_vehicle == false){
         std::cout << "Failed to find vehicle " << vehicle_name << std::endl;
     }
+    std::cout << vs.pose.pose.position.x << " "
+        << vs.pose.pose.position.y << " "
+        << vs.pose.pose.position.z << std::endl;
     Eigen::VectorXd position(3);
     position << vs.pose.pose.position.x,
         vs.pose.pose.position.y,
@@ -92,21 +95,21 @@ void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
 }
 
 void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
-    waypoint_data = waypoint_sensor_msg;
-    for(auto& actor : waypoint_data.actor_waypoints) {
-        std::cout << "Vehicle: " << actor.actor_id << " has " << 
-            actor.lanes.size() << " lanes" << std::endl;
-        for(auto& lane : actor.lanes) {
-            std::cout << "WP 0: " << lane.waypoints[0].distance << ", " << 
-                lane.waypoints[0].location.x << ", " << 
-                lane.waypoints[0].location.y << ", " << 
-                lane.waypoints[0].location.z << std::endl;
-            std::cout << "WP 1: " << lane.waypoints[1].distance << ", " << 
-                lane.waypoints[1].location.x << ", " << 
-                lane.waypoints[1].location.y << ", " << 
-                lane.waypoints[1].location.z << std::endl;
-        }
-    }
+    // waypoint_data = waypoint_sensor_msg;
+    // for(auto& actor : waypoint_data.actor_waypoints) {
+    //     std::cout << "Vehicle: " << actor.actor_id << " has " << 
+    //         actor.lanes.size() << " lanes" << std::endl;
+    //     for(auto& lane : actor.lanes) {
+    //         std::cout << "WP 0: " << lane.waypoints[0].distance << ", " << 
+    //             lane.waypoints[0].location.x << ", " << 
+    //             lane.waypoints[0].location.y << ", " << 
+    //             lane.waypoints[0].location.z << std::endl;
+    //         std::cout << "WP 1: " << lane.waypoints[1].distance << ", " << 
+    //             lane.waypoints[1].location.x << ", " << 
+    //             lane.waypoints[1].location.y << ", " << 
+    //             lane.waypoints[1].location.z << std::endl;
+    //     }
+    // }
 }
 
 void imu_sensor_callback(const sensor_msgs::Imu &imu_sensor_msg) {
@@ -127,15 +130,17 @@ int main(int argc, char** argv)
     vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
     state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
         &state_sensor_callback);
-    wp_sensor_sub = node_handle->subscribe("/monodrive/waypoint_sensor", 1, 
+    std::shared_ptr<ros::NodeHandle> node_handle_1;
+    wp_sensor_sub = node_handle_1->subscribe("/monodrive/waypoint_sensor", 1, 
         &waypoint_sensor_callback);
-    imu_sensor_sub = node_handle->subscribe("/monodrive/imu_sensor", 1, 
+    std::shared_ptr<ros::NodeHandle> node_handle_2;
+    imu_sensor_sub = node_handle_2->subscribe("/monodrive/imu_sensor", 1, 
         &imu_sensor_callback);
 
     ros::Rate rate(100);
 
     while(ros::ok()){
-        control_vehicle();
+        // control_vehicle();
         ros::spinOnce();
         rate.sleep();
     }
