@@ -49,6 +49,7 @@ public:
 	// the sensors in the list will go into a read state
 	// this should only be called when the sensors in the list count for all the sensors on the server
 	bool sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors);
+	bool sampleAllAsync(std::vector<std::shared_ptr<Sensor>>& sensors);
 	// samples sensors in the list, if any are not connected returns an error
 	bool sampleSensorList(std::vector<std::shared_ptr<Sensor>>& sensors);
 	bool sendControl(float forward, float right, float brake, int mode);
@@ -57,9 +58,9 @@ public:
 
 	const std::string& getServerIp() const{return serverIp;}
 	const short& getServerPort() const{return serverPort;}
+	Simulator(const std::string& serverIp, const short& serverPort);
 private:
 	Simulator(const Configuration& config);
-	Simulator(const std::string& serverIp, const short& serverPort);
 	Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	Simulator(const Simulator&)= delete;
 	void waitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors);
