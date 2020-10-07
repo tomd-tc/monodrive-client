@@ -24,12 +24,12 @@ namespace fs = std::experimental::filesystem;
 
 // LaneSpline lanespline;
 std::string vehicle_name = "subcompact_monoDrive_01";
-std::shared_ptr<ros::NodeHandle> node_handle;
 
 ros::Publisher vehicle_control_pub;
 ros::Subscriber state_sensor_sub;
 ros::Subscriber wp_sensor_sub;
 ros::Subscriber imu_sensor_sub;
+std::map<std::string,std::shared_ptr<ros::NodeHandle>> nodes;
 
 monodrive_msgs::StateSensor state_data;
 monodrive_msgs::WaypointSensor waypoint_data;
@@ -92,6 +92,13 @@ void control_vehicle(){
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
     state_data = state_sensor_msg;
+    std::cout << state_data.vehicles.size() << std::endl;
+    for (auto& vehicle : state_data.vehicles) {
+        std::cout << "  " << vehicle.name << std::endl;
+        std::cout << vehicle.pose.pose.position.x << " "
+        << vehicle.pose.pose.position.y << " "
+        << vehicle.pose.pose.position.z << std::endl;
+    }
 }
 
 void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
@@ -126,21 +133,37 @@ int main(int argc, char** argv)
     lanespline = LaneSpline((configPath / "Straightaway5k.json").string());
 
     // create vehicle controller publisher and sensor subscriber
-    node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
-    vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
-    state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
-        &state_sensor_callback);
-    std::shared_ptr<ros::NodeHandle> node_handle_1;
-    wp_sensor_sub = node_handle_1->subscribe("/monodrive/waypoint_sensor", 1, 
-        &waypoint_sensor_callback);
-    std::shared_ptr<ros::NodeHandle> node_handle_2;
-    imu_sensor_sub = node_handle_2->subscribe("/monodrive/imu_sensor", 1, 
-        &imu_sensor_callback);
+    {
+        std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+        vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
+        nodes["vehicle_control"] = node_handle;
+    }
+
+    {
+        std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+        state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
+            &state_sensor_callback);
+        nodes["state"] = node_handle;
+    }
+
+    {
+        std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+        wp_sensor_sub = node_handle->subscribe("/monodrive/waypoint_sensor", 1, 
+            &waypoint_sensor_callback);
+        nodes["waypoint"] = node_handle;
+    }
+
+    {
+        std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
+        imu_sensor_sub = node_handle->subscribe("/monodrive/imu_sensor", 1, 
+            &imu_sensor_callback);
+        nodes["imu"] = node_handle;
+    }
 
     ros::Rate rate(100);
 
     while(ros::ok()){
-        // control_vehicle();
+        //control_vehicle();
         ros::spinOnce();
         rate.sleep();
     }
