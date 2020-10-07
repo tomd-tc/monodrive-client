@@ -29,7 +29,7 @@ ros::Publisher vehicle_control_pub;
 ros::Subscriber state_sensor_sub;
 ros::Subscriber wp_sensor_sub;
 ros::Subscriber imu_sensor_sub;
-std::map<std::string,std::shared_ptr<ros::NodeHandle>> nodes;
+std::map<std::string,std::shared_ptr<ros::NodeHandle>> node_handles;
 
 monodrive_msgs::StateSensor state_data;
 monodrive_msgs::WaypointSensor waypoint_data;
@@ -48,9 +48,7 @@ void control_vehicle(){
     if(found_vehicle == false){
         std::cout << "Failed to find vehicle " << vehicle_name << std::endl;
     }
-    std::cout << vs.pose.pose.position.x << " "
-        << vs.pose.pose.position.y << " "
-        << vs.pose.pose.position.z << std::endl;
+
     Eigen::VectorXd position(3);
     position << vs.pose.pose.position.x,
         vs.pose.pose.position.y,
@@ -92,31 +90,24 @@ void control_vehicle(){
 
 void state_sensor_callback(const monodrive_msgs::StateSensor &state_sensor_msg){
     state_data = state_sensor_msg;
-    std::cout << state_data.vehicles.size() << std::endl;
-    for (auto& vehicle : state_data.vehicles) {
-        std::cout << "  " << vehicle.name << std::endl;
-        std::cout << vehicle.pose.pose.position.x << " "
-        << vehicle.pose.pose.position.y << " "
-        << vehicle.pose.pose.position.z << std::endl;
-    }
 }
 
 void waypoint_sensor_callback(const monodrive_msgs::WaypointSensor &waypoint_sensor_msg) {
-    // waypoint_data = waypoint_sensor_msg;
-    // for(auto& actor : waypoint_data.actor_waypoints) {
-    //     std::cout << "Vehicle: " << actor.actor_id << " has " << 
-    //         actor.lanes.size() << " lanes" << std::endl;
-    //     for(auto& lane : actor.lanes) {
-    //         std::cout << "WP 0: " << lane.waypoints[0].distance << ", " << 
-    //             lane.waypoints[0].location.x << ", " << 
-    //             lane.waypoints[0].location.y << ", " << 
-    //             lane.waypoints[0].location.z << std::endl;
-    //         std::cout << "WP 1: " << lane.waypoints[1].distance << ", " << 
-    //             lane.waypoints[1].location.x << ", " << 
-    //             lane.waypoints[1].location.y << ", " << 
-    //             lane.waypoints[1].location.z << std::endl;
-    //     }
-    // }
+    waypoint_data = waypoint_sensor_msg;
+    for(auto& actor : waypoint_data.actor_waypoints) {
+        std::cout << "Vehicle: " << actor.actor_id << " has " << 
+            actor.lanes.size() << " lanes" << std::endl;
+        for(auto& lane : actor.lanes) {
+            std::cout << "WP 0: " << lane.waypoints[0].distance << ", " << 
+                lane.waypoints[0].location.x << ", " << 
+                lane.waypoints[0].location.y << ", " << 
+                lane.waypoints[0].location.z << std::endl;
+            std::cout << "WP 1: " << lane.waypoints[1].distance << ", " << 
+                lane.waypoints[1].location.x << ", " << 
+                lane.waypoints[1].location.y << ", " << 
+                lane.waypoints[1].location.z << std::endl;
+        }
+    }
 }
 
 void imu_sensor_callback(const sensor_msgs::Imu &imu_sensor_msg) {
@@ -136,34 +127,34 @@ int main(int argc, char** argv)
     {
         std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
         vehicle_control_pub = node_handle->advertise<monodrive_msgs::VehicleControl>("/monodrive/vehicle_control", 1);
-        nodes["vehicle_control"] = node_handle;
+        node_handles["vehicle_control"] = node_handle;
     }
 
     {
         std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
         state_sensor_sub = node_handle->subscribe("/monodrive/state_sensor", 1, 
             &state_sensor_callback);
-        nodes["state"] = node_handle;
+        node_handles["state"] = node_handle;
     }
 
     {
         std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
         wp_sensor_sub = node_handle->subscribe("/monodrive/waypoint_sensor", 1, 
             &waypoint_sensor_callback);
-        nodes["waypoint"] = node_handle;
+        node_handles["waypoint"] = node_handle;
     }
 
     {
         std::shared_ptr<ros::NodeHandle> node_handle = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
         imu_sensor_sub = node_handle->subscribe("/monodrive/imu_sensor", 1, 
             &imu_sensor_callback);
-        nodes["imu"] = node_handle;
+        node_handles["imu"] = node_handle;
     }
 
     ros::Rate rate(100);
 
     while(ros::ok()){
-        //control_vehicle();
+        control_vehicle();
         ros::spinOnce();
         rate.sleep();
     }

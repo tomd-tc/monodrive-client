@@ -149,9 +149,9 @@ int main(int argc, char** argv)
 
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        configPath / "simulator_infinity.json",
+        configPath / "simulator.json",
         configPath / "weather.json",
-        configPath / "scenario_correct_map.json");
+        configPath / "scenario.json");
     
     if (!use_simulator_ros) {
         // remove the ros config if we're not publishing to ros directly from simulator
