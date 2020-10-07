@@ -52,14 +52,12 @@ std::vector<std::shared_ptr<Sensor>> create_sensors_for(const Simulator& sim0, b
 
     // if we're not using ros from the simulator, set up the callback based forwarding
     if (!use_simulator_ros) {
-        std::cout << "setting up callback" << std::endl;
         std::shared_ptr<ros::NodeHandle> node_handle_state = std::make_shared<ros::NodeHandle>(ros::NodeHandle());
         ros::Publisher pub_state = node_handle_state->advertise<monodrive_msgs::StateSensor>("/monodrive/state_sensor", 1);
         sensors.back()->sampleCallback = [pub_state](DataFrame *frame) {
             StateFrame data = *static_cast<StateFrame*>(frame);
             monodrive_msgs::StateSensor msg = monodrive_msgs::MessageFactory::FromMonoDriveFrame(data);
             pub_state.publish(msg);
-            std::cout << data.sample_count << std::endl;
         };
     }    
 
