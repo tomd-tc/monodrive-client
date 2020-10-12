@@ -6,8 +6,6 @@
 #include "command_config.h"
 
 
-
-
 int main(int argc, char** argv)
 {
     //Single Simulator Example
@@ -103,7 +101,11 @@ int main(int argc, char** argv)
     }
     lights.push_back(rf_light_config);
 
-    sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lights));
+    LightsConfig lightsConfig;
+    lightsConfig.actor_id = sim0.getEgoVehicleId();
+    lightsConfig.lights = lights;
+
+    sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lightsConfig));
 
     std::cout << "Sampling sensor loop" << std::endl;
     int led_index = 0;
@@ -114,8 +116,8 @@ int main(int argc, char** argv)
         sim0.sendControl(0.0, 0, 0, 1);
         sim0.sampleAll(sensors);
 
-        for (int i = 0; i < lights.size();  i++) {
-            auto& lightArray = lights[i];
+        for (int i = 0; i < lightsConfig.lights.size();  i++) {
+            auto& lightArray = lightsConfig.lights[i];
             for (int j = 0; j < lightArray.lights.size(); j++) {
                 int index = j + (i * lightArray.lights.size());
 
@@ -128,13 +130,12 @@ int main(int argc, char** argv)
             }
             std::cout << std::endl;
         }
-        sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lights));
+        sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lightsConfig));
         led_index += delta;
         if (led_index > ledCount)
             delta = -1;
         else if (led_index < 0)
             delta = 1;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
     return 0;

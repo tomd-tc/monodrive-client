@@ -57,6 +57,9 @@ public:
 
 	const std::string& getServerIp() const{return serverIp;}
 	const short& getServerPort() const{return serverPort;}
+
+	std::string getEgoVehicleId();
+
 private:
 	Simulator(const Configuration& config);
 	Simulator(const std::string& serverIp, const short& serverPort);

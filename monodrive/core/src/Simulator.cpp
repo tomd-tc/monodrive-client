@@ -350,3 +350,18 @@ bool Simulator::sendControl(float forward, float right, float brake, int mode)
     ego_msg["drive_mode"] = mode;
     return sendCommand(ApiMessage(123, EgoControl_ID, true, ego_msg));
 }
+
+std::string Simulator::getEgoVehicleId() {
+	if (config.scenario.find("vehicles") != config.scenario.end()) {
+		for (auto& vehicle : config.scenario.at("vehicles")) {
+			if (vehicle.find("tags") != vehicle.end()) {
+				for (auto& tag : vehicle.at("tags")) {
+					if (tag.get<std::string>() == "ego") {
+						return vehicle.at("name").get<std::string>();
+					}
+				}
+			}
+		}
+	}
+	return "";
+}

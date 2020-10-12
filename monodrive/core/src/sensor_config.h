@@ -449,6 +449,17 @@ public:
     }
 };
 
+class LightsConfig : public SensorBaseConfig
+{
+public:
+    std::string actor_id;
+    std::vector<LEDArrayConfig> lights;
+
+    virtual nlohmann::json dump() {
+        return *this;
+    }
+};
+
 /// SensorBaseConfig
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 {
@@ -978,6 +989,25 @@ void inline from_json(const nlohmann::json& j, LEDArrayConfig& config) {
     json_get(j, "lights", config.lights);
 }
 /// END Waypoint Sensor JSON parsing
+
+/// Lights Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const LightsConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["actor_id"] = config.actor_id;
+    j["lights"] = nlohmann::json::array();
+    for (auto& lightArray : config.lights) {
+        j["lights"].push_back(lightArray);
+    }
+
+}
+void inline from_json(const nlohmann::json& j, LightsConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "actor_id", config.actor_id);
+    json_get(j, "lights", config.lights);
+}
+/// END Lights Sensor JSON parsing
 
 std::unique_ptr<SensorBaseConfig> inline sensorConfigFactory(const nlohmann::json& j)
 {
