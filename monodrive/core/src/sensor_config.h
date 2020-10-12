@@ -240,7 +240,8 @@ public:
     }
 };
 
-class Poly1FisheyeCameraConfig : public Camera360Config{
+class Poly1FisheyeCameraConfig : public Camera360Config
+{
 public:
     Poly1FisheyeCameraConfig() : Camera360Config()
     {

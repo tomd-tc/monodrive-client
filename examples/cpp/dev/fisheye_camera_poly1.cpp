@@ -40,15 +40,16 @@ int main(int argc, char** argv)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
 
-    Poly1FisheyeCameraConfig fc_config();
+    Poly1FisheyeCameraConfig fc_config;
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
     fc_config.location.z = 200;
-    fc_config.a0 = 349.1260;
-    fc_config.a2 = -0.0011;
-    fc_config.a3 = 1.1978e-06;
-    fc_config.a4 = -1.5119e-09;
+    fc_config.a0 = 349.1260f;
+    fc_config.a2 = -0.0011f;
+    fc_config.a3 = 1.1978e-06f;
+    fc_config.a4 = -1.5119e-09f;
+    fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
     // face_size should be smaller than the largest resolution
     // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
     fc_config.face_size = 768;
