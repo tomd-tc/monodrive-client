@@ -16,8 +16,8 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-#define IMG_WIDTH 1920
-#define IMG_HEIGHT 1080
+#define IMG_WIDTH 1280
+#define IMG_HEIGHT 800
 
 int main(int argc, char** argv)
 {
@@ -26,9 +26,9 @@ int main(int argc, char** argv)
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
 
     Configuration config(
-        "examples/config/simulator_straightaway.json",
+        "examples/config/simulator_fisheye.json",
         "examples/config/weather.json",
-        "examples/config/scenario_multi_vehicle_straightaway.json"
+        "examples/config/fisheye.json"
     );
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
@@ -44,17 +44,12 @@ int main(int argc, char** argv)
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
-    fc_config.location.z = 225;
-    fc_config.fov = 180.f;
-    fc_config.rotation.yaw = -90.f;
-    // before the hard mechanical vignette at what point should the fade start normalized with respect to the diameter of the fisheye
-    fc_config.vignette_radius_start = 0.95f;
-    // in the transition to black at the start of the mechanical vignette start with this value of black before the linear fade
-    fc_config.vignette_bias = 0.5f;
-    // for a bounded fisheye set the pixel diameter to the smallest axis, or to the measured real pixel diameter limit from the image
-    // for a diagonal bounded fisheye set the pixel diameter to the hypotenuse of the image
-    // for a fisheye that is greater than the image plane use the value from your model
-    fc_config.fisheye_pixel_diameter = std::min(fc_config.resolution.x, fc_config.resolution.y);
+    fc_config.location.z = 200;
+    // fc_config.rotation.yaw = 0.f;
+    // fc_config.fov = 180.f;
+    // fc_config.vignette_radius_start = 1.0f;
+    // fc_config.vignette_bias = 1.0f;
+    // fc_config.fisheye_pixel_diameter = sqrt(1280*1280+800*800);
     // face_size should be smaller than the largest resolution
     // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
     fc_config.face_size = 1024;
