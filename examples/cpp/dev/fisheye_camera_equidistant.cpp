@@ -30,9 +30,10 @@ int main(int argc, char** argv)
         "examples/config/weather.json",
         "examples/config/fisheye.json"
     );
-        // "examples/config/simulator_straightaway.json",
-        // "examples/config/weather.json",
-        // "examples/config/scenario_multi_vehicle_straightaway.json"
+    // swap to this for interesting scenario with a fisheye camera
+    // "examples/config/simulator_straightaway.json",
+    // "examples/config/weather.json",
+    // "examples/config/scenario_multi_vehicle_straightaway.json"
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     // Configure simulator
@@ -49,6 +50,7 @@ int main(int argc, char** argv)
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
     fc_config.fov = 180.f;
+    // yaw to the side to get a nice side view in the scenario
     // fc_config.rotation.yaw = -90.f;
     // before the hard mechanical vignette at what point should the fade start normalized with respect to the diameter of the fisheye
     fc_config.vignette_radius_start = 0.95f;

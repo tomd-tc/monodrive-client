@@ -30,6 +30,10 @@ int main(int argc, char** argv)
         "examples/config/weather.json",
         "examples/config/fisheye.json"
     );
+    // swap to this for interesting scenario with a fisheye camera
+    // "examples/config/simulator_straightaway.json",
+    // "examples/config/weather.json",
+    // "examples/config/scenario_multi_vehicle_straightaway.json"
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     // Configure simulator
@@ -44,7 +48,9 @@ int main(int argc, char** argv)
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
-    fc_config.location.z = 200;
+    fc_config.location.z = 225;
+    // yaw to the side to get a nice side view in the scenario
+    // fc_config.rotation.yaw = -90.f;
     fc_config.a0 = 349.1260f;
     fc_config.a2 = -0.0011f;
     fc_config.a3 = 1.1978e-06f;
