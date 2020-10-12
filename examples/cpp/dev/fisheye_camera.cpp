@@ -40,20 +40,19 @@ int main(int argc, char** argv)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
 
-    FisheyeCameraConfig fc_config(Resolution(IMG_WIDTH, IMG_HEIGHT));
+    Poly1FisheyeCameraConfig fc_config();
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
     fc_config.location.z = 200;
-    // fc_config.rotation.yaw = 0.f;
-    // fc_config.fov = 180.f;
-    // fc_config.vignette_radius_start = 1.0f;
-    // fc_config.vignette_bias = 1.0f;
-    // fc_config.fisheye_pixel_diameter = sqrt(1280*1280+800*800);
+    fc_config.a0 = 349.1260;
+    fc_config.a2 = -0.0011;
+    fc_config.a3 = 1.1978e-06;
+    fc_config.a4 = -1.5119e-09;
     // face_size should be smaller than the largest resolution
     // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
-    fc_config.face_size = 1024;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<FisheyeCameraConfig>(fc_config)));
+    fc_config.face_size = 768;
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<Poly1FisheyeCameraConfig>(fc_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
