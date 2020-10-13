@@ -5,11 +5,12 @@
 #include <vector>
 #include <future>
 
-//monoDrive Includes
+// monoDrive includes
 #include "Simulator.h"
-#include "Configuration.h"  // holder for sensor, simulator, scenario, weather, and vehicle configurations
+#include "Configuration.h"
 #include "Sensor.h"
 #include "sensor_config.h"
+#include "DataFrame.h"
 #include "Stopwatch.h"
 
 #include "opencv2/core.hpp"
@@ -18,21 +19,26 @@
 #include "opencv2/imgproc.hpp"
 
 #include "LaneSpline.h"
-#include "DataFrame.h"
+#include "pid.h"
 
 using namespace lane_spline;
 
 LaneSpline lanespline = LaneSpline(std::string("examples/cpp/lane_follower/Straightaway5k.json"));
 
-#define IMG_WIDTH 1920
-#define IMG_HEIGHT 1080
+#define IMG_WIDTH 512
+#define IMG_HEIGHT 512
 
-//Single Simulator Example
+// simulator server
 std::string server0_ip = "127.0.0.1";
-int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
+int server_port = 8999;
+
+// speed control
+PID pid(0.0125f, 0.004f, 0.0025f, -1.0f, 1.0f);
+float last_time = 0;
+float desired_speed = 1500.0;
 
 
-EgoControlConfig planning(DataFrame* dataFrame){
+EgoControlConfig planning(DataFrame* dataFrame) {
     auto& frame = *static_cast<StateFrame*>(dataFrame);
     std::cout << "sample, game, wall " << frame.sample_count << " " << frame.game_time << " " << frame.wall_time << std::endl;
 
@@ -50,6 +56,7 @@ EgoControlConfig planning(DataFrame* dataFrame){
         return EgoControlConfig();
     }
 
+    // use lane follower for steering
     Eigen::VectorXd position(3);
     position << vehicle_frame->state.odometry.pose.position.x,
         vehicle_frame->state.odometry.pose.position.y,
@@ -78,13 +85,27 @@ EgoControlConfig planning(DataFrame* dataFrame){
 
     double angle = -dirToNextPoint.head<3>().cross(forwardVector.head<3>())[2];
 
+    // use PID speed controller for throttle
+    Eigen::VectorXd velocity(3);
+    velocity << vehicle_frame->state.odometry.linear_velocity.x,
+        vehicle_frame->state.odometry.linear_velocity.y,
+        vehicle_frame->state.odometry.linear_velocity.z;
+    double speed = velocity.norm();
+
+    double dt = last_time ? frame.game_time - last_time : 0.1;
+    last_time = frame.game_time;
+
+    float throttle = pid.pid(desired_speed - speed, dt);
+
+    // form controls response
     EgoControlConfig egoControl;
-    egoControl.forward_amount = 0.75;
-    egoControl.brake_amount = 0.0;
+    egoControl.forward_amount = std::max(0.0f, throttle);
+    egoControl.brake_amount = std::min(0.0f, throttle);
     egoControl.drive_mode = 1;
     egoControl.right_amount = (float)angle;
     return egoControl;
 }
+
 
 void perception(DataFrame* dataFrame) {
     auto camFrame = static_cast<CameraFrame *>(dataFrame);
