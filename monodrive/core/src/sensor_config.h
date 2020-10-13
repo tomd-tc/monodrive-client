@@ -240,17 +240,31 @@ public:
     }
 };
 
-class FisheyeCameraConfig : public Camera360Config
+class Poly1FisheyeCameraConfig : public Camera360Config
 {
 public:
-    FisheyeCameraConfig() : Camera360Config()
+    Poly1FisheyeCameraConfig() : Camera360Config()
     {
-        type = "FisheyeCamera";
+        type = "Poly1FisheyeCamera";
+        fov = 180.f;
+    }
+    float a0, a2, a3, a4;
+    virtual nlohmann::json dump(){
+        return *this;
+    }
+};
+
+class EquidistantFisheyeCameraConfig : public Camera360Config
+{
+public:
+    EquidistantFisheyeCameraConfig() : Camera360Config()
+    {
+        type = "EquidistantFisheyeCamera";
         fov = 180.f;
         fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
     }
-    FisheyeCameraConfig(Resolution res) : Camera360Config(){
-        type = "FisheyeCamera";
+    EquidistantFisheyeCameraConfig (Resolution res) : Camera360Config(){
+        type = "EquidistantFisheyeCamera";
         fov = 180.f;
         resolution = res;
         fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
@@ -551,7 +565,28 @@ void inline from_json(const nlohmann::json& j, Camera360Config& config)
     json_get(j, "face_size", config.face_size);
 }
 
-void inline to_json(nlohmann::json& j, const FisheyeCameraConfig& config)
+void inline to_json(nlohmann::json& j, const Poly1FisheyeCameraConfig& config)
+{
+    j = static_cast<Camera360Config>(config);
+    j["a0"] = config.a0;
+    j["a2"] = config.a2;
+    j["a3"] = config.a3;
+    j["a4"] = config.a4;
+}
+
+void inline from_json(const nlohmann::json& j, Poly1FisheyeCameraConfig& config)
+{
+    Camera360Config* base = static_cast<Camera360Config*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "a0", config.a0);
+    json_get(j, "a2", config.a2);
+    json_get(j, "a3", config.a3);
+    json_get(j, "a4", config.a4);
+}
+
+
+void inline to_json(nlohmann::json& j, const EquidistantFisheyeCameraConfig& config)
 {
     j = static_cast<Camera360Config>(config);
     j["fisheye_pixel_diameter"] = config.fisheye_pixel_diameter;
@@ -559,7 +594,7 @@ void inline to_json(nlohmann::json& j, const FisheyeCameraConfig& config)
     j["vignette_radius_start"] = config.vignette_radius_start;
 }
 
-void inline from_json(const nlohmann::json& j, FisheyeCameraConfig& config)
+void inline from_json(const nlohmann::json& j, EquidistantFisheyeCameraConfig& config)
 {
     Camera360Config* base = static_cast<Camera360Config*>(&config);
     from_json(j, *base);
@@ -879,10 +914,15 @@ std::unique_ptr<SensorBaseConfig> inline sensorConfigFactory(const nlohmann::jso
         from_json(j, cfg);
         return make_unique<Camera360Config>(cfg);
     }
-    else if (sensorType == "FisheyeCamera") {
-        FisheyeCameraConfig cfg;
+    else if (sensorType == "Poly1FisheyeCamera") {
+        Poly1FisheyeCameraConfig cfg;
         from_json(j, cfg);
-        return make_unique<FisheyeCameraConfig>(cfg);
+        return make_unique<Poly1FisheyeCameraConfig>(cfg);
+    }
+    else if (sensorType == "EquidistantFisheyeCamera") {
+        EquidistantFisheyeCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<EquidistantFisheyeCameraConfig>(cfg);
     }
     else if (sensorType == "Lidar") {
         LidarConfig cfg;
