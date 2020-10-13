@@ -3,7 +3,7 @@
 #include <fstream>
 
 #define GCC_VERSION __GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__
-#if GCC_VERSION >= 40900
+#if GCC_VERSION >= 40900 || _MSC_VER >= 1900
 #include "cxxopts.hpp"  // requires regex
 #endif
 
@@ -27,7 +27,7 @@ bool Job::setResult(const Result& result)
 
 void Job::parseArguments(int argc, char** argv)
 {
-#if GCC_VERSION >= 40900
+#if GCC_VERSION >= 40900 || _MSC_VER >= 1900
     cxxopts::Options options("monoDrive Simulator Jobs interface");
     options.allow_unrecognised_options();
     options.add_options()
