@@ -25,8 +25,8 @@ using namespace lane_spline;
 
 LaneSpline lanespline = LaneSpline(std::string("examples/cpp/lane_follower/Straightaway5k.json"));
 
-#define IMG_WIDTH 1920
-#define IMG_HEIGHT 1080
+#define IMG_WIDTH 1280
+#define IMG_HEIGHT 720
 
 // simulator server
 std::string server0_ip = "127.0.0.1";

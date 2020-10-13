@@ -25,8 +25,8 @@ using namespace lane_spline;
 
 LaneSpline lanespline = LaneSpline(std::string("examples/cpp/lane_follower/Straightaway5k.json"));
 
-#define IMG_WIDTH 512
-#define IMG_HEIGHT 512
+#define IMG_WIDTH 1280
+#define IMG_HEIGHT 720
 
 // simulator server
 std::string server0_ip = "127.0.0.1";
@@ -34,8 +34,9 @@ int server_port = 8999;
 
 // speed control
 PID pid(0.0125f, 0.004f, 0.0025f, -1.0f, 1.0f);
+float desired_speed = 1000.0;
 float last_time = 0;
-float desired_speed = 1500.0;
+float last_throttle = 0;
 
 
 EgoControlConfig planning(DataFrame* dataFrame) {
@@ -95,7 +96,11 @@ EgoControlConfig planning(DataFrame* dataFrame) {
     double dt = last_time ? frame.game_time - last_time : 0.1;
     last_time = frame.game_time;
 
-    float throttle = pid.pid(desired_speed - speed, dt);
+    float throttle = last_throttle;
+    if (dt) {
+        throttle = pid.pid(desired_speed - speed, dt);
+        last_throttle = throttle;
+    }
 
     // form controls response
     EgoControlConfig egoControl;
@@ -103,6 +108,9 @@ EgoControlConfig planning(DataFrame* dataFrame) {
     egoControl.brake_amount = std::min(0.0f, throttle);
     egoControl.drive_mode = 1;
     egoControl.right_amount = (float)angle;
+
+    std::cout << "throttle, brake, right: " << egoControl.forward_amount
+        << " " << egoControl.brake_amount << " " << egoControl.right_amount << std::endl;
     return egoControl;
 }
 
