@@ -60,6 +60,11 @@ add_message_files(
   ActorWaypoints.msg
   Waypoint.msg
   WaypointSensor.msg
+  Complex.msg
+  RadarTarget.msg
+  RadarTargetList.msg
+  RadarCube.msg
+  Radar.msg
 )
 
 ## Generate services in the 'srv' folder

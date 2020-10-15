@@ -26,12 +26,16 @@ std::mutex STATE_DATA_MUTEX;
 bool RUN_EXAMPLE=true;
 
 
-void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* replicasReadyEvent) {
+void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server) {
   uint64_t control_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch primary_stopwatch;
 
   std::cout << "Primary thread starting..." << std::endl;
+  // create a separate connection for the control command so that it can be called asynchronosouly without contention
+  // on the command channel
+  auto egoControlServer = std::make_unique<Simulator>(server->getSimulator()->getServerIp(), server->getSimulator()->getServerPort());
+  egoControlServer->connect();
   while (RUN_EXAMPLE) {
     auto control_start_time =
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>();
@@ -47,7 +51,7 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
     ego_control_config.right_amount = 0.0f;
     ego_control_config.brake_amount = 0.0f;
     ego_control_config.drive_mode = 1;
-    server->sendCommandAsync(ego_control_config.message());
+    egoControlServer->sendCommandAsync(ego_control_config.message());
 
     control_time +=
         primary_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -61,16 +65,12 @@ void PrimaryThread(std::shared_ptr<PrimaryDistributedServer> server, Event* repl
       frame_count = 0;
       control_time = 0;
     }
-
-    // wait for replicas to finish
-    replicasReadyEvent->wait();
   }
 }
 
 void ReplicaThread(
   std::shared_ptr<PrimaryDistributedServer> primary,
-    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers,
-    Event* replicasReadyEvent) {
+    std::vector<std::shared_ptr<ReplicaDistributedServer>> servers) {
   uint64_t sample_time = 0;
   int frame_count = 0;
   mono::precise_stopwatch replica_stopwatch;
@@ -88,9 +88,6 @@ void ReplicaThread(
     std::swap(SHARED_STATE_DATA, SHARED_STATE_DATA_BUFFER);
     STATE_DATA_MUTEX.unlock();
 
-    // wait for primary
-    primary->sampleComplete->wait();
-
     if (SHARED_STATE_DATA_BUFFER == "") {
       continue;
     }
@@ -101,10 +98,8 @@ void ReplicaThread(
 
     for (auto& server : servers) {
       while (server->isSampling());
-
-      // signal complete
-      replicasReadyEvent->notify();
     }
+
 
     sample_time +=
         replica_stopwatch.elapsed_time<uint64_t, std::chrono::microseconds>() -
@@ -146,9 +141,9 @@ int main(int argc, char** argv) {
       primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
       std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "192.168.2.8", 8999),
-      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "192.168.86.41", 9000),
+                                                 "127.0.0.1", 9000),
+      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+                                                 "127.0.0.1", 9001),
   };
 
   // Configure the primary first
@@ -170,13 +165,11 @@ int main(int argc, char** argv) {
   signal(SIGINT, sig_handler);
 
   // Kick off the orchestration threads
-  Event* replicasReadyEvent = new Event(replicaServers.size());
-  std::thread replicaThread(ReplicaThread, primaryServer, replicaServers, replicasReadyEvent);
-  std::thread primaryThread(PrimaryThread, primaryServer, replicasReadyEvent);
+  std::thread replicaThread(ReplicaThread, primaryServer, replicaServers);
+  std::thread primaryThread(PrimaryThread, primaryServer);
 
-  primaryThread.join();
   replicaThread.join();
+  primaryThread.join();
 
-  delete replicasReadyEvent;
   return 0;
 }
