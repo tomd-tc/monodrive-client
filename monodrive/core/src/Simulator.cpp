@@ -352,8 +352,13 @@ bool Simulator::sendControl(float forward, float right, float brake, int mode)
 }
 
 std::string Simulator::getEgoVehicleId() {
-	if (config.scenario.find("vehicles") != config.scenario.end()) {
-		for (auto& vehicle : config.scenario.at("vehicles")) {
+	auto& getEgoVehicleName = [](nlohmann::json& vehicles) {
+		for (auto& obj : vehicles) {
+			nlohmann::json vehicle = obj;
+			if (obj.find("state") != obj.end()) {
+				vehicle = obj.at("state");
+			}
+			
 			if (vehicle.find("tags") != vehicle.end()) {
 				for (auto& tag : vehicle.at("tags")) {
 					if (tag.get<std::string>() == "ego") {
@@ -362,6 +367,18 @@ std::string Simulator::getEgoVehicleId() {
 				}
 			}
 		}
+		return std::string("");
+	};
+	if (config.scenario.is_array()) {
+		for (auto& frame : config.scenario) {
+			if (frame.find("frame") != frame.end() && frame.at("frame").find("vehicles") != frame.at("frame").end()) {
+				std::string id = getEgoVehicleName(frame.at("frame").at("vehicles"));
+				if (id.size() > 0)
+					return id;
+			}
+		}
+	} else if (config.scenario.find("vehicles") != config.scenario.end()) {
+		return getEgoVehicleName(config.scenario.at("vehicles"));
 	}
 	return "";
 }

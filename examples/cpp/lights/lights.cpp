@@ -4,6 +4,7 @@
 #include "Sensor.h"
 #include "sensor_config.h"
 #include "command_config.h"
+#include "Stopwatch.h"
 
 
 int main(int argc, char** argv)
@@ -14,29 +15,16 @@ int main(int argc, char** argv)
 
     //Read JSON files in cpp_client/config directory
     Configuration config(
-        "examples/config/simulator_straightaway.json",
+        "examples/config/simulator_straightaway_night.json",
         "examples/config/weather.json",
-        "examples/config/scenario_multi_vehicle_straightaway.json"
+        "examples/config/scenario_headlights.json"
     );
-    config.simulator["map"] = "Straightaway5k_night";
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     // Configure simulator
     if (!sim0.configure()) {
         return -1;
     }
-
-    // Configure the sensors we wish to use
-    std::vector<std::shared_ptr<Sensor>> sensors;
-    StateConfig state_config;
-    state_config.desired_tags = { "vehicle" };
-    state_config.undesired_tags = { "static" };
-    state_config.server_ip = sim0.getServerIp();
-    state_config.server_port = sim0.getServerPort();
-    state_config.listen_port = 8200;
-    state_config.debug_drawing = true;
-    state_config.undesired_tags = { "" };
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -46,13 +34,7 @@ int main(int argc, char** argv)
     vp_config.enable_hud = true;
     Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
-    // Send configurations to the simulator
-    std::cout << "***********ALL SENSOR's CONFIGS*******" << std::endl;
-    for (auto& sensor : sensors)
-    {
-        sensor->configure();
-    }
-
+    // create headlights configuration
     std::vector<LEDArrayConfig> lights;
     LEDArrayConfig lf_light_config;
     lf_light_config.array_id = "LF";
@@ -105,19 +87,28 @@ int main(int argc, char** argv)
     lightsConfig.actor_id = sim0.getEgoVehicleId();
     lightsConfig.lights = lights;
 
+    // send lights config command
     sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lightsConfig));
 
     std::cout << "Sampling sensor loop" << std::endl;
     int led_index = 0;
     int delta = 1;
-
+    uint64_t iterations = 0;
+    uint64_t total_time = 0;
     while (true)
     {
         sim0.sendControl(0.0, 0, 0, 1);
-        sim0.sampleAll(sensors);
 
+        nlohmann::json update_config({
+                { "actor_id", lightsConfig.actor_id },
+                { "lights", nlohmann::json::array() }
+            });
         for (int i = 0; i < lightsConfig.lights.size();  i++) {
             auto& lightArray = lightsConfig.lights[i];
+            update_config["lights"].push_back({
+                    { "array_id", lightArray.array_id },
+                    { "lights", nlohmann::json::array() }
+                });
             for (int j = 0; j < lightArray.lights.size(); j++) {
                 int index = j + (i * lightArray.lights.size());
 
@@ -125,17 +116,31 @@ int main(int argc, char** argv)
                     float intensity = lightArray.lights[j].intensity > 0 ? 0 : 1500;
                     lightArray.lights[j].intensity = intensity;
                     lightArray.lights[j].backlight_intensity = intensity > 0 ? 400 : 0;
+                    update_config["lights"].back()["lights"].push_back({
+                            { "led", j },
+                            { "intensity", lightArray.lights[j].intensity },
+                            { "backlight_intensity", lightArray.lights[j].backlight_intensity }
+                        });
                 }
-                std::cout << index << ": " << lightArray.lights[j].intensity << std::endl;
             }
-            std::cout << std::endl;
         }
-        sim0.sendCommand(ApiMessage(1002, VehicleLightsConfigCommand_ID, true, lightsConfig));
+        
+        {
+            mono::precise_stopwatch stopwatch;
+            sim0.sendCommand(ApiMessage(1002, VehicleLightsUpdateCommand_ID, true, update_config));
+            total_time += stopwatch.elapsed_time<uint64_t, std::chrono::milliseconds>();
+            iterations++;
+        }
+
         led_index += delta;
         if (led_index > ledCount)
             delta = -1;
         else if (led_index < 0)
             delta = 1;
+
+        if (iterations % 100 == 0 && iterations > 0) {
+            std::cout << (total_time / (double)iterations) << " ms" << std::endl;
+        }
     }
 
     return 0;
