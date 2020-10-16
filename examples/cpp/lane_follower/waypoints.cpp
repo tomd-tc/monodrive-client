@@ -78,6 +78,8 @@ int uut(int argc, char** argv, Job* job)
         return -1;
     }
 
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
     // write test result
     ResultMetric metric;
     metric.name = "metric";
@@ -89,6 +91,9 @@ int uut(int argc, char** argv, Job* job)
     res.metrics.push_back(metric);
 
     job->setResult(res);
+
+    // cleanup
+    Simulator::clearInstances();
 
     return 0;
 }

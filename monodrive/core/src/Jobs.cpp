@@ -1,5 +1,8 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #include "Jobs.h"
+
+#include <chrono>
+#include <thread>
 #include <fstream>
 #include <boost/filesystem.hpp>
 
@@ -19,17 +22,48 @@ Job::Job(int argc, char** argv) : argc(argc), argv(argv)
 
 int Job::run(std::function<int (int, char**, Job*)> main)
 {
-    // TODO
-    return main(argc, argv, this);
+    if (!loop)
+    {
+        return main(argc, argv, this);
+    }
+
+    while (true)
+    {
+        // wait until ready
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(POLL_INTERVAL));
+            JobState state = getState();
+            std::cout << "status: " << JOB_STATE_NAMES.at(state) << std::endl;
+            if (state == JobState::READY)
+            {
+                break;
+            }
+        }
+
+        // run uut
+        int res = main(argc, argv, this);
+
+        // update job status
+        JobState state = res ? JobState::FAILED : JobState::COMPLETED;
+        setState(state);
+        std::cout << "status: " << JOB_STATE_NAMES.at(state) << std::endl;
+    }
+    return 0;
 }
 
 bool Job::setState(JobState state)
 {
+    if (assetDirPath.empty())
+    {
+        std::cerr << "No assets directory provided to locate state file" << std::endl;
+        return false;
+    }
     std::string path = (fs::path(assetDirPath) / fs::path(STATE_FILE)).string();
     std::ofstream file(path);
 	if (!file.is_open())
 	{
-        std::cerr << "Unable to write to file: " << path << std::endl;
+        std::cerr << "Unable to write to state file: " << path << std::endl;
         return false;
 	}
 	file << JOB_STATE_NAMES.at(state);
@@ -51,7 +85,7 @@ bool Job::setResult(const Result& result)
     std::ofstream file(path);
 	if (!file.is_open())
 	{
-        std::cerr << "Unable to write to file: " << path << std::endl;
+        std::cerr << "Unable to write to results file: " << path << std::endl;
         return false;
 	}
 	file << result.dump().dump(2);
@@ -61,14 +95,29 @@ bool Job::setResult(const Result& result)
 
 JobState Job::getState()
 {
+    if (assetDirPath.empty())
+    {
+        std::cerr << "No assets directory provided to locate state file" << std::endl;
+        return JobState::UNDEFINED;
+    }
     std::string path = (fs::path(assetDirPath) / fs::path(STATE_FILE)).string();
     std::ifstream file(path);
     if (!file.is_open())
 	{
-        std::cerr << "Unable to read to file: " << path << std::endl;
-        return JobState::FAILED;
+        std::cerr << "Unable to read state file: " << path << std::endl;
+        return JobState::UNDEFINED;
 	}
-    return JobState::FAILED;
+    std::string state;
+    std::getline(file, state);
+
+    for (auto const& s : JOB_STATE_NAMES)
+    {
+        if (s.second == state)
+        {
+            return s.first;
+        }
+    }
+    return JobState::UNDEFINED;
 }
 
 
@@ -124,6 +173,7 @@ void Job::parseArguments(int argc, char** argv)
      (VEHICLE_FLAG, "", cxxopts::value<std::string>())
      (SENSORS_FLAG, "", cxxopts::value<std::string>())
      (RESULTS_FLAG, "", cxxopts::value<std::string>())
+     (LOOP_FLAG, "")
     ;
     auto cla = options.parse(argc, argv);
 
@@ -154,6 +204,10 @@ void Job::parseArguments(int argc, char** argv)
     if (cla.count(RESULTS_FLAG))
     {
         resultsPath = cla[RESULTS_FLAG].as<std::string>();
+    }
+    if (cla.count(LOOP_FLAG))
+    {
+        loop = true;
     }
 #else
     std::cout << "Warning unable to parse command line args with gcc < 4.9" << std::endl;

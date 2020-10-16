@@ -40,7 +40,8 @@ enum JobState
     RUNNING = 3,
     FINISHING = 4,
     COMPLETED = 5,
-    FAILED = 6
+    FAILED = 6,
+    UNDEFINED = -1
 };
 static std::map<JobState, std::string> const JOB_STATE_NAMES = {
     {JobState::ASSIGNED, "ASSIGNED"},
@@ -48,7 +49,8 @@ static std::map<JobState, std::string> const JOB_STATE_NAMES = {
     {JobState::READY, "READY"},
     {JobState::FINISHING, "FINISHING"},
     {JobState::COMPLETED, "COMPLETED"},
-    {JobState::FAILED, "FAILED"}
+    {JobState::FAILED, "FAILED"},
+    {JobState::UNDEFINED, ""}
 };
 
 
@@ -103,7 +105,7 @@ private:
     std::string vehiclePath;
     std::string sensorsPath;
     std::string resultsPath;
-    bool loop;
+    bool loop = false;
 
     int argc;
     char** argv;
