@@ -98,22 +98,23 @@ void Simulator::clearInstances()
 
 bool Simulator::connect()
 {
+	bool success = true;
 	if(!controlSocket.is_open())
 	{
-		std::cout << "******Simulator Connect********" << std::endl;
+		std::cout << "******Simulator Connect " << serverIp << ":" << serverPort << "********" << std::endl;
 		try{
-		const auto ipaddress = boost::asio::ip::address::from_string(serverIp);
-		const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, serverPort);
-		std::cout << endpoint << std::endl;
-		controlSocket.connect(endpoint);
+			const auto ipaddress = boost::asio::ip::address::from_string(serverIp);
+			const auto endpoint = boost::asio::ip::tcp::endpoint(ipaddress, serverPort);
+			controlSocket.connect(endpoint);
+			success = true;
 		}
 		catch (const std::exception& e){
 			std::cerr << "ERROR! Failed to connect to server. Is it running?" << std::endl;
 			std::cerr << e.what() << std::endl;
-			return false;
+			success = false;
 		}
 	}
-	return true;
+	return success;
 }
 
 void Simulator::stop()
@@ -127,8 +128,9 @@ void Simulator::stop()
 bool Simulator::configure()
 {
 	using namespace std;
-	if(!connect())
+	if(!connect()){
 		return false;
+	}
 
 	if(config.simulator.empty())
 	{
