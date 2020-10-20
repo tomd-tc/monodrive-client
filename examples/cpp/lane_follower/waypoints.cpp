@@ -29,8 +29,9 @@
 #define IMG_HEIGHT 720
 
 // test critera
-#define DURATION 15
-#define TIMESTEP 0.01
+#define DURATION 15  // seconds
+#define TIMESTEP 0.01  // seconds
+#define MAX_LANE_DEVIATION 20  // cm
 
 // speed control
 PID pid(0.0125f, 0.004f, 0.0025f, -1.0f, 1.0f);
@@ -40,6 +41,9 @@ float desired_speed = 1000.0;
 // simulator server
 std::string server_ip = "127.0.0.1";
 int server_port = 8999;
+
+// results
+float deviation = 0;
 
 
 EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
@@ -61,13 +65,17 @@ EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
         return EgoControlConfig();
     }
 
-    // find next waypoint
+    // find lane waypoints
+    Eigen::VectorXd curr(3);
     Eigen::VectorXd next(3);
-    next.setZero();
+    curr.setZero();
     for (const auto& actor : waypoints->actor_waypoints) {
         if (actor.actor_id == ego->state.name) {
             for(const auto& lane : actor.lanes) {
                 if(lane.waypoints.size() >= 2) {
+                    curr << lane.waypoints[0].location.x,
+                        lane.waypoints[0].location.y,
+                        lane.waypoints[0].location.z;
                     next << lane.waypoints[1].location.x,
                         lane.waypoints[1].location.y,
                         lane.waypoints[1].location.z;
@@ -76,8 +84,8 @@ EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
             }
         }
     }
-    if (next.isZero()) {
-        std::cout << "Unable to get next waypoint."<< std::endl;
+    if (curr.isZero()) {
+        std::cout << "Unable to get ego lane waypoints."<< std::endl;
         return EgoControlConfig();
     }
 
@@ -111,6 +119,12 @@ EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
     last_time = state->game_time;
 
     float throttle = pid.pid(desired_speed - speed, dt);
+
+    // get lane deviation
+    double dev = (curr - position).norm();
+    if (dev > deviation) {
+        deviation = dev;
+    }
 
     // form controls response
     EgoControlConfig egoControl;
@@ -219,16 +233,21 @@ int uut(int argc, char** argv, Job* job)
 
         // control
         sim.sendCommand(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
-    }
 
+        if (deviation > MAX_LANE_DEVIATION) {
+            std::cout << "Lane deviation exceeded limit: "
+                << deviation <<" cm. Exiting early." << std::endl;
+            break;
+        }
+    }
 
     // write test result
     ResultMetric metric;
-    metric.name = "metric";
-    metric.score = 0.0;
+    metric.name = "lane_deviation";
+    metric.score = deviation;
 
     Result res;
-    res.pass = true;
+    res.pass = deviation < MAX_LANE_DEVIATION;
     res.message = "this job passed";
     res.metrics.push_back(metric);
 
