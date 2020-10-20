@@ -29,14 +29,15 @@
 #define IMG_HEIGHT 720
 
 // test critera
-#define DURATION 15  // seconds
-#define TIMESTEP 0.01  // seconds
+#define DURATION 15000  // ms
 #define MAX_LANE_DEVIATION 20  // cm
 
 // speed control
-PID pid(0.0125f, 0.004f, 0.0025f, -1.0f, 1.0f);
-float last_time = 0;
+PID pid(0.01f, 0.0005f, 0.0002f, -1.0f, 1.0f);
 float desired_speed = 1000.0;
+float look_ahead = 200;
+float last_time = 0;
+float last_throttle = 0;
 
 // simulator server
 std::string server_ip = "127.0.0.1";
@@ -118,7 +119,11 @@ EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
     double dt = last_time ? state->game_time - last_time : 0.1;
     last_time = state->game_time;
 
-    float throttle = pid.pid(desired_speed - speed, dt);
+    float throttle = last_throttle;
+    if (dt) {
+        throttle = pid.pid(desired_speed - speed, dt);
+        last_throttle = throttle;
+    }
 
     // get lane deviation
     double dev = (curr - position).norm();
@@ -167,9 +172,8 @@ int uut(int argc, char** argv, Job* job)
     // get configuration from job
     Configuration config = job->getConfig();
 
-    // set to fixed timestep mode
-    config.simulator["simulation_mode"] = 3;
-    config.simulator["time_step"] = TIMESTEP;
+    // set to closed loop mode
+    config.simulator["simulation_mode"] = 0;
 
     // setup simulator
     Simulator& sim = Simulator::getInstance(config, server_ip, server_port);
@@ -197,15 +201,15 @@ int uut(int argc, char** argv, Job* job)
     state_config.server_ip = sim.getServerIp();
     state_config.server_port = sim.getServerPort();
     state_config.listen_port = 8101;
-    state_config.debug_drawing = false;
+    state_config.debug_drawing = true;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<StateConfig>(state_config)));
 
     WaypointConfig wp_config;
     wp_config.server_ip = sim.getServerIp();
     wp_config.server_port = sim.getServerPort();
     wp_config.listen_port = 8102;
-    wp_config.distance = 10000;
-    wp_config.frequency = 100;
+    wp_config.distance = 1000;
+    wp_config.frequency = look_ahead;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<WaypointConfig>(wp_config)));
 
     std::cout << "Configuring sensors..." << std::endl;
@@ -218,13 +222,10 @@ int uut(int argc, char** argv, Job* job)
     sensors[0]->sampleCallback = perception;
 
     // execute test
-    for (int i = 0; i < DURATION / TIMESTEP; ++i)
+    mono::precise_stopwatch watch;
+    int count = 0;
+    while (watch.elapsed_time<unsigned int, std::chrono::milliseconds>() < DURATION)
     {
-        // step
-        ClosedLoopStepCommandConfig stepCommand;
-        stepCommand.time_step = TIMESTEP;
-        sim.sendCommand(ApiMessage(1234, ClosedLoopStepCommand_ID, true, stepCommand.dump()));
-
         // sampling/perception
         sim.sampleAll(sensors);
 
@@ -239,17 +240,24 @@ int uut(int argc, char** argv, Job* job)
                 << deviation <<" cm. Exiting early." << std::endl;
             break;
         }
+        count++;
     }
+    double fps = (double)count * 1000.0 / watch.elapsed_time<double, std::chrono::milliseconds>();
 
     // write test result
-    ResultMetric metric;
-    metric.name = "lane_deviation";
-    metric.score = deviation;
+    ResultMetric metricDeviation;
+    metricDeviation.name = "lane_deviation";
+    metricDeviation.score = deviation;
+
+    ResultMetric metricFPS;
+    metricFPS.name = "fps";
+    metricFPS.score = fps;
 
     Result res;
     res.pass = deviation < MAX_LANE_DEVIATION;
     res.message = "this job passed";
-    res.metrics.push_back(metric);
+    res.metrics.push_back(metricDeviation);
+    res.metrics.push_back(metricFPS);
 
     job->setResult(res);
 
