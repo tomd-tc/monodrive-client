@@ -169,6 +169,12 @@ void perception(DataFrame* dataFrame) {
 
 int uut(int argc, char** argv, Job* job)
 {
+    // reset any jobs globals
+    pid.reset();
+    last_time = 0;
+    last_throttle = 0;
+    deviation = 0;
+
     // get configuration from job
     Configuration config = job->getConfig();
 

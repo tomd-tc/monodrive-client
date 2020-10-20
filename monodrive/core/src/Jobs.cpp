@@ -174,8 +174,15 @@ void Job::parseArguments(int argc, char** argv)
      (SENSORS_FLAG, "", cxxopts::value<std::string>())
      (RESULTS_FLAG, "", cxxopts::value<std::string>())
      (LOOP_FLAG, "")
+     (HELP_FLAG, "")
     ;
     auto cla = options.parse(argc, argv);
+
+    if (cla.count(HELP_FLAG))
+    {
+        std::cout << options.help() << std::endl;
+        exit(0);
+    }
 
     if (cla.count(ASSET_DIR_FLAG))
     {
