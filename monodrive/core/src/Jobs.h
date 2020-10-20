@@ -14,7 +14,7 @@
 #define SENSORS_FLAG "md_sensors"
 #define RESULTS_FLAG "md_results"
 #define LOOP_FLAG "md_loop"
-#define HEKO_FLAG "md_help"
+#define HELP_FLAG "md_help"
 
 // paths
 #define ASSET_DIR "./mdassets"
