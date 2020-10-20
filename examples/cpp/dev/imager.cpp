@@ -16,8 +16,8 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-#define IMG_WIDTH 1280
-#define IMG_HEIGHT 800
+#define IMG_WIDTH 480
+#define IMG_HEIGHT 318
 
 int main(int argc, char** argv)
 {
@@ -63,8 +63,9 @@ int main(int argc, char** argv)
         sensor->configure();
     }
 
-    sensors[0]->sampleCallback = [](DataFrame *frame) {
-        auto camFrame = static_cast<CubeCameraFrame *>(frame);
+    int count = 0;
+    sensors[0]->sampleCallback = [&count](DataFrame *frame) {
+        auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
         if (imFrame->channels == 4)
@@ -72,6 +73,17 @@ int main(int argc, char** argv)
             img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
                           imFrame->pixels);
         }
+        else
+            return;
+        
+        if(count++ == 50){
+            cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
+            cv::imwrite("img.png", img);
+            cv::Mat gray;
+            cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+            cv::imwrite("gray.png", gray);
+        }
+
         cv::imshow("monoDrive 0", img);
         cv::waitKey(1);
     };
