@@ -1,4 +1,5 @@
-// 
+// Lane keep and automatic cruise control system being tested
+// against the monoDrive simulator in closed loop mode
 
 #include <iostream>		  // std::cout
 #include <chrono>		  // std::chrono	
@@ -24,17 +25,13 @@
 
 #include "pid.h"
 
-
-#define IMG_WIDTH 1280
-#define IMG_HEIGHT 720
-
 // test critera
-#define DURATION 15000  // ms
-#define MAX_LANE_DEVIATION 20  // cm
+#define DURATION 10000  // ms
+#define MAX_LANE_DEVIATION 25  // cm
 
 // speed control
 PID pid(0.01f, 0.0005f, 0.0002f, -1.0f, 1.0f);
-float desired_speed = 1000.0;
+float desired_speed = 2000.0;
 float look_ahead = 200;
 float last_time = 0;
 float last_throttle = 0;
@@ -140,32 +137,6 @@ EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
     return egoControl;
 }
 
-void perception(DataFrame* dataFrame) {
-    auto camFrame = static_cast<CameraFrame *>(dataFrame);
-    auto imFrame = camFrame->imageFrame;
-    cv::Mat img;
-    if (imFrame->channels == 4)
-    {
-        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4, imFrame->pixels);
-    }
-    else
-    {
-        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1, imFrame->pixels);
-        cv::cvtColor(img, img, cv::COLOR_GRAY2BGRA);
-    }
-    for (auto &annotation : camFrame->annotationFrame->annotations)
-    {
-        for (auto &bbox : annotation.second.bounding_boxes_2d)
-            cv::rectangle(
-                img,
-                cv::Point(int(bbox.xmin), int(bbox.ymin)),
-                cv::Point(int(bbox.xmax), int(bbox.ymax)),
-                cv::Scalar(0, 0, 255)
-            );
-    }
-    cv::imshow("monoDrive", img);
-    cv::waitKey(1);
-}
 
 int uut(int argc, char** argv, Job* job)
 {
@@ -190,16 +161,14 @@ int uut(int argc, char** argv, Job* job)
 
     // configure sensors
     std::vector<std::shared_ptr<Sensor>> sensors;
-    CameraConfig fc_config;
-    fc_config.server_ip = sim.getServerIp();
-    fc_config.server_port = sim.getServerPort();
-    fc_config.listen_port = 8100;
-    fc_config.location.z = 225;
-    fc_config.rotation.pitch = -5;
-    fc_config.resolution = Resolution(IMG_WIDTH, IMG_HEIGHT);
-    fc_config.annotation.include_annotation = true;
-    fc_config.annotation.desired_tags = {"traffic_sign"};
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
+
+    ViewportCameraConfig vp_config;
+    vp_config.server_ip = sim.getServerIp();
+    vp_config.server_port = sim.getServerPort();
+    vp_config.location.z = 400;
+    vp_config.location.x = -800;
+    vp_config.rotation.pitch = -15;
+    Sensor(std::make_unique<ViewportCameraConfig>(vp_config)).configure();
 
     StateConfig state_config;
     state_config.desired_tags = {"ego", "vehicle"};
@@ -214,8 +183,10 @@ int uut(int argc, char** argv, Job* job)
     wp_config.server_ip = sim.getServerIp();
     wp_config.server_port = sim.getServerPort();
     wp_config.listen_port = 8102;
-    wp_config.distance = 1000;
+    wp_config.distance = 2000;
     wp_config.frequency = look_ahead;
+    wp_config.draw_debug = true;
+    wp_config.debug_tags = {"ego"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<WaypointConfig>(wp_config)));
 
     std::cout << "Configuring sensors..." << std::endl;
@@ -223,9 +194,6 @@ int uut(int argc, char** argv, Job* job)
     {
         sensor->configure();
     }
-
-    // register perception callback
-    sensors[0]->sampleCallback = perception;
 
     // execute test
     mono::precise_stopwatch watch;
@@ -236,7 +204,7 @@ int uut(int argc, char** argv, Job* job)
         sim.sampleAll(sensors);
 
         // planning
-        EgoControlConfig egoControl = planning(sensors[1]->frame, sensors[2]->frame);
+        EgoControlConfig egoControl = planning(sensors[0]->frame, sensors[1]->frame);
 
         // control
         sim.sendCommand(ApiMessage(777, EgoControl_ID, true, egoControl.dump()));
@@ -244,6 +212,7 @@ int uut(int argc, char** argv, Job* job)
         if (deviation > MAX_LANE_DEVIATION) {
             std::cout << "Lane deviation exceeded limit: "
                 << deviation <<" cm. Exiting early." << std::endl;
+            sim.sendControl(0.f, 0.f, 1.f, 1);
             break;
         }
         count++;
