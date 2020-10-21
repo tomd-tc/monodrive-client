@@ -34,7 +34,7 @@ int Job::run(std::function<int (int, char**, Job*)> main)
         {
             std::this_thread::sleep_for(std::chrono::seconds(POLL_INTERVAL));
             JobState state = getState();
-            std::cout << "status: " << JOB_STATE_NAMES.at(state) << std::endl;
+            std::cout << "Job status: " << JOB_STATE_NAMES.at(state) << std::endl;
             if (state == JobState::READY)
             {
                 break;
@@ -47,7 +47,7 @@ int Job::run(std::function<int (int, char**, Job*)> main)
         // update job status
         JobState state = res ? JobState::FAILED : JobState::COMPLETED;
         setState(state);
-        std::cout << "status: " << JOB_STATE_NAMES.at(state) << std::endl;
+        std::cout << "Job status: " << JOB_STATE_NAMES.at(state) << std::endl;
     }
     return 0;
 }
@@ -56,14 +56,14 @@ bool Job::setState(JobState state)
 {
     if (assetDirPath.empty())
     {
-        std::cerr << "No assets directory provided to locate state file" << std::endl;
+        std::cerr << "ERROR! No assets directory provided to locate state file" << std::endl;
         return false;
     }
     std::string path = (fs::path(assetDirPath) / fs::path(STATE_FILE)).string();
     std::ofstream file(path);
 	if (!file.is_open())
 	{
-        std::cerr << "Unable to write to state file: " << path << std::endl;
+        std::cerr << "ERROR! Unable to write to state file: " << path << std::endl;
         return false;
 	}
 	file << JOB_STATE_NAMES.at(state);
@@ -85,7 +85,7 @@ bool Job::setResult(const Result& result)
     std::ofstream file(path);
 	if (!file.is_open())
 	{
-        std::cerr << "Unable to write to results file: " << path << std::endl;
+        std::cerr << "ERROR! Unable to write to results file: " << path << std::endl;
         return false;
 	}
 	file << result.dump().dump(2);
@@ -97,14 +97,14 @@ JobState Job::getState()
 {
     if (assetDirPath.empty())
     {
-        std::cerr << "No assets directory provided to locate state file" << std::endl;
+        std::cerr << "ERROR! No assets directory provided to locate state file" << std::endl;
         return JobState::UNDEFINED;
     }
     std::string path = (fs::path(assetDirPath) / fs::path(STATE_FILE)).string();
     std::ifstream file(path);
     if (!file.is_open())
 	{
-        std::cerr << "Unable to read state file: " << path << std::endl;
+        std::cout << "WARNING! Unable to read state file: " << path << std::endl;
         return JobState::UNDEFINED;
 	}
     std::string state;

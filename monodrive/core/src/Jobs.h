@@ -90,13 +90,13 @@ public:
     ~Job(){};
 
     int run(std::function<int (int, char**, Job*)> main);
-    bool setState(JobState state);
     bool setResult(const Result& result);
-    JobState getState();
     Configuration getConfig();
 
 private:
     void parseArguments(int argc, char** argv);
+    bool setState(JobState state);
+    JobState getState();
 
     std::string assetDirPath;
     std::string simulatorPath;

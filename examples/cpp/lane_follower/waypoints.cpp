@@ -31,7 +31,7 @@
 
 // speed control
 PID pid(0.01f, 0.0005f, 0.0002f, -1.0f, 1.0f);
-float desired_speed = 2000.0;
+float desired_speed = 1000.0;
 float look_ahead = 200;
 float last_time = 0;
 float last_throttle = 0;
@@ -113,7 +113,7 @@ EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
         ego->state.odometry.linear_velocity.z;
     double speed = velocity.norm();
 
-    double dt = last_time ? state->game_time - last_time : 0.1;
+    double dt = last_time > 0 ? state->game_time - last_time : 0.1;
     last_time = state->game_time;
 
     float throttle = last_throttle;

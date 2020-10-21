@@ -19,6 +19,11 @@ Run example
 ./build/examples/cpp/lane_follower/real_time
 ```
 
+Note that on Windows, these examples will be built to the `Debug` or `Release` folder`
+```
+./build/examples/cpp/lane_follower/Release/real_time.exe
+```
+
 
 ### Lane follower - fixed time step
 The simulator is configured in fixed time step mode. Otherwise this example is the same as
@@ -31,7 +36,7 @@ Run example
 
 
 ### Lane follower - lidar
-This example also configures a Lidar sensor and forwards packets for visualization in VeloView.Otherwise this is the same as the fixed time step example described above.
+This example also configures a Lidar sensor and forwards packets for visualization in VeloView. Otherwise this is the same as the fixed time step example described above.
 
 Run example
 ```

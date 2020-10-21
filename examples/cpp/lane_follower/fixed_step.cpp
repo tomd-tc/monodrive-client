@@ -91,7 +91,7 @@ EgoControlConfig planning(DataFrame* dataFrame) {
         vehicle_frame->state.odometry.linear_velocity.z;
     double speed = velocity.norm();
 
-    double dt = last_time ? frame.game_time - last_time : 0.1;
+    double dt = last_time > 0 ? frame.game_time - last_time : 0.1;
     last_time = frame.game_time;
 
     float throttle = pid.pid(desired_speed - speed, dt);
