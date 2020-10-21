@@ -26,10 +26,14 @@ int main(int argc, char** argv)
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
 
     Configuration config(
-        "examples/config/simulator_straightaway.json",
+        "examples/config/simulator_fisheye.json",
         "examples/config/weather.json",
-        "examples/config/scenario_multi_vehicle_straightaway.json"
+        "examples/config/fisheye.json"
     );
+    // swap to this for interesting scenario with a fisheye camera
+    // "examples/config/simulator_straightaway.json",
+    // "examples/config/weather.json",
+    // "examples/config/scenario_multi_vehicle_straightaway.json"
     Simulator& sim0 = Simulator::getInstance(config, server0_ip, server_port);
 
     // Configure simulator
@@ -40,13 +44,14 @@ int main(int argc, char** argv)
     // Configure the sensors we wish to use
     std::vector<std::shared_ptr<Sensor>> sensors;
 
-    FisheyeCameraConfig fc_config(Resolution(IMG_WIDTH, IMG_HEIGHT));
+    EquidistantFisheyeCameraConfig fc_config(Resolution(IMG_WIDTH, IMG_HEIGHT));
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
     fc_config.location.z = 225;
     fc_config.fov = 180.f;
-    fc_config.rotation.yaw = -90.f;
+    // yaw to the side to get a nice side view in the scenario
+    // fc_config.rotation.yaw = -90.f;
     // before the hard mechanical vignette at what point should the fade start normalized with respect to the diameter of the fisheye
     fc_config.vignette_radius_start = 0.95f;
     // in the transition to black at the start of the mechanical vignette start with this value of black before the linear fade
@@ -58,7 +63,7 @@ int main(int argc, char** argv)
     // face_size should be smaller than the largest resolution
     // increasing face_size improves image quality and vice versa with diminishing returns wrt to the image resolution
     fc_config.face_size = 1024;
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<FisheyeCameraConfig>(fc_config)));
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<EquidistantFisheyeCameraConfig>(fc_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();

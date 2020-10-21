@@ -137,12 +137,12 @@ int main(int argc, char **argv)
       "examples/config/scenario_multi_vehicle_straightaway.json",
       "examples/ros/src/distributed/config/primary_sensors.json");
   /// The replica servers just need to be forced into replay mode
-  Configuration replica_lidar_config(
+  Configuration replica_0_config(
       "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
       "examples/cpp/distributed/replica_lidar_sensors.json");
-  Configuration replica_radar_config(
+  Configuration replica_1_config(
       "examples/config/simulator_straightaway.json",
       "examples/config/weather.json", 
       "examples/config/scenario.json",
@@ -153,40 +153,40 @@ int main(int argc, char **argv)
       primary_config, "127.0.0.1", 8999);
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
       // machine 1 instance 1
-      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_0_config,
                                                  "192.168.86.41", 8998),
       // machine 1 instance 2
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "192.168.86.41", 8999),
       // machine 2 instance 3
-      /*std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      /*std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.160", 8998),
       // machine 2 instance 4
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.160", 8999),
       // machine 3 instance 5
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.163", 8998),
       // machine 3 instance 6
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.163", 8999),
       // machine 4 instance 7
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.159", 8998),
       // machine 4 instance 8
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.159", 8999), 
       // machine 5 instance 9
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.153", 8998),
       // machine 5 instance 10
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.153", 8999),
       // machine 6 instance 11
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.138", 8998),
       // machine 6 instance 12
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
+      std::make_shared<ReplicaDistributedServer>(replica_1_config,
                                                  "10.100.11.138", 8999),*/
   };
 
@@ -207,7 +207,6 @@ int main(int argc, char **argv)
             for(auto& packet : lidarFrame.packets){
                 boost::system::error_code err;
                 socket.send_to(boost::asio::buffer(&packet, sizeof(LidarPacket)), remote_endpoint, 0, err);
-                std::this_thread::sleep_for(std::chrono::microseconds(1327));
             }
         };
       } else if (sensor->config->type == "Radar") {
