@@ -207,6 +207,10 @@ public:
         bool cull_partial_frame{false};
         bool debug_draw{false};
     } annotation;
+    struct ColorFilterArray {
+        bool use_cfa{false};
+        std::string cfa{"rccc"};
+    } color_filter_array;
     Viewport viewport;
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
@@ -509,6 +513,17 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
     json_get(j, "include_obb", annotation.include_oob);
     json_get(j, "include_tags", annotation.include_tags);
     json_get(j, "debug_draw", annotation.debug_draw);
+}
+
+void inline to_json(nlohmann::json& j, const CameraConfig::ColorFilterArray& cfa) {
+    j = nlohmann::json{
+        {"cfa", cfa.cfa},
+        {"use_cfa", cfa.use_cfa}
+    };
+}
+void inline from_json(const nlohmann::json& j, CameraConfig::ColorFilterArray& cfa) {
+    json_get(j, "cfa", cfa.cfa);
+    json_get(j, "use_cfa", cfa.use_cfa);
 }
 
 /// Camera Config JSON Parsing
