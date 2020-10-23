@@ -76,15 +76,19 @@ int main(int argc, char** argv)
         else
             return;
         
+        cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
+        cv::Mat1b red;
+        cv::extractChannel(img, red, 2); 
         if(count++ == 50){
-            cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
+
+            // cv::Mat gray;
+            // cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+            // cv::imwrite("gray.png", gray);
             cv::imwrite("img.png", img);
-            cv::Mat gray;
-            cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
-            cv::imwrite("gray.png", gray);
+            cv::imwrite("red_pass.png", red);
         }
 
-        cv::imshow("monoDrive 0", img);
+        cv::imshow("monoDrive 0", red);
         cv::waitKey(1);
     };
 
