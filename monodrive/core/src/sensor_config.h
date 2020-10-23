@@ -543,6 +543,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["channels"] = config.channels;
     j["channel_depth"] = config.channel_depth;
     j["annotation"] = config.annotation;
+    j["color_filter_array"] = config.color_filter_array;
     j["viewport"] = config.viewport;
 }
 
@@ -563,6 +564,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "channels", config.channels);         
     json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
+    json_get(j, "color_filter_array", config.color_filter_array);
     json_get(j, "viewport", config.viewport);
 }
 
