@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     std::vector<LEDArrayConfig> lights;
     LEDArrayConfig lf_light_config;
     lf_light_config.array_id = "LF";
-    lf_light_config.location = Location(171, -54.5, 81);
+    lf_light_config.location = Location(90, -50, 75);
     int ledCount = 0;
     int yaw = 6;
     for (int i = 0; i < 8; i++) {
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
     LEDArrayConfig rf_light_config;
     rf_light_config.array_id = "RF";
-    rf_light_config.location = Location(171, 54.5, 81);
+    rf_light_config.location = Location(90, 50, 75);
     yaw = -6;
     for (int i = 0; i < 8; i++) {
         LEDConfig led_config;
