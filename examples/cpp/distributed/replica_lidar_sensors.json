@@ -51,7 +51,11 @@
       "enable_viewport": true,
       "monitor_name": "",
       "monitor_number": -1,
-      "fullscreen": false
+      "fullscreen": false,
+      "window_offset": {
+        "x": 0.0,
+        "y": 32.0
+      }
     }
   }
 ]
