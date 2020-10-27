@@ -366,7 +366,7 @@ bool Simulator::sendControl(float forward, float right, float brake, int mode)
 }
 
 std::string Simulator::getEgoVehicleId() {
-	auto& getEgoVehicleName = [](nlohmann::json& vehicles) {
+	const auto getEgoVehicleName = [](nlohmann::json& vehicles) {
 		for (auto& obj : vehicles) {
 			nlohmann::json vehicle = obj;
 			if (obj.find("state") != obj.end()) {
