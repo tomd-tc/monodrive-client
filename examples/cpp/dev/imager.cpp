@@ -81,8 +81,8 @@ int main(int argc, char** argv)
         sensor->configure();
     }
 
-    int count = 0;
-    sensors[0]->sampleCallback = [&count](DataFrame *frame) {
+    int count1 = 0;
+    sensors[0]->sampleCallback = [&count1](DataFrame *frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
@@ -97,22 +97,19 @@ int main(int argc, char** argv)
         cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
         cv::Mat1b red;
         cv::extractChannel(img, red, 0); 
-        if(count++ == 50){
-
-            // cv::Mat gray;
-            // cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
-            // cv::imwrite("gray.png", gray);
-            cv::imwrite("img.png", img);
-            cv::imwrite("red_pass.png", red);
-        }
 
         cv::Mat color;
         cv::cvtColor(red, color, cv::COLOR_BayerBG2BGR);
+        if(count1++ == 50){
+            cv::imwrite("de_bayered.png", color);
+            cv::imwrite("bayer.png", red);
+        }
         cv::imshow("de-bayered", color);
         cv::imshow("bayer", img);
         cv::waitKey(1);
     };
-    sensors[1]->sampleCallback = [&count](DataFrame *frame) {
+    int count2 = 0;
+    sensors[1]->sampleCallback = [&count2](DataFrame *frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
@@ -123,6 +120,9 @@ int main(int argc, char** argv)
         }
         else
             return;
+        if(count2++ == 50){
+            cv::imwrite("rgb.png", img);
+        }
         cv::imshow("rgb", img);
         cv::waitKey(1);
     };

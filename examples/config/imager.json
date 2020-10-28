@@ -32,8 +32,8 @@
         "steer_forward_distance_lane_change": 1500.0
       },
       "location": {
-        "x": 6170.0,
-        "y": 960.0,
+        "x": 7782.835449,
+        "y": -33.783367,
         "z": 10.0
       },
       "name": "crossover_monoDrive_01_5",
