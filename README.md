@@ -1,6 +1,6 @@
 # monoDrive Clients
 
-Collection of monoDrive client software for different languages. 
+Collection of monoDrive client software for different languages.
 
 - [C++](#monodrive-c++-client)
 - [ROS](#monodrive-ros-client)
@@ -14,25 +14,30 @@ Collection of monoDrive client software for different languages.
 - [VSCode](https://code.visualstudio.com/)
 
 ### Windows Library Dependencies
-Note: Extract or install these libraries to **C:/local** for cmake can find them.
+**NOTE**: Extract or install these libraries to **C:/local** for cmake can find them.
 
-- [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.73.0/boost_1_73_0-msvc-14.2-64.exe/download) 
+- [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.73.0/boost_1_73_0-msvc-14.2-64.exe/download)
   - Add `C:\local\boost_1_73_0\lib64-msvc-14.2` to your PATH variable
-  - Create the `BOOST_ROOT` environment variable and set it to`C:\local\boost_1_73_0\` 
-- [CMake](https://cmake.org/download/) 
+  - Create the `BOOST_ROOT` environment variable and set it to `C:\local\boost_1_73_0\`
+    <img src="doc/cpp-client/setup/images/boost_root_system_var.jpg" width="500">
+- [CMake](https://cmake.org/download/)
   - When installing, make sure to choose the option to CMake to your Windows Path variable.
 
 To build the examples the following are required:
 - [OpenCV](https://github.com/opencv/opencv/releases/download/4.3.0/opencv-4.3.0-vc14_vc15.exe) Extract to `C:\local\opencv` and add `C:\local\opencv\build\x64\vc15\bin` to your PATH environment variable.
 - [Eigen](https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip) Extract to `C:\local\Eigen3` and add `C:\local\Eigen3` to your PATH environment variable.
+  - **NOTE**: You will need to move the extracted contents out of the version subfolder (eg `.\eigen-3.3.7\`) into the parent directory, such that `C:\local\Eigen3\Eigen` is a valid directory path.
 
- 
+    <img src="doc/cpp-client/setup/images/eigen3_dir.jpg" width="300">
+
+#### Figure: Environment Variables
+<img src="doc/cpp-client/setup/images/env_paths.jpg" width="800">
 
 ## Ubuntu 18.04 Prerequisites
 - Ubuntu 18.04
 - [VSCode](https://code.visualstudio.com/)
-- Install packages: 
-    ```bash 
+- Install packages:
+    ```bash
     sudo apt-get update && sudo apt-get install libboost-dev libboost-system-dev build-essential libeigen3-dev
     ```
 ## VSCode Setup and Build Instructions
@@ -43,18 +48,18 @@ To build the examples the following are required:
     - C/C++
 3. Select `File -> Open Folder` and navigate to this folder to build the cpp-examples or simulator-cpp-client to build just the client library.
 4. Use the CMake extension to configure and build
-    1. Click the Configure All Projects icon: 
+    1. Click the Configure All Projects icon:
 
         <img src="doc/cpp-client/setup/images/configure.png" width="250">
 
     2. If prompted to Scan for Kits select Yes.
-    
+
         *Windows* Choose: `Visual Studio Community 2019 Release - amd64`.
-    
+
         *Linux* Choose: `Choose the compiler of your choice, tested with g++ 7.5.0`.
-    
+
     3. Build the client by clicking the `Build All Projects` icon:
-    
+
         <img src="doc/cpp-client/setup/images/build.png" width="250">
 
 
@@ -124,10 +129,10 @@ Finally run
 
 
 # monoDrive ROS Client
-There are two ways to integrate the monoDrive simulator with ROS. 
+There are two ways to integrate the monoDrive simulator with ROS.
 
 The first is to configure the sensors to publish data directly to ROS instead of usng TCP streams. This is supported for
-IMU, Waypoint, State, Camera and Lidar sensors. The `simulator_control`, `vehicle_control`, and`wheel_vehicle_control` 
+IMU, Waypoint, State, Camera and Lidar sensors. The `simulator_control`, `vehicle_control`, and`wheel_vehicle_control`
 examples demonstrate how to do this.
 
 The second is using TCP/IP streams to receive sensor data, converting that data on a frame by frame basis to ROS
@@ -139,8 +144,8 @@ ROS messages and vice-versa. The `distributed` ROS example demonstrates how to u
 ## Ubuntu 18.04 Prerequisites
 - [monoDrive c++ client](https://github.com/monoDriveIO/monodrive-client/blob/master/README.md#monodrive-c++-client)
 - [ROS](http://wiki.ros.org/melodic/Installation/Ubuntu) *Note: Tested with melodic*
-- ROS Bridge: 
-```bash 
+- ROS Bridge:
+```bash
 sudo apt-get install ros-melodic-rosbridge-suite
 ````
 - ROS Joy:
@@ -163,7 +168,7 @@ source devel/setup.bash
 echo "source <path/to/monodrive/ros/devel/setup.bash>" >> ~/.bashrc
 ```
 
-3. Execute the following to build the ROS packages: 
+3. Execute the following to build the ROS packages:
 ```bash
 cd ./examples/ros
 catkin_make
@@ -204,7 +209,7 @@ If you are running the simulator and client on separate machines the following n
 ### Launching the direct-to-ROS examples
 
 3. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
-    1. Launch rosbridge, you can leave this running: 
+    1. Launch rosbridge, you can leave this running:
     ```bash
     roslaunch rosbridge_server rosbridge_tcp.launch bson_only_mode:=True
     ```
@@ -250,11 +255,11 @@ rosparam set joy_node/dev "/dev/input/js0"
 rosparam set joy_node/deadzone 0.05
 ```
 
-#### Launching the example 
+#### Launching the example
 
 To launch the monoDrive examples create 4 tabs and run each command in a separate terminal:   
 
-1. Launch rosbridge, you can leave this running: 
+1. Launch rosbridge, you can leave this running:
 ```bash
 roslaunch rosbridge_server rosbridge_tcp.launch bson_only_mode:=True
 ```
@@ -272,8 +277,8 @@ rosrun wheel_vehicle_control node
 ```bash
 rosrun simulator_control node
 ```
-    
-    
+
+
 **Note:** The following table show how the buttons in the G920 wheel map to the ROS message.   
 
 <table>
@@ -308,9 +313,3 @@ rosrun simulator_control node
 | LSB | joy->buttons[9]|
 | Xbox button | joy->buttons[10]|   
 </td></tr> </table>
-
-
-
-
-
-    
