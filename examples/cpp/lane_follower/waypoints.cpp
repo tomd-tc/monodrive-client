@@ -26,13 +26,14 @@
 #include "pid.h"
 
 // test critera
-#define DURATION 10000  // ms
-#define MAX_LANE_DEVIATION 25  // cm
+const unsigned int DURATION = 10000;  // ms
+const float MAX_LANE_DEVIATION = 25;  // cm
 
 // speed control
+const float DESIRED_SPEED = 1000.0;
+const float LOOK_AHEAD = 200;
+
 PID pid(0.01f, 0.0005f, 0.0002f, -1.0f, 1.0f);
-float desired_speed = 1000.0;
-float look_ahead = 200;
 float last_time = 0;
 float last_throttle = 0;
 
@@ -118,7 +119,7 @@ EgoControlConfig planning(DataFrame* stateFrame, DataFrame* waypointFrame) {
 
     float throttle = last_throttle;
     if (dt) {
-        throttle = pid.pid(desired_speed - speed, dt);
+        throttle = pid.pid(DESIRED_SPEED - speed, dt);
         last_throttle = throttle;
     }
 
@@ -184,7 +185,7 @@ int uut(int argc, char** argv, Job* job)
     wp_config.server_port = sim.getServerPort();
     wp_config.listen_port = 8102;
     wp_config.distance = 2000;
-    wp_config.frequency = look_ahead;
+    wp_config.frequency = LOOK_AHEAD;
     wp_config.draw_debug = true;
     wp_config.debug_tags = {"ego"};
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<WaypointConfig>(wp_config)));

@@ -8,6 +8,12 @@ speed controller for the ego vehicle in the monoDrive Simulator.
 Follow instruction in the root directory of this repository.
 
 
+**Note** that on Windows, these examples will be built to the `Debug` or `Release` folder`
+```
+./build/examples/cpp/lane_follower/Release/real_time.exe
+```
+
+
 ### Lane follower - real time
 The simulator is configured in closed loop mode. The exported lane splines (in geojson format)
 are loaded and used as a map. The state sensor is used for localization. A simple lane
@@ -19,10 +25,6 @@ Run example
 ./build/examples/cpp/lane_follower/real_time
 ```
 
-Note that on Windows, these examples will be built to the `Debug` or `Release` folder`
-```
-./build/examples/cpp/lane_follower/Release/real_time.exe
-```
 
 
 ### Lane follower - fixed time step
