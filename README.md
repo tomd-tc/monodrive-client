@@ -14,12 +14,15 @@ Collection of monoDrive client software for different languages.
 - [VSCode](https://code.visualstudio.com/)
 
 ### Windows Library Dependencies
-**NOTE**: Extract or install these libraries to **C:/local** for cmake can find them.
+**NOTE**: Extract or install these libraries to `C:\local` so cmake can find them.
 
 - [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.73.0/boost_1_73_0-msvc-14.2-64.exe/download)
   - Add `C:\local\boost_1_73_0\lib64-msvc-14.2` to your PATH variable
   - Create the `BOOST_ROOT` environment variable and set it to `C:\local\boost_1_73_0\`
+
     <img src="doc/cpp-client/setup/images/boost_root_system_var.jpg" width="500">
+
+
 - [CMake](https://cmake.org/download/)
   - When installing, make sure to choose the option to CMake to your Windows Path variable.
 
@@ -40,12 +43,18 @@ To build the examples the following are required:
     ```bash
     sudo apt-get update && sudo apt-get install libboost-dev libboost-system-dev build-essential libeigen3-dev
     ```
-## VSCode Setup and Build Instructions
+
+## Setup Using VSCode
+
+### Build
 1. Open VSCode.
+
 2. Add the following VSCode extensions:
-    - CMake
-    - CMake Tools
-    - C/C++
+    - [CMake](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)
+    - [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
+    - [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+
+
 3. Select `File -> Open Folder` and navigate to this folder to build the cpp-examples or simulator-cpp-client to build just the client library.
 4. Use the CMake extension to configure and build
     1. Click the Configure All Projects icon:
@@ -54,14 +63,30 @@ To build the examples the following are required:
 
     2. If prompted to Scan for Kits select Yes.
 
-        *Windows* Choose: `Visual Studio Community 2019 Release - amd64`.
+        **Windows**: Use `Visual Studio Community 2019 Release - amd64`.
 
-        *Linux* Choose: `Choose the compiler of your choice, tested with g++ 7.5.0`.
+        **Linux**: Use the compiler of your choice. Tested with `g++ 7.5.0`.
 
     3. Build the client by clicking the `Build All Projects` icon:
 
         <img src="doc/cpp-client/setup/images/build.png" width="250">
 
+### Set Launch Target
+
+<p><img src="doc/cpp-client/setup/images/dev_target_set_example_v3.jpg" width="500">
+
+
+**NOTE**: Launching automatically fires off a build check in cmake so just setting the launch target will suffice.
+
+
+### Run Example
+#### Windows
+
+<img src="doc/cpp-client/setup/images/example_windows_vscode.jpg" width="1300">
+
+*Example configuration with `fisheye_camera_equidistant` as a build + launch target.*
+
+After you've set your build configuration and target, you can run by hitting `F5` to run in debug or `Ctrl+F5` to run without debugging.
 
 ## Installation with CMake
 You can include the monoDrive Simulator client in your existing CMake project
