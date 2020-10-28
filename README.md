@@ -82,7 +82,7 @@ To build the examples the following are required:
 ### Run Example
 #### Windows
 
-<img src="doc/cpp-client/setup/images/example_windows_vscode.jpg" width="1300">
+<img src="doc/cpp-client/setup/images/example_windows_vscode.jpg" width="1500">
 
 *Example configuration with `fisheye_camera_equidistant` as a build + launch target.*
 
