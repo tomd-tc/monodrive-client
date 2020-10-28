@@ -46,6 +46,15 @@ Run example
 ```
 
 
+### Lane follower - speed curve
+This example uses the PID with a dataset of target speeds over time to reproduce a speed curve.
+
+Run example
+```
+./build/examples/cpp/lane_follower/speed_curve
+```
+
+
 ### Waypoint follower - batch job
 
 The simulator is configured in closed loop mode. The Waypoint sensor is used as a local map

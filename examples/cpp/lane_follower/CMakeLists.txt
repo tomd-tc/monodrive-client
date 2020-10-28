@@ -10,11 +10,13 @@ add_executable(fixed_step fixed_step.cpp)
 add_executable(fixed_step_lidar fixed_step_lidar.cpp)
 add_executable(real_time real_time.cpp)
 add_executable(waypoints waypoints.cpp)
+add_executable(speed_curve speed_curve.cpp)
 
 target_link_libraries(fixed_step monodrive)
 target_link_libraries(fixed_step_lidar monodrive)
 target_link_libraries(real_time monodrive)
 target_link_libraries(waypoints monodrive)
+target_link_libraries(speed_curve monodrive)
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 
@@ -37,6 +39,10 @@ target_include_directories(waypoints PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(waypoints ${OpenCV_LIBRARIES})
 target_link_libraries(waypoints ${OpenCV_LIBRARIES})
 
+target_include_directories(speed_curve PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(speed_curve ${OpenCV_LIBRARIES})
+target_link_libraries(speed_curve ${OpenCV_LIBRARIES})
+
 # copy dll to runtime directory
 if(MSVC)
   add_custom_target(monodrive_lib_copy_lanes)
@@ -49,4 +55,5 @@ if(MSVC)
   add_dependencies(fixed_step_lidar monodrive_lib_copy_lanes)
   add_dependencies(real_time monodrive_lib_copy_lanes)
   add_dependencies(waypoints monodrive_lib_copy_lanes)
+  add_dependencies(speed_curve monodrive_lib_copy_lanes)
 endif(MSVC)
