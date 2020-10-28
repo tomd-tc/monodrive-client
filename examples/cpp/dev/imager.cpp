@@ -16,8 +16,8 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-#define IMG_WIDTH 480
-#define IMG_HEIGHT 318
+#define IMG_WIDTH 1920
+#define IMG_HEIGHT 1080
 
 int main(int argc, char** argv)
 {
@@ -26,9 +26,9 @@ int main(int argc, char** argv)
     int server_port = 8999;   // This has to be 8999 this simulator is listening for connections on this port;
 
     Configuration config(
-        "examples/config/simulator_fisheye.json",
+        "examples/config/simulator_imager.json",
         "examples/config/weather.json",
-        "examples/config/fisheye.json"
+        "examples/config/imager.json"
     );
     // swap to this for interesting scenario with a fisheye camera
     Simulator sim0(config, server0_ip, server_port);
@@ -45,9 +45,27 @@ int main(int argc, char** argv)
     fc_config.server_ip = sim0.getServerIp();
     fc_config.server_port = sim0.getServerPort();
     fc_config.listen_port = 8100;
-    fc_config.location.z = 225;
+    fc_config.location.x = 70;
+    fc_config.location.z = 170;
+    // fc_config.color_filter_array.cfa = "rccc";
+    fc_config.color_filter_array.cfa = "rggb";
+    fc_config.color_filter_array.use_cfa = true;
+    // configure viewport settings for hdmi streaming
+    fc_config.viewport.enable_viewport = true;
+    fc_config.viewport.fullscreen = true;
+    fc_config.viewport.window_size = Resolution(1920,1080);
+    fc_config.viewport.monitor_number = 1;
     fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
+
+    CameraConfig rgb_config;
+    rgb_config.server_ip = sim0.getServerIp();
+    rgb_config.server_port = sim0.getServerPort();
+    rgb_config.listen_port = 8101;
+    rgb_config.location.x = 70;
+    rgb_config.location.z = 170;
+    rgb_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(rgb_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -78,7 +96,7 @@ int main(int argc, char** argv)
         
         cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
         cv::Mat1b red;
-        cv::extractChannel(img, red, 2); 
+        cv::extractChannel(img, red, 0); 
         if(count++ == 50){
 
             // cv::Mat gray;
@@ -88,7 +106,24 @@ int main(int argc, char** argv)
             cv::imwrite("red_pass.png", red);
         }
 
-        cv::imshow("monoDrive 0", red);
+        cv::Mat color;
+        cv::cvtColor(red, color, cv::COLOR_BayerBG2BGR);
+        cv::imshow("de-bayered", color);
+        cv::imshow("bayer", img);
+        cv::waitKey(1);
+    };
+    sensors[1]->sampleCallback = [&count](DataFrame *frame) {
+        auto camFrame = static_cast<CameraFrame*>(frame);
+        auto imFrame = camFrame->imageFrame;
+        cv::Mat img;
+        if (imFrame->channels == 4)
+        {
+            img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
+                          imFrame->pixels);
+        }
+        else
+            return;
+        cv::imshow("rgb", img);
         cv::waitKey(1);
     };
 
