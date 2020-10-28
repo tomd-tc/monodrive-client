@@ -21,16 +21,17 @@
     "reset_angle": 0.0
   },
   {
-    "type": "ViewportCamera",
-    "listen_port": 0,
+    "type": "Camera",
+    "listen_port": 8001,
+    "enable_streaming": false,
     "location": {
-      "x": -800.0,
-      "y": 0.0,
-      "z": 400.0
+      "x": 0.0,
+      "y": -25.0,
+      "z": 225.0
     },
     "rotation": {
-      "pitch": -15.0,
-      "yaw": 0.0,
+      "pitch": -5.0,
+      "yaw": -15.0,
       "roll": 0.0
     },
     "stream_dimensions": {
@@ -45,6 +46,16 @@
     "min_shutter": 0.000500,
     "max_shutter": 0.001400,
     "sensor_size": 9.07,
-    "channels": "bgra"
+    "channels": "bgra",
+    "viewport": {
+      "enable_viewport": true,
+      "monitor_name": "",
+      "monitor_number": -1,
+      "fullscreen": false,
+      "window_offset": {
+        "x": 0.0,
+        "y": 32.0
+      }
+    }
   }
 ]

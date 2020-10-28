@@ -241,7 +241,10 @@ bool Simulator::stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors
 {
 	ApiMessage message(333, REPLAY_StateStepSimulationCommand_ID, true, state);
 	for(auto& sensor : sensors)
-   {
+	{
+		if (!sensor->config->enable_streaming) {
+			continue;
+		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	bool success = sendCommand(message);

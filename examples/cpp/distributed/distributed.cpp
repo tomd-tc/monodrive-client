@@ -138,12 +138,15 @@ int main(int argc, char** argv) {
 
   // Set up all the server
   auto primaryServer = std::make_shared<PrimaryDistributedServer>(
-      primary_config, "127.0.0.1", 8999);
+      primary_config, "127.0.0.1", 8999
+  );
   std::vector<std::shared_ptr<ReplicaDistributedServer>> replicaServers = {
-      std::make_shared<ReplicaDistributedServer>(replica_lidar_config,
-                                                 "127.0.0.1", 9000),
-      std::make_shared<ReplicaDistributedServer>(replica_radar_config,
-                                                 "127.0.0.1", 9001),
+      std::make_shared<ReplicaDistributedServer>(
+        replica_lidar_config, "127.0.0.1", 9000
+      ),
+      std::make_shared<ReplicaDistributedServer>(
+        replica_radar_config, "127.0.0.1", 9001
+      ),
   };
 
   // Configure the primary first
