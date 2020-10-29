@@ -47,25 +47,28 @@ int main(int argc, char** argv)
     fc_config.listen_port = 8100;
     fc_config.location.x = 70;
     fc_config.location.z = 170;
-    // fc_config.color_filter_array.cfa = "rccc";
-    fc_config.color_filter_array.cfa = "rggb";
-    fc_config.color_filter_array.use_cfa = true;
-    // configure viewport settings for hdmi streaming
-    fc_config.viewport.enable_viewport = true;
-    fc_config.viewport.fullscreen = true;
-    fc_config.viewport.window_size = Resolution(1920,1080);
-    fc_config.viewport.monitor_number = 1;
     fc_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
+    fc_config.color_filter_array.cfa = "rccc";
+    fc_config.channels = "bgra";
+    fc_config.color_filter_array.use_cfa = true;
+
+    // configure viewport settings for hdmi streaming, uncomment to stream to HDMI
+    // fc_config.viewport.enable_viewport = true;
+    // fc_config.viewport.fullscreen = true;
+    // fc_config.viewport.window_size = Resolution(IMG_WIDTH,IMG_HEIGHT);
+    // 0 is main monitor starting from the left
+    // fc_config.viewport.monitor_number = 1;
     sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(fc_config)));
 
-    CameraConfig rgb_config;
-    rgb_config.server_ip = sim0.getServerIp();
-    rgb_config.server_port = sim0.getServerPort();
-    rgb_config.listen_port = 8101;
-    rgb_config.location.x = 70;
-    rgb_config.location.z = 170;
-    rgb_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
-    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(rgb_config)));
+    CameraConfig gray_config;
+    gray_config.server_ip = sim0.getServerIp();
+    gray_config.server_port = sim0.getServerPort();
+    gray_config.listen_port = 8101;
+    gray_config.resolution = Resolution(IMG_WIDTH,IMG_HEIGHT);
+    gray_config.location.x = 70;
+    gray_config.location.z = 170;
+    gray_config.channels = "gray";
+    sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(gray_config)));
 
     ViewportCameraConfig vp_config;
     vp_config.server_ip = sim0.getServerIp();
@@ -94,36 +97,28 @@ int main(int argc, char** argv)
         else
             return;
         
-        cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
-        cv::Mat1b red;
-        cv::extractChannel(img, red, 0); 
-
-        cv::Mat color;
-        cv::cvtColor(red, color, cv::COLOR_BayerBG2BGR);
+        // just to make the gray image smaller when saved
+        cv::Mat1b rccc;
+        cv::extractChannel(img, rccc, 2); 
         if(count1++ == 50){
-            cv::imwrite("de_bayered.png", color);
-            cv::imwrite("bayer.png", red);
+            // saving a copy of one of the streamed images
+            cv::imwrite("rccc.png", rccc);
         }
-        cv::imshow("de-bayered", color);
-        cv::imshow("bayer", img);
+        cv::imshow("rccc", rccc);
         cv::waitKey(1);
     };
+    // an gray rendered image for comparison
     int count2 = 0;
     sensors[1]->sampleCallback = [&count2](DataFrame *frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
-        if (imFrame->channels == 4)
-        {
-            img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
+        img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
                           imFrame->pixels);
-        }
-        else
-            return;
         if(count2++ == 50){
-            cv::imwrite("rgb.png", img);
+            cv::imwrite("gray.png", img);
         }
-        cv::imshow("rgb", img);
+        cv::imshow("gray", img);
         cv::waitKey(1);
     };
 

@@ -214,7 +214,7 @@ public:
     Viewport viewport;
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
-        if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
+        if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0 || color_filter_array.use_cfa)
             nChannels = 4;
         else if(channels.compare("gray") == 0)
             nChannels = 1;
