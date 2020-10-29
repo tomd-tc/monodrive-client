@@ -98,9 +98,6 @@ int main(int argc, char** argv)
         
         // just to make the rgb image smaller when saved
         cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
-        // std::cout << (int)img.at<cv::Vec3b>(0,0)[0] << " " 
-        //     << (int)img.at<cv::Vec3b>(0,0)[1] << " " 
-        //     << (int)img.at<cv::Vec3b>(0,0)[2] << " " <<std::endl;
         cv::Mat1b rggb;
         cv::extractChannel(img, rggb, 2); 
         std::cout << rggb.size() << std::endl;
@@ -110,7 +107,7 @@ int main(int argc, char** argv)
         if(count1++ == 50){
             // saving a copy of one of the streamed images
             cv::imwrite("de_bayered.png", color);
-            cv::imwrite("bayer.png", rggb);
+            cv::imwrite("rggb.png", rggb);
         }
         cv::imshow("de-bayered", color);
         cv::imshow("bayer", rggb);
