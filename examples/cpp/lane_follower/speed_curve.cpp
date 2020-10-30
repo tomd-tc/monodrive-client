@@ -124,6 +124,9 @@ EgoControlConfig planning(DataFrame* dataFrame) {
         throttle = pid.pid(desired_speed - speed, dt);
         last_throttle = throttle;
     }
+    if (desired_speed == 0) {
+        throttle = -1;
+    }
 
     output << frame.game_time << " " << desired_speed << " " << speed << " " << throttle << std::endl;
     std::cout << frame.game_time << " " << desired_speed << " " << speed << " " << throttle << std::endl;
