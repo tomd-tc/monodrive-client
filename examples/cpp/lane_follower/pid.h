@@ -17,6 +17,11 @@ public:
 
     float inline pid(float error, float dt)
     {
+        if (dt == 0)
+        {
+            std::cerr << "WARNING: dt = 0 in PID controller" << std::endl;
+            return 0;
+        }
         integral += (error * dt);
         float derivative = (error - error_prior) / dt;
         error_prior = error;

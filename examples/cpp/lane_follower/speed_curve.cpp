@@ -40,6 +40,7 @@ int server_port = 8999;
 // speed curve
 PID pid(0.0125f, 0.004f, 0.0025f, -1.0f, 1.0f);
 float last_time = 0;
+float last_throttle = 0;
 float desired_speed = 0;
 std::ofstream output;
 
@@ -118,7 +119,11 @@ EgoControlConfig planning(DataFrame* dataFrame) {
     double dt = last_time > 0 ? frame.game_time - last_time : 0.1;
     last_time = frame.game_time;
 
-    float throttle = pid.pid(desired_speed - speed, dt);
+    float throttle = last_throttle;
+    if (dt) {
+        throttle = pid.pid(desired_speed - speed, dt);
+        last_throttle = throttle;
+    }
 
     output << frame.game_time << " " << desired_speed << " " << speed << " " << throttle << std::endl;
     std::cout << frame.game_time << " " << desired_speed << " " << speed << " " << throttle << std::endl;
@@ -167,7 +172,7 @@ int main(int argc, char** argv)
     Configuration config(
         "examples/config/simulator_straightaway.json",
         "examples/config/weather.json",
-        "examples/config/scenario_multi_vehicle_straightaway.json"
+        "examples/config/scenario_solo_straightaway.json"
     );
     // set to fixed timestep mode
     config.simulator["simulation_mode"] = 3;
