@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 project(monodrive)
 
 # collect headers and source
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB HEADERS "src/*.h" "src/*.hpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "src/*.h" "src/*.hpp")
 
 # define shared library
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
