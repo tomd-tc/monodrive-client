@@ -18,6 +18,11 @@ set_target_properties(
       CXX_EXTENSIONS NO
 )
 
+# opendrive requires shlwapi on windows
+if(MSVC)
+  target_link_libraries(${PROJECT_NAME} shlwapi)
+endif(MSVC)
+
 # need to export all symbols from .dll on windows
 if(MSVC)
   set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
