@@ -49,14 +49,14 @@ namespace logging {
   // https://stackoverflow.com/a/27375675
   template <typename Arg, typename ... Args>
   LIBCARLA_NOINLINE
-  static void MONODRIVECORE_API write_to_stream(std::ostream &out, Arg &&arg, Args && ... args) {
+  static void write_to_stream(std::ostream &out, Arg &&arg, Args && ... args) {
     out << std::boolalpha << std::forward<Arg>(arg);
     using expander = int[];
     (void) expander{0, (void(out << ' ' << std::forward<Args>(args)), 0) ...};
   }
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log(Args && ... args) {
+  static inline void log(Args && ... args) {
     logging::write_to_stream(std::cout, std::forward<Args>(args) ..., '\n');
   }
 
@@ -72,28 +72,28 @@ namespace logging {
 #else
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_debug(Args && ...) {}
+  static inline void log_debug(Args && ...) {}
 
 #endif
 
 #if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_INFO
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_info(Args && ... args) {
+  static inline void log_info(Args && ... args) {
     logging::write_to_stream(std::cout, "INFO: ", std::forward<Args>(args) ..., '\n');
   }
 
 #else
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_info(Args && ...) {}
+  static inline void log_info(Args && ...) {}
 
 #endif
 
 #if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_WARNING
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_warning(Args && ... args) {
+  static inline void log_warning(Args && ... args) {
     logging::write_to_stream(std::cerr, "WARNING:", std::forward<Args>(args) ..., '\n');
   }
 
@@ -107,28 +107,28 @@ namespace logging {
 #if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_ERROR
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_error(Args && ... args) {
+  static inline void log_error(Args && ... args) {
     logging::write_to_stream(std::cerr, "ERROR:", std::forward<Args>(args) ..., '\n');
   }
 
 #else
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_error(Args && ...) {}
+  static inline void log_error(Args && ...) {}
 
 #endif
 
 #if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_CRITICAL
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_critical(Args && ... args) {
+  static inline void log_critical(Args && ... args) {
     logging::write_to_stream(std::cerr, "CRITICAL:", std::forward<Args>(args) ..., '\n');
   }
 
 #else
 
   template <typename ... Args>
-  static inline void MONODRIVECORE_API log_critical(Args && ...) {}
+  static inline void log_critical(Args && ...) {}
 
 #endif
 

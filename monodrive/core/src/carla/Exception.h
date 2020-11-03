@@ -34,7 +34,7 @@ namespace carla {
 namespace carla {
 
   template <typename T>
-  [[ noreturn ]] void MONODRIVECORE_API throw_exception(const T &e) {
+  [[ noreturn ]] void throw_exception(const T &e) {
     throw e;
   }
 
