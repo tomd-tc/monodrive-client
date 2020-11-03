@@ -19,7 +19,7 @@ namespace element {
   /// valid in direction of the increasing s co-ordinate until a new entry is
   /// defined. If multiple entries are defined, they must be listed in
   /// increasing order.
-  class RoadInfoLaneAccess final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoLaneAccess final : public RoadInfo {
   public:
 
     RoadInfoLaneAccess(

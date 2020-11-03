@@ -19,7 +19,7 @@ namespace element {
   /// height record provides a simplified method to describe this offset by
   /// setting an inner and outer offset from road level at discrete positions
   /// along the lane profile.
-  class RoadInfoLaneHeight final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoLaneHeight final : public RoadInfo {
   public:
 
     RoadInfoLaneHeight(

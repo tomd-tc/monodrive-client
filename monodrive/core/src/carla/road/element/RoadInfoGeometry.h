@@ -14,7 +14,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  class RoadInfoGeometry final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoGeometry final : public RoadInfo {
   public:
 
     RoadInfoGeometry(double s, std::unique_ptr<Geometry> &&geom)

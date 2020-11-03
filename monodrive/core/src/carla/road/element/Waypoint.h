@@ -15,7 +15,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  struct Waypoint {
+  struct MONODRIVECORE_API Waypoint {
 
     RoadId road_id = 0u;
 
@@ -33,7 +33,7 @@ namespace element {
 namespace std {
 
   template <>
-  struct hash<carla::road::element::Waypoint> {
+  struct MONODRIVECORE_API hash<carla::road::element::Waypoint> {
 
     using argument_type = carla::road::element::Waypoint;
 
@@ -52,12 +52,12 @@ namespace carla {
 namespace road {
 namespace element {
 
-  inline bool operator==(const Waypoint &lhs, const Waypoint &rhs) {
+  inline bool MONODRIVECORE_API operator==(const Waypoint &lhs, const Waypoint &rhs) {
     auto hasher = std::hash<Waypoint>();
     return hasher(lhs) == hasher(rhs);
   }
 
-  inline bool operator!=(const Waypoint &lhs, const Waypoint &rhs) {
+  inline bool MONODRIVECORE_API operator!=(const Waypoint &lhs, const Waypoint &rhs) {
     return !operator==(lhs, rhs);
   }
 

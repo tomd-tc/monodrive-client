@@ -17,7 +17,7 @@
 namespace carla {
 namespace road {
 
-  class MapBuilder {
+  class MONODRIVECORE_API MapBuilder {
   public:
 
     boost::optional<Map> Build();

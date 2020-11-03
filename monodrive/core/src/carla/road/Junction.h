@@ -20,7 +20,7 @@ namespace road {
 
   class MapBuilder;
 
-  class Junction : private MovableNonCopyable {
+  class MONODRIVECORE_API Junction : private MovableNonCopyable {
   public:
 
     struct LaneLink {

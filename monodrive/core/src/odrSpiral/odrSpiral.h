@@ -32,4 +32,4 @@
 * @param t      tangent direction at s [rad]
 */
 
-extern void odrSpiral( double s, double cDot, double *x, double *y, double *t );
+extern void MONODRIVECORE_API odrSpiral( double s, double cDot, double *x, double *y, double *t );

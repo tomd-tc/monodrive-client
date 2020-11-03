@@ -13,7 +13,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  class RoadInfoMarkTypeLine final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoMarkTypeLine final : public RoadInfo {
   public:
 
     RoadInfoMarkTypeLine(

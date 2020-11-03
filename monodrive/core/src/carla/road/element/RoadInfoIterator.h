@@ -17,7 +17,7 @@ namespace road {
 namespace element {
 
   template <typename T, typename IT>
-  class RoadInfoIterator : private RoadInfoVisitor {
+  class MONODRIVECORE_API RoadInfoIterator : private RoadInfoVisitor {
   public:
 
     static_assert(std::is_same<std::unique_ptr<RoadInfo>, typename IT::value_type>::value, "Not compatible.");

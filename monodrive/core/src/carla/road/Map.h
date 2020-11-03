@@ -24,7 +24,7 @@
 namespace carla {
 namespace road {
 
-  class Map : private MovableNonCopyable {
+  class MONODRIVECORE_API Map : private MovableNonCopyable {
   public:
 
     using Waypoint = element::Waypoint;

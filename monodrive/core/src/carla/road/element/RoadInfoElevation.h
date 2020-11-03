@@ -13,7 +13,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  class RoadInfoElevation final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoElevation final : public RoadInfo {
   public:
 
     RoadInfoElevation(

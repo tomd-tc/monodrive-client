@@ -10,7 +10,7 @@
 
 namespace carla {
 
-  class StringUtil {
+  class MONODRIVECORE_API StringUtil {
   public:
 
     static const char *ToConstCharPtr(const char *str) {

@@ -20,7 +20,7 @@ namespace road {
 
   /// A set of elements ordered by its position on the road.
   template <typename T>
-  class RoadElementSet : private MovableNonCopyable {
+  class MONODRIVECORE_API RoadElementSet : private MovableNonCopyable {
   public:
 
     using mapped_type = T;

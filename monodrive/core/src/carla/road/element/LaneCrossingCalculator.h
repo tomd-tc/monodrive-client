@@ -18,7 +18,7 @@ namespace road {
 
 namespace element {
 
-  class LaneCrossingCalculator {
+  class MONODRIVECORE_API LaneCrossingCalculator {
   public:
 
     static std::vector<LaneMarking> Calculate(

@@ -28,7 +28,7 @@ namespace element {
   class RoadInfoCrosswalk;
   class RoadInfoSignal;
 
-  class RoadInfoVisitor {
+  class MONODRIVECORE_API RoadInfoVisitor {
   public:
 
     RoadInfoVisitor() = default;

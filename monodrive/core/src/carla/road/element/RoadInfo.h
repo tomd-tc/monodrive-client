@@ -17,7 +17,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  class RoadInfo : private NonCopyable {
+  class MONODRIVECORE_API RoadInfo : private NonCopyable {
   public:
 
     virtual ~RoadInfo() = default;

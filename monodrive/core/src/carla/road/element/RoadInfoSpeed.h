@@ -12,7 +12,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  class RoadInfoSpeed final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoSpeed final : public RoadInfo {
   public:
 
     RoadInfoSpeed(double s, double speed)

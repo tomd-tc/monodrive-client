@@ -12,14 +12,14 @@ namespace carla {
 namespace road {
 namespace element {
 
-  struct CrosswalkPoint {
+  struct MONODRIVECORE_API CrosswalkPoint {
     double u            { 0.0 };
     double v            { 0.0 };
     double z            { 0.0 };
     CrosswalkPoint(double _u, double _v, double _z) : u(_u), v(_v), z(_z) {};
   };
 
-  class RoadInfoCrosswalk final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoCrosswalk final : public RoadInfo {
   public:
 
     RoadInfoCrosswalk(

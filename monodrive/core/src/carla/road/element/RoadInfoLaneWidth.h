@@ -18,7 +18,7 @@ namespace element {
   /// lane, except for the center lane which is, per convention, of zero width.
   /// Each entry is valid until a new entry is defined. If multiple entries are
   /// defined for a lane, they must be listed in ascendingorder.
-  class RoadInfoLaneWidth final : public RoadInfo {
+  class MONODRIVECORE_API RoadInfoLaneWidth final : public RoadInfo {
   public:
 
     RoadInfoLaneWidth(

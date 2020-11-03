@@ -14,7 +14,7 @@
 namespace carla {
 namespace road {
 
-  struct LaneValidity {
+  struct MONODRIVECORE_API LaneValidity {
   public:
 
     LaneValidity(LaneId from_lane, LaneId to_lane)

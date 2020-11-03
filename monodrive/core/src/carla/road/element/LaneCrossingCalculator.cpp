@@ -19,7 +19,7 @@ namespace element {
   /// shouders have a small width, they can cause problems while finding
   /// the nearest center of a lane given a location that are in a road,
   /// but very close to a shoulder.
-  static constexpr uint32_t FLAGS =
+  static constexpr uint32_t MONODRIVECORE_API FLAGS =
       static_cast<uint32_t>(Lane::LaneType::Driving) |
       static_cast<uint32_t>(Lane::LaneType::Bidirectional) |
       static_cast<uint32_t>(Lane::LaneType::Biking) |
@@ -27,7 +27,7 @@ namespace element {
 
   /// Calculate the lane markings that need to be crossed from @a lane_id_origin
   /// to @a lane_id_destination.
-  static std::vector<LaneMarking> CrossingAtSameSection(
+  static std::vector<LaneMarking> MONODRIVECORE_API CrossingAtSameSection(
       const Map &map,
       const Waypoint *w0,
       const Waypoint *w1,
@@ -53,11 +53,11 @@ namespace element {
     return {};
   }
 
-  static bool IsOffRoad(const Map &map, const geom::Location &location) {
+  static bool MONODRIVECORE_API IsOffRoad(const Map &map, const geom::Location &location) {
     return !map.GetWaypoint(location, FLAGS).has_value();
   }
 
-  std::vector<LaneMarking> LaneCrossingCalculator::Calculate(
+  std::vector<LaneMarking> MONODRIVECORE_API LaneCrossingCalculator::Calculate(
       const Map &map,
       const geom::Location &origin,
       const geom::Location &destination) {

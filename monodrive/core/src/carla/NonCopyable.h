@@ -9,7 +9,7 @@
 namespace carla {
 
   /// Inherit (privately) to suppress copy/move construction and assignment.
-  class NonCopyable {
+  class MONODRIVECORE_API NonCopyable {
   public:
 
     NonCopyable() = default;
@@ -22,7 +22,7 @@ namespace carla {
   };
 
   /// Inherit (privately) to suppress copy construction and assignment.
-  class MovableNonCopyable {
+  class MONODRIVECORE_API MovableNonCopyable {
   public:
 
     MovableNonCopyable() = default;

@@ -21,7 +21,7 @@ namespace road {
   class Road;
   class MapBuilder;
 
-  class LaneSection : private MovableNonCopyable {
+  class MONODRIVECORE_API LaneSection : private MovableNonCopyable {
   public:
 
     explicit LaneSection(SectionId id, double s) : _id(id), _s(s) {}

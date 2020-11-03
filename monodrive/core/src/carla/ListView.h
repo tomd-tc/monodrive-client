@@ -16,7 +16,7 @@ namespace carla {
   /// A view over a range of elements in a container. Basically a pair of begin
   /// and end iterators.
   template<typename IT>
-  class ListView {
+  class MONODRIVECORE_API ListView {
   public:
 
     using iterator = IT;

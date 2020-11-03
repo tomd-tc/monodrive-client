@@ -15,7 +15,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  enum class GeometryType : unsigned int {
+  enum class MONODRIVECORE_API GeometryType : unsigned int {
     LINE,
     ARC,
     SPIRAL,
@@ -23,7 +23,7 @@ namespace element {
     POLY3PARAM
   };
 
-  struct DirectedPoint {
+  struct MONODRIVECORE_API DirectedPoint {
 
     DirectedPoint()
       : location(0, 0, 0),
@@ -46,7 +46,7 @@ namespace element {
     }
   };
 
-  class Geometry {
+  class MONODRIVECORE_API Geometry {
   public:
 
     GeometryType GetType() const {
@@ -97,7 +97,7 @@ namespace element {
     geom::Location _start_position; // [meters]
   };
 
-  class GeometryLine final : public Geometry {
+  class MONODRIVECORE_API GeometryLine final : public Geometry {
   public:
 
     GeometryLine(
@@ -124,7 +124,7 @@ namespace element {
 
   };
 
-  class GeometryArc final : public Geometry {
+  class MONODRIVECORE_API GeometryArc final : public Geometry {
   public:
 
     GeometryArc(
@@ -161,7 +161,7 @@ namespace element {
     double _curvature;
   };
 
-  class GeometrySpiral final : public Geometry {
+  class MONODRIVECORE_API GeometrySpiral final : public Geometry {
   public:
 
     GeometrySpiral(
@@ -193,7 +193,7 @@ namespace element {
     double _curve_end;
   };
 
-  class GeometryPoly3 final : public Geometry {
+  class MONODRIVECORE_API GeometryPoly3 final : public Geometry {
   public:
 
     GeometryPoly3(
@@ -252,7 +252,7 @@ namespace element {
     void PreComputeSpline();
   };
 
-  class GeometryParamPoly3 final : public Geometry {
+  class MONODRIVECORE_API GeometryParamPoly3 final : public Geometry {
   public:
 
     GeometryParamPoly3(
