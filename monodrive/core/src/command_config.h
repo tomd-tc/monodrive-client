@@ -1,3 +1,4 @@
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
 
 #include <string>
@@ -60,6 +61,18 @@ public:
     }
 };
 
+class ClosedLoopStepCommandConfig : public CommandBaseConfig
+{
+public:
+    ClosedLoopStepCommandConfig(){
+        type = ClosedLoopStepCommand_ID;
+    }
+    float time_step = 0.01f;
+    virtual nlohmann::json dump(){
+        return *this;
+    }
+};
+
 void inline to_json(nlohmann::json& j, const CommandBaseConfig& config)
 {
     j = nlohmann::json{
@@ -97,4 +110,13 @@ void inline from_json(const nlohmann::json& j, MapConfig& config) {
     json_get(j, "point_delta", config.point_delta);
     json_get(j, "orientation", config.orientation);
     json_get(j, "gis_anchor", config.gis_anchor);
+}
+
+void inline to_json(nlohmann::json& j, const ClosedLoopStepCommandConfig& config){
+    j = static_cast<CommandBaseConfig>(config);
+    j["time_step"] = config.time_step;
+}
+
+void inline from_json(const nlohmann::json& j, ClosedLoopStepCommandConfig& config) {
+    json_get(j, "time_step", config.time_step);
 }

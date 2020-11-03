@@ -1,5 +1,6 @@
-// Copyright 2017-2020 monoDrive, LLC. All Rights Reserved.
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
+#include <iostream>
 #include <string>
 #include <cstring>
 #include <deque>
@@ -16,8 +17,10 @@
 #pragma push_macro("TEXT")
 #undef TEXT
 #pragma warning( push )
-#pragma warning( disable: 4668 4191 4834 4267) 
-#include "targetver.h"
+#pragma warning( disable: 4668 4191 4834 4267)
+#ifdef _WIN32
+#include <SDKDDKVer.h>
+#endif
 #include <boost/asio.hpp>
 #undef UpdateResource
 #undef DeleteFile

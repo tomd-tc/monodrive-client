@@ -1,4 +1,4 @@
-// Copyright 2017-2019 monoDrive, LLC. All Rights Reserved.
+// Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #pragma once
 
 /*
@@ -54,6 +54,7 @@
  */
 #define EgoControl_ID				"EgoControl_ID" 
 #define SampleSensorsCommand_ID "SampleSensorsCommand_ID"
+#define SampleSensorListCommand_ID "SampleSensorListCommand_ID"
 /*
  * Activate license command
  */
@@ -77,6 +78,7 @@
 #define ImportMapCommand_ID			"ImportMap"
 #define SpawnVehicleCommand_ID "SpawnVehicleCommand_ID"
 #define ClosedLoopConfigCommand_ID "ClosedLoopConfigCommand_ID"
+#define ClosedLoopStepCommand_ID "ClosedLoopStepCommand_ID"
 
 /*
  * Vehicle lights configuration command
