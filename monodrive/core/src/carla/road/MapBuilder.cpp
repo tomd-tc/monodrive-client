@@ -35,7 +35,7 @@ using namespace carla::road::element;
 namespace carla {
 namespace road {
 
-  boost::optional<Map> MapBuilder::Build() {
+  std::optional<Map> MapBuilder::Build() {
 
     CreatePointersBetweenRoadSegments();
 
@@ -980,9 +980,9 @@ void MapBuilder::CreateController(
       }
       if(closest_waypoint_to_signal) {
         auto distance_to_road =
-            (map.ComputeTransform(closest_waypoint_to_signal.get()).location -
+            (map.ComputeTransform(*closest_waypoint_to_signal).location -
             signal_position).Length();
-        double lane_width = map.GetLaneWidth(closest_waypoint_to_signal.get());
+        double lane_width = map.GetLaneWidth(*closest_waypoint_to_signal);
         int iter = 0;
         int MaxIter = 10;
         // Displaces signal until it finds a suitable spot
@@ -998,9 +998,9 @@ void MapBuilder::CreateController(
           closest_waypoint_to_signal =
               map.GetClosestWaypointOnRoad(signal_position);
           distance_to_road =
-              (map.ComputeTransform(closest_waypoint_to_signal.get()).location -
+              (map.ComputeTransform(*closest_waypoint_to_signal).location -
               signal_position).Length();
-          lane_width = map.GetLaneWidth(closest_waypoint_to_signal.get());
+          lane_width = map.GetLaneWidth(*closest_waypoint_to_signal);
           iter++;
         }
         if(iter == MaxIter) {

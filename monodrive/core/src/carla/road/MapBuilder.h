@@ -10,7 +10,8 @@
 #include "carla/road/element/RoadInfoCrosswalk.h"
 #include "carla/road/element/RoadInfoSignal.h"
 
-#include <boost/optional.hpp>
+// #include <boost/optional.hpp>
+#include <optional>
 
 #include <map>
 
@@ -20,7 +21,7 @@ namespace road {
   class MapBuilder {
   public:
 
-    boost::optional<Map> Build();
+    std::optional<Map> Build();
 
     // called from road parser
     carla::road::Road *AddRoad(

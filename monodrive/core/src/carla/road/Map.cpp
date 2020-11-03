@@ -153,7 +153,7 @@ namespace road {
   // -- Map: Geometry ----------------------------------------------------------
   // ===========================================================================
 
-  boost::optional<Waypoint> Map::GetClosestWaypointOnRoad(
+  std::optional<Waypoint> Map::GetClosestWaypointOnRoad(
       const geom::Location &pos,
       int32_t lane_type) const {
     std::vector<Rtree::TreeElement> query_result =
@@ -164,7 +164,7 @@ namespace road {
         });
 
     if (query_result.size() == 0) {
-      return boost::optional<Waypoint>{};
+      return std::optional<Waypoint>{};
     }
 
     Rtree::BSegment segment = query_result.front().first;
@@ -200,10 +200,10 @@ namespace road {
     }
   }
 
-  boost::optional<Waypoint> Map::GetWaypoint(
+  std::optional<Waypoint> Map::GetWaypoint(
       const geom::Location &pos,
       int32_t lane_type) const {
-    boost::optional<Waypoint> w = GetClosestWaypointOnRoad(pos, lane_type);
+    std::optional<Waypoint> w = GetClosestWaypointOnRoad(pos, lane_type);
 
     if (!w.has_value()) {
       return w;
@@ -218,10 +218,10 @@ namespace road {
       return w;
     }
 
-    return boost::optional<Waypoint>{};
+    return std::optional<Waypoint>{};
   }
 
-  boost::optional<Waypoint> Map::GetWaypoint(
+  std::optional<Waypoint> Map::GetWaypoint(
       RoadId road_id,
       LaneId lane_id,
       float s) const {
@@ -234,13 +234,13 @@ namespace road {
 
     // check the road
     if (!_data.ContainsRoad(waypoint.road_id)) {
-      return boost::optional<Waypoint>{};
+      return std::optional<Waypoint>{};
     }
     const Road &road = _data.GetRoad(waypoint.road_id);
 
     // check the 's' distance
     if (s < 0.0f || s >= road.GetLength()) {
-      return boost::optional<Waypoint>{};
+      return std::optional<Waypoint>{};
     }
 
     // check the section
@@ -255,7 +255,7 @@ namespace road {
 
     // check the lane id
     if (!lane_found) {
-      return boost::optional<Waypoint>{};
+      return std::optional<Waypoint>{};
     }
 
     return waypoint;
@@ -564,17 +564,17 @@ namespace road {
     return result;
   }
 
-  boost::optional<Waypoint> Map::GetRight(Waypoint waypoint) const {
+  std::optional<Waypoint> Map::GetRight(Waypoint waypoint) const {
     RELEASE_ASSERT(waypoint.lane_id != 0);
     if (waypoint.lane_id > 0) {
       ++waypoint.lane_id;
     } else {
       --waypoint.lane_id;
     }
-    return IsLanePresent(_data, waypoint) ? waypoint : boost::optional<Waypoint>{};
+    return IsLanePresent(_data, waypoint) ? waypoint : std::optional<Waypoint>{};
   }
 
-  boost::optional<Waypoint> Map::GetLeft(Waypoint waypoint) const {
+  std::optional<Waypoint> Map::GetLeft(Waypoint waypoint) const {
     RELEASE_ASSERT(waypoint.lane_id != 0);
     if (std::abs(waypoint.lane_id) == 1) {
       waypoint.lane_id *= -1;
@@ -583,7 +583,7 @@ namespace road {
     } else {
       ++waypoint.lane_id;
     }
-    return IsLanePresent(_data, waypoint) ? waypoint : boost::optional<Waypoint>{};
+    return IsLanePresent(_data, waypoint) ? waypoint : std::optional<Waypoint>{};
   }
 
   std::vector<Waypoint> Map::GenerateWaypoints(const double distance) const {

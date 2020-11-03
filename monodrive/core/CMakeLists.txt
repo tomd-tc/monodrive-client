@@ -9,11 +9,11 @@ file(GLOB_RECURSE HEADERS "src/*.h" "src/*.hpp")
 # define shared library
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
-# set c++ 11 standard
+# set c++ 17 standard
 set_target_properties(
 	${PROJECT_NAME}
     PROPERTIES
-      CXX_STANDARD 14
+      CXX_STANDARD 17
       CXX_STANDARD_REQUIRED YES
       CXX_EXTENSIONS NO
 )
