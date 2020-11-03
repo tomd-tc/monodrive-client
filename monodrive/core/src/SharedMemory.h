@@ -1,5 +1,6 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 //#include <boost/interprocess/shared_memory_object.hpp>
+#pragma once
 
 #pragma push_macro("TEXT")
 #undef TEXT

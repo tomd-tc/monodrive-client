@@ -1,4 +1,6 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
+#pragma once
+
 #include <chrono>
 #include <atomic>
 
