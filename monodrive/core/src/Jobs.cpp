@@ -1,73 +1,220 @@
 // Copyright (C) 2017-2020, monoDrive, LLC. All Rights Reserved.
 #include "Jobs.h"
+
+#include <chrono>
+#include <thread>
 #include <fstream>
+#include <boost/filesystem.hpp>
 
 #define GCC_VERSION __GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__
-#if GCC_VERSION >= 40900
+#if GCC_VERSION >= 40900 || _MSC_VER >= 1900
 #include "cxxopts.hpp"  // requires regex
 #endif
 
+namespace fs = boost::filesystem;
 
-Job::Job(int argc, char** argv)
+
+Job::Job(int argc, char** argv) : argc(argc), argv(argv)
 {
     parseArguments(argc, argv);
 }
 
-bool Job::setResult(const Result& result)
+
+int Job::run(std::function<int (int, char**, Job*)> main)
 {
-    std::ofstream file(resultsPath);
+    if (!loop)
+    {
+        return main(argc, argv, this);
+    }
+
+    while (true)
+    {
+        // wait until ready
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(POLL_INTERVAL));
+            JobState state = getState();
+            std::cout << "Job status: " << JOB_STATE_NAMES.at(state) << std::endl;
+            if (state == JobState::READY)
+            {
+                break;
+            }
+        }
+
+        // run uut
+        int res = main(argc, argv, this);
+
+        // update job status
+        JobState state = res ? JobState::FAILED : JobState::COMPLETED;
+        setState(state);
+        std::cout << "Job status: " << JOB_STATE_NAMES.at(state) << std::endl;
+    }
+    return 0;
+}
+
+bool Job::setState(JobState state)
+{
+    if (assetDirPath.empty())
+    {
+        std::cerr << "ERROR! No assets directory provided to locate state file" << std::endl;
+        return false;
+    }
+    std::string path = (fs::path(assetDirPath) / fs::path(STATE_FILE)).string();
+    std::ofstream file(path);
 	if (!file.is_open())
 	{
-        std::cerr << "Unable to write to file: " << std::endl;
+        std::cerr << "ERROR! Unable to write to state file: " << path << std::endl;
+        return false;
+	}
+	file << JOB_STATE_NAMES.at(state);
+    return true;
+}
+
+
+bool Job::setResult(const Result& result)
+{
+    std::string path;
+    if (!assetDirPath.empty())
+    {
+        path = (fs::path(assetDirPath) / fs::path(RESULTS_FILE)).string();
+    }
+    if (!resultsPath.empty())
+    {
+        path = resultsPath;
+    }
+    std::ofstream file(path);
+	if (!file.is_open())
+	{
+        std::cerr << "ERROR! Unable to write to results file: " << path << std::endl;
         return false;
 	}
 	file << result.dump().dump(2);
     return true;
 }
 
+
+JobState Job::getState()
+{
+    if (assetDirPath.empty())
+    {
+        std::cerr << "ERROR! No assets directory provided to locate state file" << std::endl;
+        return JobState::UNDEFINED;
+    }
+    std::string path = (fs::path(assetDirPath) / fs::path(STATE_FILE)).string();
+    std::ifstream file(path);
+    if (!file.is_open())
+	{
+        std::cout << "WARNING! Unable to read state file: " << path << std::endl;
+        return JobState::UNDEFINED;
+	}
+    std::string state;
+    std::getline(file, state);
+
+    for (auto const& s : JOB_STATE_NAMES)
+    {
+        if (s.second == state)
+        {
+            return s.first;
+        }
+    }
+    return JobState::UNDEFINED;
+}
+
+
+Configuration Job::getConfig()
+{
+    std::string sim;
+    std::string scenario;
+    std::string weather;
+    std::string sensors;
+
+    // set paths from assets directory if provided
+    if (!assetDirPath.empty())
+    {
+        sim = (fs::path(assetDirPath) / fs::path(SIMULATOR_FILE)).string();
+        scenario = (fs::path(assetDirPath) / fs::path(SCENARIO_FILE)).string();
+        weather = (fs::path(assetDirPath) / fs::path(WEATHER_FILE)).string();
+        sensors = (fs::path(assetDirPath) / fs::path(SENSORS_FILE)).string();
+    }
+
+    // set/update with individual flags
+    if (!simulatorPath.empty())
+    {
+        sim = simulatorPath;
+    }
+    if (!scenarioPath.empty())
+    {
+        scenario = scenarioPath;
+    }
+    if (!weatherPath.empty())
+    {
+        weather = weatherPath;
+    }
+    if (!sensorsPath.empty())
+    {
+        sensors = sensorsPath;
+    }
+
+    // create config
+    return Configuration(sim, weather, scenario, sensors);
+}
+
+
 void Job::parseArguments(int argc, char** argv)
 {
-#if GCC_VERSION >= 40900
+#if GCC_VERSION >= 40900 || _MSC_VER >= 1900
     cxxopts::Options options("monoDrive Simulator Jobs interface");
     options.allow_unrecognised_options();
     options.add_options()
-     (AssetDir_FLAG, "", cxxopts::value<std::string>())
-     (Simulator_FLAG, "", cxxopts::value<std::string>())
-     (Scenario_FLAG, "", cxxopts::value<std::string>())
-     (Weather_FLAG, "", cxxopts::value<std::string>())
-     (Vehicle_FLAG, "", cxxopts::value<std::string>())
-     (Sensors_FLAG, "", cxxopts::value<std::string>())
-     (Results_FLAG, "", cxxopts::value<std::string>())
+     (ASSET_DIR_FLAG, "", cxxopts::value<std::string>())
+     (SIMULATOR_FLAG, "", cxxopts::value<std::string>())
+     (SCENARIO_FLAG, "", cxxopts::value<std::string>())
+     (WEATHER_FLAG, "", cxxopts::value<std::string>())
+     (VEHICLE_FLAG, "", cxxopts::value<std::string>())
+     (SENSORS_FLAG, "", cxxopts::value<std::string>())
+     (RESULTS_FLAG, "", cxxopts::value<std::string>())
+     (LOOP_FLAG, "")
+     (HELP_FLAG, "")
     ;
     auto cla = options.parse(argc, argv);
 
-    if (cla.count(AssetDir_FLAG))
+    if (cla.count(HELP_FLAG))
     {
-        assetDirPath = cla[AssetDir_FLAG].as<std::string>();
+        std::cout << options.help() << std::endl;
+        exit(0);
     }
-    if (cla.count(Simulator_FLAG))
+
+    if (cla.count(ASSET_DIR_FLAG))
     {
-        simulatorPath = cla[Simulator_FLAG].as<std::string>();
+        assetDirPath = cla[ASSET_DIR_FLAG].as<std::string>();
     }
-    if (cla.count(Scenario_FLAG))
+    if (cla.count(SIMULATOR_FLAG))
     {
-        scenarioPath = cla[Scenario_FLAG].as<std::string>();
+        simulatorPath = cla[SIMULATOR_FLAG].as<std::string>();
     }
-    if (cla.count(Weather_FLAG))
+    if (cla.count(SCENARIO_FLAG))
     {
-        weatherPath = cla[Weather_FLAG].as<std::string>();
+        scenarioPath = cla[SCENARIO_FLAG].as<std::string>();
     }
-    if (cla.count(Vehicle_FLAG))
+    if (cla.count(WEATHER_FLAG))
     {
-        vehiclePath = cla[Vehicle_FLAG].as<std::string>();
+        weatherPath = cla[WEATHER_FLAG].as<std::string>();
     }
-    if (cla.count(Sensors_FLAG))
+    if (cla.count(VEHICLE_FLAG))
     {
-        sensorsPath = cla[Sensors_FLAG].as<std::string>();
+        vehiclePath = cla[VEHICLE_FLAG].as<std::string>();
     }
-    if (cla.count(Results_FLAG))
+    if (cla.count(SENSORS_FLAG))
     {
-        resultsPath = cla[Results_FLAG].as<std::string>();
+        sensorsPath = cla[SENSORS_FLAG].as<std::string>();
+    }
+    if (cla.count(RESULTS_FLAG))
+    {
+        resultsPath = cla[RESULTS_FLAG].as<std::string>();
+    }
+    if (cla.count(LOOP_FLAG))
+    {
+        loop = true;
     }
 #else
     std::cout << "Warning unable to parse command line args with gcc < 4.9" << std::endl;
