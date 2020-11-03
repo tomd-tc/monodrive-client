@@ -31,5 +31,6 @@
 * @param y      resulting y-coordinate in spirals local co-ordinate system [m]
 * @param t      tangent direction at s [rad]
 */
+#include "UECompatability.h"
 
 extern void MONODRIVECORE_API odrSpiral( double s, double cDot, double *x, double *y, double *t );

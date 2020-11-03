@@ -7,6 +7,7 @@
 #pragma once
 
 #include "carla/road/RoadTypes.h"
+#include "UECompatability.h"
 
 #include <cstdint>
 #include <functional>

@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "UECompatability.h"
 #ifdef LIBCARLA_NO_EXCEPTIONS
 
 namespace std {

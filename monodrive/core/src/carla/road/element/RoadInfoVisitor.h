@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "UECompatability.h"
+
 namespace carla {
 namespace road {
 namespace element {

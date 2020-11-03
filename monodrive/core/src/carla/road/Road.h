@@ -18,6 +18,7 @@
 #include "carla/road/LaneSectionMap.h"
 #include "carla/road/RoadElementSet.h"
 #include "carla/road/RoadTypes.h"
+#include "UECompatability.h"
 
 #include <unordered_map>
 #include <vector>

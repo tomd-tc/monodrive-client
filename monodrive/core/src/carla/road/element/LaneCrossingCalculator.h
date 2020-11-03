@@ -7,6 +7,7 @@
 #pragma once
 
 #include "carla/road/element/LaneMarking.h"
+#include "UECompatability.h"
 
 #include <vector>
 

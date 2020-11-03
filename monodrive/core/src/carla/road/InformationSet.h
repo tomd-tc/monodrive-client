@@ -10,6 +10,7 @@
 #include "carla/road/RoadElementSet.h"
 #include "carla/road/element/RoadInfo.h"
 #include "carla/road/element/RoadInfoIterator.h"
+#include "UECompatability.h"
 
 #include <vector>
 #include <memory>

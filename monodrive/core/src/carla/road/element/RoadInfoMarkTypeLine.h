@@ -7,6 +7,7 @@
 #pragma once
 
 #include "carla/road/element/RoadInfo.h"
+#include "UECompatability.h"
 #include <string>
 
 namespace carla {

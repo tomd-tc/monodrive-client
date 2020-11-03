@@ -8,6 +8,7 @@
 
 #include "carla/NonCopyable.h"
 #include "carla/road/RoadTypes.h"
+#include "UECompatability.h"
 
 #include <set>
 

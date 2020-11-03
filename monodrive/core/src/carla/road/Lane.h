@@ -10,6 +10,7 @@
 #include "carla/geom/Transform.h"
 #include "carla/road/InformationSet.h"
 #include "carla/road/RoadTypes.h"
+#include "UECompatability.h"
 
 #include <vector>
 #include <iostream>

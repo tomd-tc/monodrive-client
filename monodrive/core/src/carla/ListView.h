@@ -7,6 +7,7 @@
 #pragma once
 
 #include "carla/Debug.h"
+#include "UECompatability.h"
 
 #include <type_traits>
 #include <iterator>

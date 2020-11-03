@@ -9,6 +9,7 @@
 #include "carla/Debug.h"
 #include "carla/road/element/Geometry.h"
 #include "carla/road/element/RoadInfo.h"
+#include "UECompatability.h"
 
 namespace carla {
 namespace road {

@@ -11,6 +11,7 @@
 #include "carla/road/Lane.h"
 #include "carla/road/RoadElementSet.h"
 #include "carla/road/RoadTypes.h"
+#include "UECompatability.h"
 
 #include <map>
 #include <vector>

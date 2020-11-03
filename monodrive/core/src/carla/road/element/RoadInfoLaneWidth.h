@@ -8,6 +8,7 @@
 
 #include "carla/road/element/RoadInfo.h"
 #include "carla/geom/CubicPolynomial.h"
+#include "UECompatability.h"
 
 namespace carla {
 namespace road {

@@ -8,6 +8,7 @@
 
 #include "carla/Debug.h"
 #include "carla/road/element/RoadInfoVisitor.h"
+#include "UECompatability.h"
 
 #include <iterator>
 #include <memory>

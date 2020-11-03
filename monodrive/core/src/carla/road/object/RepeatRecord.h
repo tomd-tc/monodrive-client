@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "carla/road/RoadTypes.h"
+#include "UECompatability.h"
 
 namespace carla {
 namespace road {

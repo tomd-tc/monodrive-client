@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "UECompatability.h"
 #include <boost/algorithm/string.hpp>
 
 namespace carla {

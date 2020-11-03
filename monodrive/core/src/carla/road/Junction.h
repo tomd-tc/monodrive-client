@@ -9,6 +9,7 @@
 #include "carla/geom/BoundingBox.h"
 #include "carla/NonCopyable.h"
 #include "carla/road/RoadTypes.h"
+#include "UECompatability.h"
 
 #include <unordered_map>
 #include <unordered_set>

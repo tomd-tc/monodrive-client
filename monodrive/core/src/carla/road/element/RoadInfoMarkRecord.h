@@ -8,6 +8,7 @@
 
 #include "carla/road/element/RoadInfo.h"
 #include "carla/road/element/RoadInfoMarkTypeLine.h"
+#include "UECompatability.h"
 #include <string>
 #include <vector>
 #include <memory>

@@ -8,6 +8,7 @@
 
 #include "carla/road/element/RoadInfo.h"
 #include <string>
+#include "UECompatability.h"
 
 namespace carla {
 namespace road {

@@ -8,6 +8,7 @@
 
 #include "carla/ListView.h"
 #include "carla/NonCopyable.h"
+#include "UECompatability.h"
 
 #include <iterator>
 #include <memory>

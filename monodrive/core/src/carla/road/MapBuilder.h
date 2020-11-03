@@ -9,6 +9,7 @@
 #include "carla/road/Map.h"
 #include "carla/road/element/RoadInfoCrosswalk.h"
 #include "carla/road/element/RoadInfoSignal.h"
+#include "UECompatability.h"
 
 #include <boost/optional.hpp>
 

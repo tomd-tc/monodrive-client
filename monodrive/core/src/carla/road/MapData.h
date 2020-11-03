@@ -16,6 +16,7 @@
 #include "carla/road/Road.h"
 #include "carla/road/RoadTypes.h"
 #include "carla/road/Signal.h"
+#include "UECompatability.h"
 
 #include <boost/iterator/transform_iterator.hpp>
 
