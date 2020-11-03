@@ -241,7 +241,10 @@ bool Simulator::stateStepSampleAll(std::vector<std::shared_ptr<Sensor>>& sensors
 {
 	ApiMessage message(333, REPLAY_StateStepSimulationCommand_ID, true, state);
 	for(auto& sensor : sensors)
-   {
+	{
+		if (!sensor->config->enable_streaming) {
+			continue;
+		}
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
 	}
 	bool success = sendCommand(message);
@@ -363,4 +366,36 @@ bool Simulator::sendControl(float forward, float right, float brake, int mode)
     ego_msg["brake_amount"] = brake;
     ego_msg["drive_mode"] = mode;
     return sendCommand(ApiMessage(123, EgoControl_ID, true, ego_msg));
+}
+
+std::string Simulator::getEgoVehicleId() {
+	const auto getEgoVehicleName = [](nlohmann::json& vehicles) {
+		for (auto& obj : vehicles) {
+			nlohmann::json vehicle = obj;
+			if (obj.find("state") != obj.end()) {
+				vehicle = obj.at("state");
+			}
+			
+			if (vehicle.find("tags") != vehicle.end()) {
+				for (auto& tag : vehicle.at("tags")) {
+					if (tag.get<std::string>() == "ego") {
+						return vehicle.at("name").get<std::string>();
+					}
+				}
+			}
+		}
+		return std::string("");
+	};
+	if (config.scenario.is_array()) {
+		for (auto& frame : config.scenario) {
+			if (frame.find("frame") != frame.end() && frame.at("frame").find("vehicles") != frame.at("frame").end()) {
+				std::string id = getEgoVehicleName(frame.at("frame").at("vehicles"));
+				if (id.size() > 0)
+					return id;
+			}
+		}
+	} else if (config.scenario.find("vehicles") != config.scenario.end()) {
+		return getEgoVehicleName(config.scenario.at("vehicles"));
+	}
+	return "";
 }
