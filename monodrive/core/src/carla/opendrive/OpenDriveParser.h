@@ -7,6 +7,7 @@
 #pragma once
 
 #include "carla/road/Map.h"
+#include "UECompatability.h"
 
 #include <boost/optional.hpp>
 

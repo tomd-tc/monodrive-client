@@ -5,6 +5,7 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
+#include "UECompatability.h"
 
 #include <vector>
 #include <string>

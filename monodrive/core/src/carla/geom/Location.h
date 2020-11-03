@@ -5,6 +5,7 @@
 // For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
+#include "UECompatability.h"
 
 #include "carla/geom/Vector3D.h"
 #include "carla/geom/Math.h"
