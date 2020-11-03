@@ -47,7 +47,10 @@ Run example
 
 
 ### Lane follower - speed curve
-This example uses the PID with a dataset of target speeds over time to reproduce a speed curve.
+This example uses the PID controller with a time series of target speeds to reproduce a speed curve.
+
+Currently the example uses the mock data found in `speed_curve_data.csv`. This can be replaced with your own
+data in order to compare or calibrate the vehicle physics model used in the simulator.
 
 Run example
 ```
