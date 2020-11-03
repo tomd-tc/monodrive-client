@@ -1,4 +1,5 @@
 classdef Simulator < handle
+    
    properties 
       sim_config_json
       sim_config
@@ -37,6 +38,7 @@ classdef Simulator < handle
                 obj.vehicle_config = struct(jsondecode(obj.vehicle_config_json));
                 fclose(fid);
                 
+                %scenario_config_path = 'configurations/trajectories/scenario_config_single_vehicle.json';
                 scenario_config_path = 'configurations/trajectories/scenario_config_single_vehicle.json';
                 fid = fopen(scenario_config_path,'r','n','UTF-8');
                 obj.scenario_config_json = fscanf(fid, '%s');
