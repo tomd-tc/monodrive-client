@@ -15,7 +15,7 @@ namespace geom {
 
   /// Describes a Cubic Polynomial so:
   /// f(x) = a + bx + cx^2 + dx^3
-  class CubicPolynomial {
+  class MONODRIVECORE_API CubicPolynomial {
   public:
 
     using value_type = double;

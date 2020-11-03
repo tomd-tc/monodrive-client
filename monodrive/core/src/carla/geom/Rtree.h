@@ -19,7 +19,7 @@ namespace geom {
   /// Asociates a T element with a 3D point
   /// Useful to perform fast k-NN searches
   template <typename T, size_t Dimension = 3>
-  class PointCloudRtree {
+  class MONODRIVECORE_API PointCloudRtree {
   public:
 
     typedef boost::geometry::model::point<float, Dimension, boost::geometry::cs::cartesian> BPoint;
@@ -75,7 +75,7 @@ namespace geom {
   /// Stores a pair of T elements (one for each end of the segment)
   /// Useful to perform fast k-NN searches.
   template <typename T, size_t Dimension = 3>
-  class SegmentCloudRtree {
+  class MONODRIVECORE_API SegmentCloudRtree {
   public:
 
     typedef boost::geometry::model::point<float, Dimension, boost::geometry::cs::cartesian> BPoint;

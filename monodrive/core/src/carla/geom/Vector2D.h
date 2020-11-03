@@ -14,7 +14,7 @@
 namespace carla {
 namespace geom {
 
-  class Vector2D {
+  class MONODRIVECORE_API Vector2D {
   public:
 
     // =========================================================================

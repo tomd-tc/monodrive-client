@@ -19,7 +19,7 @@ namespace road {
 namespace opendrive {
 namespace parser {
 
-  class GeoReferenceParser {
+  class MONODRIVECORE_API GeoReferenceParser {
   public:
 
     static void Parse(

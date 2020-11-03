@@ -15,7 +15,7 @@
 namespace carla {
 namespace opendrive {
 
-  class OpenDriveParser {
+  class MONODRIVECORE_API OpenDriveParser {
   public:
 
     static boost::optional<road::Map> Load(const std::string &opendrive);

@@ -20,7 +20,7 @@ namespace geom {
 
   /// Material that references the vertex index start and end of
   /// a mesh where it is affecting.
-  struct MeshMaterial {
+  struct MONODRIVECORE_API MeshMaterial {
 
     MeshMaterial(
         const std::string &new_name,
@@ -39,7 +39,7 @@ namespace geom {
   };
 
   /// Mesh data container, validator and exporter.
-  class Mesh {
+  class MONODRIVECORE_API Mesh {
   public:
 
     using vertex_type = Vector3D;
