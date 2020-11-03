@@ -25,6 +25,8 @@ int main(int argc, char** argv)
         new CollisionConfig(),
         new DepthCameraConfig(),
         new GPSConfig(),
+        new Poly1FisheyeCameraConfig(),
+        new EquidistantFisheyeCameraConfig(),
         new IMUConfig(),
         new LidarConfig(),
         new OccupancyGridConfig(),

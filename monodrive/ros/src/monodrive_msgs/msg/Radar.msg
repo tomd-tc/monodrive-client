@@ -1,0 +1,4 @@
+bool has_radar_cube
+int32 current_frame_index
+RadarTargetList radar_target_list_frame
+RadarCube radar_cube_frame

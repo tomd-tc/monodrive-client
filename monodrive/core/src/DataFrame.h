@@ -35,6 +35,13 @@ public:
 	virtual ~DataFrame() {}
 };
 
+class MONODRIVECORE_API BinaryDataFrame : public DataFrame{
+public:
+    virtual void parse(ByteBuffer& buffer) override;
+    virtual ByteBuffer write() const override;
+    ByteBuffer data_frame;
+};
+
 class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
@@ -226,6 +233,13 @@ public:
     int currentFrameIndex;
 };
 
+class MONODRIVECORE_API CubeCameraFrame : public CameraFrame{
+public:
+    CubeCameraFrame(int width, int height) : CameraFrame(width, height, 4, 1, false)
+    {
+    }
+};
+
 class MONODRIVECORE_API LidarFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
@@ -268,8 +282,8 @@ class MONODRIVECORE_API UltrasonicFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
-    UltrasonicFrame(bool send_ultrasonic_raw, int numSamples) 
-        : bSendUltrasonicRaw(send_ultrasonic_raw),
+    UltrasonicFrame(bool bSendProcessed, int numSamples)
+        : bSendProcessed(bSendProcessed),
         currentFrameIndex(0)
     {
         ultrasonicTargetListFrame = new UltrasonicTargetListFrame();
@@ -280,14 +294,14 @@ public:
         delete ultrasonicRawFrame;
     }
     virtual bool parse_complete() const{
-        if(!bSendUltrasonicRaw or currentFrameIndex % 2 == 0)
+        if(!bSendProcessed or currentFrameIndex % 2 == 0)
             return true;
         else
             return false;
     }
     UltrasonicTargetListFrame* ultrasonicTargetListFrame;
     UltrasonicRawFrame* ultrasonicRawFrame;
-    bool bSendUltrasonicRaw;
+    bool bSendProcessed;
     int currentFrameIndex;
 };
 

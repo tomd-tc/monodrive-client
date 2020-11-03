@@ -60,6 +60,11 @@ add_message_files(
   ActorWaypoints.msg
   Waypoint.msg
   WaypointSensor.msg
+  Complex.msg
+  RadarTarget.msg
+  RadarTargetList.msg
+  RadarCube.msg
+  Radar.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -114,7 +119,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES monodrive_msgs
 #  CATKIN_DEPENDS message_generation message_runtime std_msgs
 #  DEPENDS system_lib
@@ -127,7 +132,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 

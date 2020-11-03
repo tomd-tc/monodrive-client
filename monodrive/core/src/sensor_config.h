@@ -6,6 +6,7 @@
 #include <exception>
 #include "JsonHelpers.h"
 #include "DataFrame.h"
+#include "Util.h"
 #include "config_types.h"
 
 class SensorBaseConfig
@@ -19,13 +20,9 @@ class SensorBaseConfig
         std::string description;
         int listen_port = 0;
         bool wait_for_fresh_frame = true;
+        bool enable_streaming = true;
         Location location;
-        struct Rotation
-        {
-            float yaw{0.0f};
-            float pitch{0.0f};
-            float roll{0.0f};
-        }rotation;
+        Rotation rotation;
         struct ROS{
             bool publish_to_ros{false};
             bool advertise{true};
@@ -113,6 +110,7 @@ public:
     int bandwidth{250000000};
     int max_radar_returns{500};
     int elements{8};
+    std::string fmcw{""};
     struct Transmitter
     {
         float peak_power{5.0f};
@@ -136,10 +134,12 @@ public:
         float elevation_fov{10.0f};
         float ray_division_y{10.0f};
         float ray_division_z{10.0f};
+        float ray_division_noise_y{200.0f};
+        float ray_division_noise_z{200.0f};
         bool debug_frustum{false};
         bool debug_scan{false};
         bool debug_rescan{false};
-    }sbr;   
+    }sbr;
     virtual DataFrame* DataFrameFactory() override{
         return new RadarFrame(send_radar_cube, num_sweeps, num_samples_per_sweep, elements);
     }
@@ -157,6 +157,7 @@ public:
     }
     double fc{40000.0};
     double pwm_factor{2.5};
+    float period{60.0f / 1000.0f};
     int max_ultrasonic_returns{93};
     bool send_processed_data{true};
     struct SBR
@@ -206,6 +207,7 @@ public:
         bool cull_partial_frame{false};
         bool debug_draw{false};
     } annotation;
+    Viewport viewport;
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
         if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
@@ -218,6 +220,59 @@ public:
             channel_depth, annotation.include_annotation);
     }
     virtual nlohmann::json dump(){
+        return *this;
+    }
+};
+
+class Camera360Config : public CameraConfig
+{
+public:
+    Camera360Config() : CameraConfig()
+    {
+        type = "Camera360";
+    }
+    int face_size{512};
+    virtual DataFrame* DataFrameFactory() override{
+        return new CubeCameraFrame(resolution.x, resolution.y);
+    }
+    virtual nlohmann::json dump() {
+        return *this;
+    }
+};
+
+class Poly1FisheyeCameraConfig : public Camera360Config
+{
+public:
+    Poly1FisheyeCameraConfig() : Camera360Config()
+    {
+        type = "Poly1FisheyeCamera";
+        fov = 180.f;
+    }
+    float a0, a2, a3, a4;
+    virtual nlohmann::json dump(){
+        return *this;
+    }
+};
+
+class EquidistantFisheyeCameraConfig : public Camera360Config
+{
+public:
+    EquidistantFisheyeCameraConfig() : Camera360Config()
+    {
+        type = "EquidistantFisheyeCamera";
+        fov = 180.f;
+        fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
+    }
+    EquidistantFisheyeCameraConfig (Resolution res) : Camera360Config(){
+        type = "EquidistantFisheyeCamera";
+        fov = 180.f;
+        resolution = res;
+        fisheye_pixel_diameter = std::min(resolution.x, resolution.y);
+    }
+    int fisheye_pixel_diameter;
+    float vignette_radius_start = 0.95f;
+    float vignette_bias = 0.5f;
+    virtual nlohmann::json dump() {
         return *this;
     }
 };
@@ -243,13 +298,16 @@ public:
     }
 };
 
-class OccupancyGridConfig : public SensorBaseConfig
+class OccupancyGridConfig : public SemanticCameraConfig
 {
 public:
-    OccupancyGridConfig() {
-        type= "OccupancyGrid";
+    OccupancyGridConfig() : SemanticCameraConfig()
+    {
+        type = "OccupancyGrid";
+        channels = "gray";
+        rotation = Rotation(0.0, -90.0, 0.0);
+        location = Location(0.0, 0.0, 0.0);
     }
-    Resolution resolution;
     double meters_per_pixel = 0.1;
     bool follow_yaw = false;
     bool follow_pitch = false;
@@ -307,6 +365,8 @@ public:
 
     float distance = 1000.0;
     float frequency = 100.0;
+    bool draw_debug = false;
+    std::vector<std::string> debug_tags{};
 };
 
 class RPMConfig : public SensorBaseConfig
@@ -340,14 +400,17 @@ public:
     }
 };
 
+
 class ViewportCameraConfig : public CameraConfig
 {
 public:
     ViewportCameraConfig()
     {
         type = "ViewportCamera";
+        enable_streaming = false;
     }
     bool enable_hud = false;
+
     virtual DataFrame* DataFrameFactory() override {
         return nullptr;
     }
@@ -356,21 +419,62 @@ public:
     }
 };
 
+class LEDConfig : public SensorBaseConfig 
+{
+public:
+    int led = 0;
+
+    float inner_cone_angle = 8.0f;
+    float outer_cone_angle = 16.0f;
+    float intensity = 2500.0f;
+    Color color;
+    float attenuation_radius = 10000.0f;
+    float temperature = 8000.0f;
+    float source_radius = 0;
+    float soft_source_radius = 0;
+    float source_length = 1;
+    float indirect_lighting_intensity = 1.0;
+    float volumetric_scattering_intensity = 5;
+    std::string ies_profile;
+
+    float backlight_intensity;
+    Color backlight_color;
+    float backlight_attenuation_radius = 10;
+    float backlight_source_radius = 1;
+    float backlight_soft_source_radius = 2;
+    float backlight_source_length = 1;
+    float backlight_temperature = 8000;
+    float backlight_indirect_lighting_intensity = 10;
+    float backlight_volumetric_scattering_intensity = 10;
+
+    virtual nlohmann::json dump() {
+        return *this;
+    }
+};
+
+class LEDArrayConfig : public SensorBaseConfig
+{
+public:
+    std::string array_id;
+    std::vector<LEDConfig> lights;
+
+    virtual nlohmann::json dump() {
+        return *this;
+    }
+};
+
+class LightsConfig : public SensorBaseConfig
+{
+public:
+    std::string actor_id;
+    std::vector<LEDArrayConfig> lights;
+
+    virtual nlohmann::json dump() {
+        return *this;
+    }
+};
+
 /// SensorBaseConfig
-void inline to_json(nlohmann::json& j, const SensorBaseConfig::Rotation& rotation)
-{
-    j = nlohmann::json{
-        {"yaw", rotation.yaw},
-        {"pitch", rotation.pitch},
-        {"roll", rotation.roll}
-    };
-}
-void inline from_json(const nlohmann::json& j, SensorBaseConfig::Rotation& rotation)
-{
-    json_get(j,"yaw", rotation.yaw);
-    json_get(j,"pitch", rotation.pitch);
-    json_get(j, "roll", rotation.roll);
-}
 void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 {
     j = nlohmann::json{   
@@ -384,7 +488,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig::ROS& ros)
 }
 void inline from_json(const nlohmann::json& j, SensorBaseConfig::ROS& ros)
 {
-    json_get(j,"publis_to_ross", ros.publish_to_ros);
+    json_get(j,"publish_to_ros", ros.publish_to_ros);
     json_get(j,"advertise", ros.advertise);
     json_get(j,"topic", ros.topic);
     json_get(j,"message_type", ros.message_type);
@@ -400,6 +504,7 @@ void inline to_json(nlohmann::json& j, const SensorBaseConfig& config)
         {"location", config.location},
         {"rotation", config.rotation},
         {"wait_for_fresh_frame", config.wait_for_fresh_frame},
+        {"enable_streaming", config.enable_streaming},
         {"ros", config.ros},
     };
 };
@@ -411,10 +516,34 @@ void inline from_json(const nlohmann::json& j, SensorBaseConfig& config)
     json_get(j, "location", config.location);
     json_get(j, "rotation", config.rotation);
     json_get(j, "wait_for_fresh_frame", config.wait_for_fresh_frame);
+    json_get(j, "enable_streaming", config.enable_streaming);
     json_get(j, "ros", config.ros);
 }
 /// End SensorBaseConfig JSON Parsing
 
+/// StateConfig JSON Parsing
+void inline to_json(nlohmann::json& j, const StateConfig& config)
+{
+    j = static_cast<SensorBaseConfig>(config);
+    j["desired_tags"] = config.desired_tags;
+    j["undesired_tags"] = config.undesired_tags;
+    j["debug_drawing"] = config.debug_drawing;
+    j["include_obb"] = config.include_obb;
+}
+
+void inline from_json(const nlohmann::json& j, StateConfig& config)
+{
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "include_obb", config.include_obb);
+    json_get(j, "debug_drawing", config.debug_drawing);
+    json_get(j, "desired_tags", config.desired_tags);
+    json_get(j, "undesired_tags", config.undesired_tags);
+}
+/// End StateConfig JSON Parsing
+
+/// Camera Config JSON Parsing
 void inline to_json(nlohmann::json& j, const CameraConfig::Annotation& annotation){
     j = nlohmann::json{
         {"include_annotation", annotation.include_annotation},
@@ -438,26 +567,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
     json_get(j, "debug_draw", annotation.debug_draw);
 }
 
-
 /// Camera Config JSON Parsing
-void inline to_json(nlohmann::json& j, const StateConfig& config){
-    j = static_cast<SensorBaseConfig>(config);
-    j["desired_tags"] = config.desired_tags;
-    j["undesired_tags"] = config.undesired_tags;
-    j["debug_drawing"] = config.debug_drawing;
-    j["include_obb"] = config.include_obb;
-}
-
-void inline from_json(const nlohmann::json& j, StateConfig& config)
-{
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
-    from_json(j, *base);
-
-    json_get(j, "include_obb", config.include_obb);
-    json_get(j, "debug_drawing", config.debug_drawing);
-    json_get(j, "desired_tags", config.desired_tags);
-    json_get(j, "undesired_tags", config.undesired_tags);
-}
 
 void inline to_json(nlohmann::json& j, const CameraConfig& config)
 {
@@ -474,6 +584,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["channels"] = config.channels;
     j["channel_depth"] = config.channel_depth;
     j["annotation"] = config.annotation;
+    j["viewport"] = config.viewport;
 }
 
 void inline from_json(const nlohmann::json& j, CameraConfig& config)
@@ -493,6 +604,60 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "channels", config.channels);         
     json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
+    json_get(j, "viewport", config.viewport);
+}
+
+void inline to_json(nlohmann::json& j, const Camera360Config& config)
+{
+    j = static_cast<CameraConfig>(config);
+    j["face_size"] = config.face_size;
+}
+
+void inline from_json(const nlohmann::json& j, Camera360Config& config)
+{
+    CameraConfig* base = static_cast<CameraConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "face_size", config.face_size);
+}
+
+void inline to_json(nlohmann::json& j, const Poly1FisheyeCameraConfig& config)
+{
+    j = static_cast<Camera360Config>(config);
+    j["a0"] = config.a0;
+    j["a2"] = config.a2;
+    j["a3"] = config.a3;
+    j["a4"] = config.a4;
+}
+
+void inline from_json(const nlohmann::json& j, Poly1FisheyeCameraConfig& config)
+{
+    Camera360Config* base = static_cast<Camera360Config*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "a0", config.a0);
+    json_get(j, "a2", config.a2);
+    json_get(j, "a3", config.a3);
+    json_get(j, "a4", config.a4);
+}
+
+
+void inline to_json(nlohmann::json& j, const EquidistantFisheyeCameraConfig& config)
+{
+    j = static_cast<Camera360Config>(config);
+    j["fisheye_pixel_diameter"] = config.fisheye_pixel_diameter;
+    j["vignette_bias"] = config.vignette_bias;
+    j["vignette_radius_start"] = config.vignette_radius_start;
+}
+
+void inline from_json(const nlohmann::json& j, EquidistantFisheyeCameraConfig& config)
+{
+    Camera360Config* base = static_cast<Camera360Config*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "fisheye_pixel_diameter", config.fisheye_pixel_diameter);
+    json_get(j, "vignette_bias", config.vignette_bias);
+    json_get(j, "vignette_radius_start", config.vignette_radius_start);
 }
 
 void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
@@ -501,12 +666,10 @@ void inline to_json(nlohmann::json& j, const ViewportCameraConfig& config)
     j["use_vehicle_hud"] = config.enable_hud;
 }
 
-
 void inline from_json(const nlohmann::json& j, ViewportCameraConfig& config)
 {
-    SensorBaseConfig* base = static_cast<CameraConfig*>(&config);
+    CameraConfig* base = static_cast<CameraConfig*>(&config);
     from_json(j, *base);
-
     json_get(j, "use_vehicle_hud", config.enable_hud);
 }
 
@@ -523,6 +686,8 @@ void inline to_json(nlohmann::json& j, const RadarConfig::SBR& config)
         {"elevation_fov", config.elevation_fov},
         {"ray_division_z", config.ray_division_z},
         {"ray_division_y", config.ray_division_y},
+        {"ray_division_noise_z", config.ray_division_noise_z},
+        {"ray_division_noise_y", config.ray_division_noise_y},
         {"debug_frustum", config.debug_frustum},
         {"debug_scan", config.debug_scan},
         {"debug_rescan", config.debug_rescan}
@@ -550,7 +715,7 @@ void inline from_json(const nlohmann::json& j, RadarConfig& config)
     json_get(j, "sbr", config.sbr);
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Transmitter& config)
 {
     json_get(j, "peak_power", config.peak_power);
     json_get(j, "aperture", config.aperture);
@@ -565,7 +730,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Transmitter& config)
      };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::Receiver config)
+void inline from_json(const nlohmann::json& j, RadarConfig::Receiver& config)
 {
     json_get(j, "gain", config.gain);
     json_get(j, "aperture", config.aperture);
@@ -584,7 +749,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig::Receiver& config)
     };
 }
 
-void inline from_json(const nlohmann::json& j, RadarConfig::SBR config)
+void inline from_json(const nlohmann::json& j, RadarConfig::SBR& config)
 {
     json_get(j, "long_range_scan_distance", config.long_range_scan_distance);
     json_get(j, "short_range_scan_distance",config.short_range_scan_distance);
@@ -622,7 +787,7 @@ void inline to_json(nlohmann::json& j, const RadarConfig& config)
 /// END Radar Config JSON Parsing
 
 /// Ultrasonic Config JSON Parsing
-void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
+void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR& config) {
     j = nlohmann::json{
         {"scan_distance", config.scan_distance},
         {"azimuth_fov", config.azimuth_fov},
@@ -634,7 +799,7 @@ void inline to_json(nlohmann::json& j, const UltrasonicConfig::SBR config) {
         {"debug_rescan", config.debug_rescan}
     };
 }
-void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR config) {
+void inline from_json(const nlohmann::json& j, UltrasonicConfig::SBR& config) {
     json_get(j, "scan_distance", config.scan_distance);
     json_get(j, "azimuth_fov", config.azimuth_fov);
     json_get(j, "elevation_fov", config.elevation_fov);
@@ -731,7 +896,7 @@ void inline from_json(const nlohmann::json& j, CollisionConfig& config)
 /// Occupancy Grid Sensor JSON parsing
 void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
 {
-    j = static_cast<SensorBaseConfig>(config);
+    j = static_cast<SemanticCameraConfig>(config);
     j["stream_dimensions"] = config.resolution;
     j["meters_per_pixel"] = config.meters_per_pixel;
     j["follow_yaw"] = config.follow_yaw;
@@ -740,7 +905,7 @@ void inline to_json(nlohmann::json& j, const OccupancyGridConfig& config)
 }
 void inline from_json(const nlohmann::json& j, OccupancyGridConfig& config)
 {
-    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    SemanticCameraConfig* base = static_cast<SemanticCameraConfig*>(&config);
     from_json(j, *base);
 
     json_get(j, "stream_dimensions", config.resolution);
@@ -772,10 +937,210 @@ void inline to_json(nlohmann::json& j, const WaypointConfig& config) {
     j = static_cast<SensorBaseConfig>(config);
     j["distance"] = config.distance;
     j["frequency"] = config.frequency;
+    j["draw_debug"] = config.draw_debug;
+    j["debug_tags"] = config.debug_tags;
 
 }
 void inline from_json(const nlohmann::json& j, WaypointConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
     json_get(j, "distance", config.distance);
     json_get(j, "frequency", config.frequency);
+    json_get(j, "draw_debug", config.draw_debug);
+    json_get(j, "debug_tags", config.debug_tags);
 }
 /// END Waypoint Sensor JSON parsing
+
+/// LED JSON parsing
+void inline to_json(nlohmann::json& j, const LEDConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["led"] = config.led;
+    j["inner_cone_angle"] = config.inner_cone_angle;
+    j["outer_cone_angle"] = config.outer_cone_angle;
+    j["intensity"] = config.intensity;
+    j["color"] = config.color;
+    j["attenuation_radius"] = config.attenuation_radius;
+    j["temperature"] = config.temperature;
+    j["source_radius"] = config.source_radius;
+    j["soft_source_radius"] = config.soft_source_radius;
+    j["source_length"] = config.source_length;
+    j["indirect_lighting_intensity"] = config.indirect_lighting_intensity;
+    j["volumetric_scattering_intensity"] = config.volumetric_scattering_intensity;
+    j["ies_profile"] = config.ies_profile;
+    j["backlight_intensity"] = config.backlight_intensity;
+    j["backlight_color"] = config.backlight_color;
+    j["backlight_attenuation_radius"] = config.backlight_attenuation_radius;
+    j["backlight_source_radius"] = config.backlight_source_radius;
+    j["backlight_soft_source_radius"] = config.backlight_soft_source_radius;
+    j["backlight_source_length"] = config.backlight_source_length;
+    j["backlight_temperature"] = config.backlight_temperature;
+    j["backlight_indirect_lighting_intensity"] = config.backlight_indirect_lighting_intensity;
+    j["backlight_volumetric_scattering_intensity"] = config.backlight_volumetric_scattering_intensity;
+}
+void inline from_json(const nlohmann::json& j, LEDConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+    json_get(j, "led", config.led);
+    json_get(j, "inner_cone_angle", config.inner_cone_angle);
+    json_get(j, "outer_cone_angle", config.outer_cone_angle);
+    json_get(j, "intensity", config.intensity);
+    json_get(j, "color", config.color);
+    json_get(j, "attenuation_radius", config.attenuation_radius);
+    json_get(j, "temperature", config.temperature);
+    json_get(j, "source_radius", config.source_radius);
+    json_get(j, "soft_source_radius", config.soft_source_radius);
+    json_get(j, "source_length", config.source_length);
+    json_get(j, "indirect_lighting_intensity", config.indirect_lighting_intensity);
+    json_get(j, "volumetric_scattering_intensity", config.volumetric_scattering_intensity);
+    json_get(j, "ies_profile", config.ies_profile);
+    json_get(j, "backlight_intensity", config.backlight_intensity);
+    json_get(j, "backlight_color", config.backlight_color);
+    json_get(j, "backlight_attenuation_radius", config.backlight_attenuation_radius);
+    json_get(j, "backlight_source_radius", config.backlight_source_radius);
+    json_get(j, "backlight_soft_source_radius", config.backlight_soft_source_radius);
+    json_get(j, "backlight_source_length", config.backlight_source_length);
+    json_get(j, "backlight_temperature", config.backlight_temperature);
+    json_get(j, "backlight_indirect_lighting_intensity", config.backlight_indirect_lighting_intensity);
+    json_get(j, "backlight_volumetric_scattering_intensity", config.backlight_volumetric_scattering_intensity);
+}
+/// END Waypoint Sensor JSON parsing
+
+/// LEDArray Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const LEDArrayConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["array_id"] = config.array_id;
+    j["lights"] = nlohmann::json::array();
+    for (auto& led : config.lights) {
+        j["lights"].push_back(led);
+    }
+
+}
+void inline from_json(const nlohmann::json& j, LEDArrayConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "array_id", config.array_id);
+    json_get(j, "lights", config.lights);
+}
+/// END Waypoint Sensor JSON parsing
+
+/// Lights Sensor JSON parsing
+void inline to_json(nlohmann::json& j, const LightsConfig& config) {
+    j = static_cast<SensorBaseConfig>(config);
+    j["actor_id"] = config.actor_id;
+    j["lights"] = nlohmann::json::array();
+    for (auto& lightArray : config.lights) {
+        j["lights"].push_back(lightArray);
+    }
+
+}
+void inline from_json(const nlohmann::json& j, LightsConfig& config) {
+    SensorBaseConfig* base = static_cast<SensorBaseConfig*>(&config);
+    from_json(j, *base);
+
+    json_get(j, "actor_id", config.actor_id);
+    json_get(j, "lights", config.lights);
+}
+/// END Lights Sensor JSON parsing
+
+std::unique_ptr<SensorBaseConfig> inline sensorConfigFactory(const nlohmann::json& j)
+{
+    std::string sensorType;
+    json_get(j, "type", sensorType);
+
+    if (sensorType == "Camera") {
+        CameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<CameraConfig>(cfg);
+    }
+    else if (sensorType == "SemanticCamera") {
+        SemanticCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<SemanticCameraConfig>(cfg);
+    }
+    else if (sensorType == "Camera360") {
+        Camera360Config cfg;
+        from_json(j, cfg);
+        return make_unique<Camera360Config>(cfg);
+    }
+    else if (sensorType == "Poly1FisheyeCamera") {
+        Poly1FisheyeCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<Poly1FisheyeCameraConfig>(cfg);
+    }
+    else if (sensorType == "EquidistantFisheyeCamera") {
+        EquidistantFisheyeCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<EquidistantFisheyeCameraConfig>(cfg);
+    }
+    else if (sensorType == "Lidar") {
+        LidarConfig cfg;
+        from_json(j, cfg);
+        return make_unique<LidarConfig>(cfg);
+    }
+    else if (sensorType == "SemanticLidar") {
+        SemanticLidarConfig cfg;
+        from_json(j, cfg);
+        return make_unique<SemanticLidarConfig>(cfg);
+    }
+    else if (sensorType == "Radar") {
+        RadarConfig cfg;
+        from_json(j, cfg);
+        return make_unique<RadarConfig>(cfg);
+    }
+    else if (sensorType == "Ultrasonic") {
+        UltrasonicConfig cfg;
+        from_json(j, cfg);
+        return make_unique<UltrasonicConfig>(cfg);
+    }
+    else if (sensorType == "RadarGroundTruth") {
+        return nullptr;
+    }
+    else if (sensorType == "GPS") {
+        GPSConfig cfg;
+        from_json(j, cfg);
+        return make_unique<GPSConfig>(cfg);
+    }
+    else if (sensorType == "IMU") {
+        IMUConfig cfg;
+        from_json(j, cfg);
+        return make_unique<IMUConfig>(cfg);
+    }
+    else if (sensorType == "State") {
+        StateConfig cfg;
+        from_json(j, cfg);
+        return make_unique<StateConfig>(cfg);
+    }
+    else if (sensorType == "Waypoint") {
+        WaypointConfig cfg;
+        from_json(j, cfg);
+        return make_unique<WaypointConfig>(cfg);
+    }
+    else if (sensorType == "RPM") {
+        RPMConfig cfg;
+        from_json(j, cfg);
+        return make_unique<RPMConfig>(cfg);
+    }
+    else if (sensorType == "Collision") {
+        CollisionConfig cfg;
+        from_json(j, cfg);
+        return make_unique<CollisionConfig>(cfg);
+    }
+    else if (sensorType == "DepthCamera") {
+        DepthCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<DepthCameraConfig>(cfg);
+    }
+    else if (sensorType == "OccupancyGrid") {
+        OccupancyGridConfig cfg;
+        from_json(j, cfg);
+        return make_unique<OccupancyGridConfig>(cfg);
+    }
+    else if (sensorType == "ViewportCamera") {
+        ViewportCameraConfig cfg;
+        from_json(j, cfg);
+        return make_unique<ViewportCameraConfig>(cfg);
+    }
+    return nullptr;
+}

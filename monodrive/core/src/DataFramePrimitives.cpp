@@ -102,6 +102,8 @@ void to_json(nlohmann::json& j, const ObjectState& v) {
 	j = {
 		{"name", v.name},
 		{"odometry", v.odometry},
+		{"replay_class", v.replay_class},
+		{"color", v.color},
 		{"tags", v.tags},
 		{"oriented_bounding_box", v.oobbs}
 	};
@@ -109,6 +111,8 @@ void to_json(nlohmann::json& j, const ObjectState& v) {
 void from_json(const nlohmann::json& j, ObjectState& v) {
 	json_get(j, "name", v.name);
 	json_get(j, "odometry", v.odometry);
+	json_get(j, "replay_class", v.replay_class);
+	json_get(j, "color", v.color);
 	json_get(j, "tags", v.tags);
 	json_get(j, "oriented_bounding_box", v.oobbs);
 }

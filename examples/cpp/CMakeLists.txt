@@ -19,3 +19,5 @@ endif()
 
 add_subdirectory(replay)
 add_subdirectory(replay_step)
+add_subdirectory(distributed)
+add_subdirectory(lights)
