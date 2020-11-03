@@ -13,9 +13,9 @@
 
 #include <array>
 
-#ifdef LIBCARLA_INCLUDED_FROM_UE4
-#  include "Carla/Util/BoundingBox.h"
-#endif // LIBCARLA_INCLUDED_FROM_UE4
+//#ifdef LIBCARLA_INCLUDED_FROM_UE4
+//#  include "Carla/Util/BoundingBox.h"
+//#endif // LIBCARLA_INCLUDED_FROM_UE4
 
 namespace carla {
 namespace geom {
@@ -109,14 +109,14 @@ namespace geom {
     // -- Conversions to UE4 types ---------------------------------------------
     // =========================================================================
 
-#ifdef LIBCARLA_INCLUDED_FROM_UE4
-
-    BoundingBox(const FBoundingBox &Box)
-      : location(Box.Origin),
-        extent(1e-2f * Box.Extent.X, 1e-2f * Box.Extent.Y, 1e-2f * Box.Extent.Z),
-        rotation(Box.Rotation) {}
-
-#endif // LIBCARLA_INCLUDED_FROM_UE4
+//#ifdef LIBCARLA_INCLUDED_FROM_UE4
+//
+//    BoundingBox(const FBoundingBox &Box)
+//      : location(Box.Origin),
+//        extent(1e-2f * Box.Extent.X, 1e-2f * Box.Extent.Y, 1e-2f * Box.Extent.Z),
+//        rotation(Box.Rotation) {}
+//
+//#endif // LIBCARLA_INCLUDED_FROM_UE4
 
   };
 
