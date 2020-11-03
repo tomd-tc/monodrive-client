@@ -30,6 +30,7 @@ namespace opendrive {
 
     if (parse_result == false) {
       log_error("unable to parse the OpenDRIVE XML string");
+      log_error(parse_result.description());
       return {};
     }
 
