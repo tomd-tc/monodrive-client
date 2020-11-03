@@ -19,7 +19,7 @@
 namespace carla {
 namespace geom {
 
-  class Transform {
+  class MONODRIVECORE_API Transform {
   public:
 
     // =========================================================================
