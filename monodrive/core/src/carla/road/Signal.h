@@ -19,13 +19,13 @@
 namespace carla {
 namespace road {
 
-  enum MONODRIVECORE_API SignalOrientation {
+  enum SignalOrientation {
     Positive,
     Negative,
     Both
   };
 
-  struct MONODRIVECORE_API SignalDependency {
+  struct SignalDependency {
   public:
 
     SignalDependency( std::string dependency_id, std::string type)

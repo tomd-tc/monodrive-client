@@ -13,7 +13,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  struct MONODRIVECORE_API CrosswalkPoint {
+  struct CrosswalkPoint {
     double u            { 0.0 };
     double v            { 0.0 };
     double z            { 0.0 };

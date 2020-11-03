@@ -21,7 +21,7 @@ namespace geom {
 
   /// Material that references the vertex index start and end of
   /// a mesh where it is affecting.
-  struct MONODRIVECORE_API MeshMaterial {
+  struct MeshMaterial {
 
     MeshMaterial(
         const std::string &new_name,
@@ -31,7 +31,7 @@ namespace geom {
         index_start(start),
         index_end(end) {}
 
-    const std::string name;
+    std::string name;
 
     size_t index_start;
 

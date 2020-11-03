@@ -15,7 +15,7 @@ namespace element {
 
   class RoadInfoMarkRecord;
 
-  struct MONODRIVECORE_API LaneMarking {
+  struct LaneMarking {
 
     enum class Type {
       Other,

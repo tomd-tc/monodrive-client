@@ -15,7 +15,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  enum class MONODRIVECORE_API GeometryType : unsigned int {
+  enum class GeometryType : unsigned int {
     LINE,
     ARC,
     SPIRAL,
@@ -23,7 +23,7 @@ namespace element {
     POLY3PARAM
   };
 
-  struct MONODRIVECORE_API DirectedPoint {
+  struct DirectedPoint {
 
     DirectedPoint()
       : location(0, 0, 0),

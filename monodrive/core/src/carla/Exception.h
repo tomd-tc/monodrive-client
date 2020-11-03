@@ -26,7 +26,7 @@ namespace carla {
   /// appropriate definition. Callers of throw_exception are allowed to assume
   /// that the function never returns; therefore, if the user-defined
   /// throw_exception returns, the behavior is undefined.
-  [[ noreturn ]] void MONODRIVECORE_API throw_exception(const std::exception &e);
+  [[ noreturn ]] void throw_exception(const std::exception &e);
 
 } // namespace carla
 
