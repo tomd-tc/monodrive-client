@@ -152,6 +152,61 @@ namespace road {
   // ===========================================================================
   // -- Map: Geometry ----------------------------------------------------------
   // ===========================================================================
+  boost::optional<element::Waypoint> Map::GetClosestWaypointOnRoadinSet(
+      const geom::Location &location,
+      const std::vector<Waypoint>& waypoints) const
+  {
+    std::vector<Rtree::TreeElement> query_result =
+        _rtree.GetNearestNeighboursWithFilter(Rtree::BPoint(pos.x, pos.y, pos.z),
+        [&](Rtree::TreeElement const &element) {
+          Waypoint& waypoint = element.second.first;
+          bool in_set = false;
+          for(auto& set_point : waypoints){
+            in_set = waypoint.road_id == set_point.road_id and
+            waypoint.lane_id == set_point.lane_id and
+            waypoint.section_id == set_point.section_id;
+            if(in_set)
+              break;
+          }
+          return in_set;
+        });
+
+    if (query_result.size() == 0) {
+      return boost::optional<Waypoint>{};
+    }
+
+    Rtree::BSegment segment = query_result.front().first;
+    Rtree::BPoint s1 = segment.first;
+    Rtree::BPoint s2 = segment.second;
+    auto distance_to_segment = geom::Math::DistanceSegmentToPoint(pos,
+        geom::Vector3D(s1.get<0>(), s1.get<1>(), s1.get<2>()),
+        geom::Vector3D(s2.get<0>(), s2.get<1>(), s2.get<2>()));
+
+    Waypoint result_start = query_result.front().second.first;
+    Waypoint result_end = query_result.front().second.second;
+
+    if (result_start.lane_id < 0) {
+      double delta_s = distance_to_segment.first;
+      double final_s = result_start.s + delta_s;
+      if (final_s >= result_end.s) {
+        return result_end;
+      } else if (delta_s <= 0) {
+        return result_start;
+      } else {
+        return GetNext(result_start, delta_s).front();
+      }
+    } else {
+      double delta_s = distance_to_segment.first;
+      double final_s = result_start.s - delta_s;
+      if (final_s <= result_end.s) {
+        return result_end;
+      } else if (delta_s <= 0) {
+        return result_start;
+      } else {
+        return GetNext(result_start, delta_s).front();
+      }
+    }
+  }
 
   boost::optional<Waypoint> Map::GetClosestWaypointOnRoad(
       const geom::Location &pos,

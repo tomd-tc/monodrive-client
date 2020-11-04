@@ -50,6 +50,10 @@ namespace road {
     /// -- Geometry ------------------------------------------------------------
     /// ========================================================================
 
+    boost::optional<element::Waypoint> GetClosestWaypointOnRoadinSet(
+        const geom::Location &location,
+        const std::vector<Waypoint>& waypoints) const;
+
     boost::optional<element::Waypoint> GetClosestWaypointOnRoad(
         const geom::Location &location,
         int32_t lane_type = static_cast<int32_t>(Lane::LaneType::Driving)) const;
