@@ -22,8 +22,6 @@ set_target_properties(
 if(MSVC)
   target_link_libraries(${PROJECT_NAME} shlwapi)
 endif(MSVC)
-add_compile_options(-fno-rtti)
-add_compile_options(/GR-)
 
 # need to export all symbols from .dll on windows
 if(MSVC)

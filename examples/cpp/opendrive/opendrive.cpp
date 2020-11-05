@@ -20,6 +20,39 @@ int main(){
             std::cout << points.second.road_id << " " <<  points.second.lane_id << " " << points.second.section_id << " " << points.second.s << std::endl;
         // }
     }
+    carla::geom::Vector3D location(0,0,0);
+    auto wayPoint = map->GetClosestWaypointOnRoad(location);
+    auto nextWaypoints = map->GetSuccessors(wayPoint.get());
+    std::cout << " NEXT " << std::endl;
+    for(auto& next : nextWaypoints){
+        std::cout << next.s << " " << next.road_id << " " << next.lane_id << std::endl;
+    }
+
+	auto getEndWaypoint = [&map](carla::road::element::Waypoint inWaypoint) {
+		if (inWaypoint.lane_id < 0) {
+			return carla::road::element::Waypoint{
+				inWaypoint.road_id,
+				inWaypoint.section_id,
+				inWaypoint.lane_id,
+				map->GetLane(inWaypoint).GetDistance()
+			};
+		}
+		else {
+			return carla::road::element::Waypoint{
+				inWaypoint.road_id,
+				inWaypoint.section_id,
+				inWaypoint.lane_id,
+				0
+			};
+		}
+	};
+    auto endPoint = getEndWaypoint(wayPoint.get());
+    std::cout << endPoint.s << " " << endPoint.road_id << " " << endPoint.lane_id << std::endl;
+
+
+
+
+ 
 
     std::cout << "map load complete" << std::endl;
     return 0;
