@@ -249,13 +249,24 @@ If you are running the simulator and client on separate machines the following n
     rosrun simulator_control node
     ```
 
-### Launching the message conversion to ROS example
+### Launching the message conversion to ROS examples
 
-4. To launch the monoDrive example create 3 tabs and run each command in a separate terminal:
+4. When using the message conversion approach to forward sensor data from TCP to ROS, remove the `"ros'` configuration
+   node from `simulator.json` from step 1. This will configure the sensors to stream data over TCP/IP instead
+   of using the ROS bridge.
+
+5. To launch the monoDrive examples create 3 tabs and run each command in a separate terminal:
     1. Make sure the monoDrive simulator is running since the run command will connect to and start the simulator scenario running.
     ```bash
     rosrun distributed node
     ```
+
+6. The vehicle_control, simulator_control and wheel_control examples from step 3 can also be run in this mode by passing in
+   a private parameter:
+   ```bash
+   rosrun vehicle_control node _use_simulator_ros:=False
+   ``` 
+   
 
 ### Using the G920 Logitech wheel
 

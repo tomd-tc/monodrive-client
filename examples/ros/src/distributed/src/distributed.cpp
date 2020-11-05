@@ -40,6 +40,7 @@ void rosLoop(float fps) {
   {
     // Sample the sensors
     rate.sleep();
+    ros::spinOnce();
   }
 
   ROS_RUNNING.store(false, std::memory_order_relaxed);
