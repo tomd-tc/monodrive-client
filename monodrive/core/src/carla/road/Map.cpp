@@ -153,13 +153,13 @@ namespace road {
   // -- Map: Geometry ----------------------------------------------------------
   // ===========================================================================
   boost::optional<element::Waypoint> Map::GetClosestWaypointOnRoadinSet(
-      const geom::Location &location,
+      const geom::Location &pos,
       const std::vector<Waypoint>& waypoints) const
   {
     std::vector<Rtree::TreeElement> query_result =
         _rtree.GetNearestNeighboursWithFilter(Rtree::BPoint(pos.x, pos.y, pos.z),
         [&](Rtree::TreeElement const &element) {
-          Waypoint& waypoint = element.second.first;
+          const Waypoint& waypoint = element.second.first;
           bool in_set = false;
           for(auto& set_point : waypoints){
             in_set = waypoint.road_id == set_point.road_id and
