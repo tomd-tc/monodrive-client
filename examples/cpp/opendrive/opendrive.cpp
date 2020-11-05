@@ -22,54 +22,22 @@ int main(){
     carla::geom::Vector3D location(0,0,0);
     auto wayPoint = map->GetClosestWaypointOnRoad(location);
 
-	auto getEndWaypoint = [&map](carla::road::element::Waypoint inWaypoint) {
-		if (inWaypoint.lane_id < 0) {
-			return carla::road::element::Waypoint{
-				inWaypoint.road_id,
-				inWaypoint.section_id,
-				inWaypoint.lane_id,
-				map->GetLane(inWaypoint).GetDistance()
-			};
-		}
-		else {
-			return carla::road::element::Waypoint{
-				inWaypoint.road_id,
-				inWaypoint.section_id,
-				inWaypoint.lane_id,
-				0
-			};
-		}
-	};
-    std::cout << "p0-0: " << std::endl;
-    std::cout << wayPoint->s << " " << wayPoint->road_id << " " << wayPoint->lane_id << std::endl;
 
-    auto endPoint = getEndWaypoint(wayPoint.get());
-    std::cout << "p0-1: " << std::endl;
-    std::cout << endPoint.s << " " << endPoint.road_id << " " << endPoint.lane_id << std::endl;
-
-    std::cout << "p1-0: " << std::endl;
-    auto nextWaypoints = map->GetSuccessors(wayPoint.get());
-    for(auto& next : nextWaypoints){
-        std::cout << next.s << " " << next.road_id << " " << next.lane_id << std::endl;
+    auto waypoint = wayPoint.get();
+    int road_id_final = waypoint.road_id;
+    for(int road_id = 0; road_id != road_id_final; road_id = waypoint.road_id){
+        std::cout << "--------------------------" << std::endl;
+        std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
+        waypoint.s = map->GetDistanceAtEndOfLane(waypoint);
+        std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
+        auto wayPoints = map->GetSuccessors(waypoint);
+        waypoint = wayPoints[0];
     }
-    auto nextEnd = getEndWaypoint(nextWaypoints[0]);
-    std::cout << "p1-1: " << std::endl;
-    std::cout << nextEnd.s << " " << nextEnd.road_id << " " << nextEnd.lane_id << std::endl;
+    std::cout << "--------------------------" << std::endl;
+    std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
+    waypoint.s = map->GetDistanceAtEndOfLane(waypoint);
+    std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
 
-    std::cout << "p2-0: " << std::endl;
-    nextWaypoints = map->GetSuccessors(nextEnd);
-    for(auto& next : nextWaypoints){
-        std::cout << next.s << " " << next.road_id << " " << next.lane_id << std::endl;
-    }
-    nextEnd = getEndWaypoint(nextWaypoints[0]);
-    std::cout << "p2-1: " << std::endl;
-    std::cout << nextEnd.s << " " << nextEnd.road_id << " " << nextEnd.lane_id << std::endl;
-
-
-
-
-
- 
 
     std::cout << "map load complete" << std::endl;
     return 0;

@@ -109,6 +109,11 @@ namespace road {
     std::vector<const element::RoadInfoSignal*>
         GetAllSignalReferences() const;
 
+    static double GetDistanceAtStartOfLane(const Lane &lane);
+    double GetDistanceAtStartOfLane(const Waypoint &waypoint);
+
+    static double GetDistanceAtEndOfLane(const Lane &lane);
+    double GetDistanceAtEndOfLane(const Waypoint &waypoint);
     /// ========================================================================
     /// -- Waypoint generation -------------------------------------------------
     /// ========================================================================

@@ -45,8 +45,10 @@ namespace road {
         std::make_move_iterator(src.end()));
     return dst;
   }
-
-  static double GetDistanceAtStartOfLane(const Lane &lane) {
+  double Map::GetDistanceAtStartOfLane(const Waypoint &waypoint) {
+    return GetDistanceAtStartOfLane(GetLane(waypoint));
+  }
+  double Map::GetDistanceAtStartOfLane(const Lane &lane) {
     if (lane.GetId() <= 0) {
       return lane.GetDistance() + 10.0 * EPSILON;
     } else {
@@ -54,12 +56,15 @@ namespace road {
     }
   }
 
-  static double GetDistanceAtEndOfLane(const Lane &lane) {
+  double Map::GetDistanceAtEndOfLane(const Lane &lane) {
     if (lane.GetId() > 0) {
       return lane.GetDistance() + 10.0 * EPSILON;
     } else {
       return lane.GetDistance() + lane.GetLength() - 10.0 * EPSILON;
     }
+  }
+  double Map::GetDistanceAtEndOfLane(const Waypoint &waypoint) {
+    return GetDistanceAtEndOfLane(GetLane(waypoint));
   }
 
   /// Return a waypoint for each drivable lane on @a lane_section.
@@ -79,7 +84,7 @@ namespace road {
             road_id,
             lane_section.GetId(),
             lane.GetId(),
-            distance < 0.0 ? GetDistanceAtStartOfLane(lane) : distance});
+            distance < 0.0 ? Map::GetDistanceAtStartOfLane(lane) : distance});
       }
     }
   }
@@ -101,7 +106,7 @@ namespace road {
             road_id,
             lane_section.GetId(),
             lane.GetId(),
-            distance < 0.0 ? GetDistanceAtStartOfLane(lane) : distance});
+            distance < 0.0 ? Map::GetDistanceAtStartOfLane(lane) : distance});
       }
     }
   }
