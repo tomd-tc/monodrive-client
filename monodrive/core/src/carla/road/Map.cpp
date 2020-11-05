@@ -162,8 +162,8 @@ namespace road {
           const Waypoint& waypoint = element.second.first;
           bool in_set = false;
           for(auto& set_point : waypoints){
-            in_set = waypoint.road_id == set_point.road_id and
-            waypoint.lane_id == set_point.lane_id and
+            in_set = waypoint.road_id == set_point.road_id &&
+            waypoint.lane_id == set_point.lane_id &&
             waypoint.section_id == set_point.section_id;
             if(in_set)
               break;
