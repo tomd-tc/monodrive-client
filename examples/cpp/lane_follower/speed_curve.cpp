@@ -18,7 +18,7 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgproc.hpp"
 
-#include "eigen3/Eigen/Dense"
+#include <Eigen/Eigen>
 #include <vector>
 #include <fstream>
 
