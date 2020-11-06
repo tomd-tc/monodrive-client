@@ -1,14 +1,14 @@
 classdef monoDriveVehicle < matlab.System & matlab.system.mixin.Propagates ...
-        & matlab.system.mixin.SampleTime & matlab.system.mixin.CustomIcon 
+        & matlab.system.mixin.SampleTime & matlab.system.mixin.CustomIcon
     % Example usage
     
     % This template includes the minimum set of functions required
     % to define a System object with discrete state.
-
+    
     % Public, tunable properties
-
+    
     properties
-
+        
     end
     properties(Nontunable)
         SampleTime = 1.4; % Sample Time
@@ -22,13 +22,13 @@ classdef monoDriveVehicle < matlab.System & matlab.system.mixin.Propagates ...
     properties(DiscreteState)
         Count
     end
-
+    
     % Pre-computed constants
     properties(Access = private)
         sim= libpointer
     end
-
-
+    
+    
     methods(Access = protected)
         function sts = getSampleTimeImpl(obj)
             switch char(obj.SampleTimeTypeProp)
@@ -44,8 +44,8 @@ classdef monoDriveVehicle < matlab.System & matlab.system.mixin.Propagates ...
                     sts = createSampleTime(obj,'Type','Fixed In Minor Step');
                 case 'Discrete'
                     sts = createSampleTime(obj,'Type','Discrete',...
-                      'SampleTime',obj.SampleTime, ...
-                      'OffsetTime',obj.OffsetTime);
+                        'SampleTime',obj.SampleTime, ...
+                        'OffsetTime',obj.OffsetTime);
                 case 'Controllable'
                     sts = createSampleTime(obj,'Type','Controllable',...
                         'TickTime',obj.TickTime);
@@ -58,7 +58,7 @@ classdef monoDriveVehicle < matlab.System & matlab.system.mixin.Propagates ...
             obj.sim = Simulator();
             obj.sim.initialize();
         end
-
+        
         function Count = stepImpl(obj, forward_amount, right_amount, brake_amount)
             % Implement algorithm. Calculate y as a function of input u and
             % discrete states.
@@ -66,48 +66,46 @@ classdef monoDriveVehicle < matlab.System & matlab.system.mixin.Propagates ...
             Time = getCurrentTime(obj);
             sts = getSampleTime(obj);
             if strcmp(sts.Type,'Controllable')
-               setNumTicksUntilNextHit(obj,obj.Count);
+                setNumTicksUntilNextHit(obj,obj.Count);
             end
-            msg = ego_control_command(forward_amount, right_amount, brake_amount)
-            obj.sim.step_vehicle(obj.sim.ID_EGO_CONTROL, msg);
-            obj.sim.sample_sensors();
+            obj.sim.step_vehicle(forward_amount, right_amount, brake_amount);
+            %obj.sim.sample_sensors();
             Count = obj.Count;
         end
-
+        
         function resetImpl(obj)
             % Initialize / reset discrete-state properties
             obj.Count = 0;
         end
-
-          function [sz,dt,cp] = getDiscreteStateSpecificationImpl(~,name)
-             if strcmp(name,'Count')
+        
+        function [sz,dt,cp] = getDiscreteStateSpecificationImpl(~,name)
+            if strcmp(name,'Count')
                 sz = [1 1];
                 dt = 'double';
                 cp = false;
-             else
+            else
                 error(['Error: Incorrect State Name: ', name.']);
-             end
-          end
-          function dataout = getOutputDataTypeImpl(~)
-             dataout = 'double';
-          end
-          function sizeout = getOutputSizeImpl(~)
-             sizeout = [1 1];
-          end
-          function cplxout = isOutputComplexImpl(~)
-             cplxout = false;
-          end
-          function fixedout = isOutputFixedSizeImpl(~)
-             fixedout = true;
-          end
-          function flag = isInputSizeMutableImpl(~,idx)
-             if idx == 1
-               flag = true;
-             else
-               flag = false;
-             end
-          end
-
+            end
+        end
+        function dataout = getOutputDataTypeImpl(~)
+            dataout = 'double';
+        end
+        function sizeout = getOutputSizeImpl(~)
+            sizeout = [1 1];
+        end
+        function cplxout = isOutputComplexImpl(~)
+            cplxout = false;
+        end
+        function fixedout = isOutputFixedSizeImpl(~)
+            fixedout = true;
+        end
+        function flag = isInputSizeMutableImpl(~,idx)
+            if idx == 1
+                flag = true;
+            else
+                flag = false;
+            end
+        end
         function icon = getIconImpl(obj)
             % Define icon for System block
             icon = mfilename("class"); % Use class name
