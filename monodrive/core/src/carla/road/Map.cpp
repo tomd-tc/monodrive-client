@@ -933,52 +933,52 @@ namespace road {
     return _data.GetJunction(id);
   }
 
-  //geom::Mesh Map::GenerateMesh(
-  //    const double distance,
-  //    const float extra_width,
-  //    const  bool smooth_junctions) const {
-  //  RELEASE_ASSERT(distance > 0.0);
-  //  geom::MeshFactory mesh_factory;
-  //  geom::Mesh out_mesh;
+  geom::Mesh Map::GenerateMesh(
+     const double distance,
+     const float extra_width,
+     const  bool smooth_junctions) const {
+   RELEASE_ASSERT(distance > 0.0);
+   geom::MeshFactory mesh_factory;
+   geom::Mesh out_mesh;
 
-  //  mesh_factory.road_param.resolution = static_cast<float>(distance);
-  //  mesh_factory.road_param.extra_lane_width = extra_width;
+   mesh_factory.road_param.resolution = static_cast<float>(distance);
+   mesh_factory.road_param.extra_lane_width = extra_width;
 
-  //  // Generate roads outside junctions
-  //  for (auto &&pair : _data.GetRoads()) {
-  //    const auto &road = pair.second;
-  //    if (road.IsJunction()) {
-  //      continue;
-  //    }
-  //    out_mesh += *mesh_factory.Generate(road);
-  //  }
+   // Generate roads outside junctions
+   for (auto &&pair : _data.GetRoads()) {
+     const auto &road = pair.second;
+     if (road.IsJunction()) {
+       continue;
+     }
+     out_mesh += *mesh_factory.Generate(road);
+   }
 
-  //  // Generate roads within junctions and smooth them
-  //  for (const auto &junc_pair : _data.GetJunctions()) {
-  //    const auto &junction = junc_pair.second;
-  //    std::vector<std::unique_ptr<geom::Mesh>> lane_meshes;
-  //    for(const auto &connection_pair : junction.GetConnections()) {
-  //      const auto &connection = connection_pair.second;
-  //      const auto &road = _data.GetRoads().at(connection.connecting_road);
-  //      for (auto &&lane_section : road.GetLaneSections()) {
-  //        for (auto &&lane_pair : lane_section.GetLanes()) {
-  //          lane_meshes.push_back(mesh_factory.Generate(lane_pair.second));
-  //        }
-  //      }
-  //    }
-  //    if(smooth_junctions) {
-  //      out_mesh += *mesh_factory.MergeAndSmooth(lane_meshes);
-  //    } else {
-  //      geom::Mesh junction_mesh;
-  //      for(auto& lane : lane_meshes) {
-  //        junction_mesh += *lane;
-  //      }
-  //      out_mesh += junction_mesh;
-  //    }
-  //  }
+   // Generate roads within junctions and smooth them
+   for (const auto &junc_pair : _data.GetJunctions()) {
+     const auto &junction = junc_pair.second;
+     std::vector<std::unique_ptr<geom::Mesh>> lane_meshes;
+     for(const auto &connection_pair : junction.GetConnections()) {
+       const auto &connection = connection_pair.second;
+       const auto &road = _data.GetRoads().at(connection.connecting_road);
+       for (auto &&lane_section : road.GetLaneSections()) {
+         for (auto &&lane_pair : lane_section.GetLanes()) {
+           lane_meshes.push_back(mesh_factory.Generate(lane_pair.second));
+         }
+       }
+     }
+     if(smooth_junctions) {
+       out_mesh += *mesh_factory.MergeAndSmooth(lane_meshes);
+     } else {
+       geom::Mesh junction_mesh;
+       for(auto& lane : lane_meshes) {
+         junction_mesh += *lane;
+       }
+       out_mesh += junction_mesh;
+     }
+   }
 
-  //  return out_mesh;
-  //}
+   return out_mesh;
+  }
 
   //std::vector<std::unique_ptr<geom::Mesh>> Map::GenerateChunkedMesh(
   //    const rpc::OpendriveGenerationParameters& params) const {

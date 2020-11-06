@@ -151,16 +151,16 @@ namespace road {
     std::unordered_map<road::RoadId, std::unordered_set<road::RoadId>>
         ComputeJunctionConflicts(JuncId id) const;
 
-    /// Buids a mesh based on the OpenDRIVE
-    //geom::Mesh GenerateMesh(
-    //    const double distance,
-    //    const float extra_width = 0.6f,
-    //    const  bool smooth_junctions = true) const;
+    // Builds a mesh based on the OpenDRIVE
+    geom::Mesh GenerateMesh(
+       const double distance,
+       const float extra_width = 0.6f,
+       const  bool smooth_junctions = true) const;
 
     //std::vector<std::unique_ptr<geom::Mesh>> GenerateChunkedMesh(
     //    const rpc::OpendriveGenerationParameters& params) const;
 
-    /// Buids a mesh of all crosswalks based on the OpenDRIVE
+    /// Builds a mesh of all crosswalks based on the OpenDRIVE
     geom::Mesh GetAllCrosswalkMesh() const;
 
     geom::Mesh GenerateWalls(const double distance, const float wall_height) const;
@@ -173,11 +173,11 @@ namespace road {
       return _data.GetControllers();
     }
 
-#ifdef LIBCARLA_WITH_GTEST
+//#ifdef LIBCARLA_WITH_GTEST
     MapData &GetMap() {
       return _data;
     }
-#endif // LIBCARLA_WITH_GTEST
+//#endif // LIBCARLA_WITH_GTEST
 
 private:
 
