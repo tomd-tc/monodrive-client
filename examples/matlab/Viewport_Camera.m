@@ -28,6 +28,10 @@ classdef Viewport_Camera < Sensor
         function y = stepImpl(obj)
 
         end
+        
+        function y = parse(obj, data)
+            
+        end
 
         function resetImpl(obj)
             % Initialize / reset discrete-state properties

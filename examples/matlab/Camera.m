@@ -1,53 +1,45 @@
-classdef Camera < Sensor 
+classdef Camera < Sensor
     % Camera Sensor
     %
     % This template includes the minimum set of functions required
     % to define a System object with discrete state.
-
+    
     % Public, tunable properties
     properties
         config_path = 'configurations/camera.json'
-          
     end
-
+    
     % Pre-computed constants
-    properties(Access = protected)
+    properties
         image = zeros(1024,1024,3);
         width
         height
     end
-
+    
     methods(Access = protected)
         function setupImpl(obj)
-            % Setup super class             
+            % Setup super class
             setupImpl@Sensor(obj);
             obj.width = obj.config.stream_dimensions.x;
             obj.height = obj.config.stream_dimensions.y;
         end
-
-        function y = stepImpl(obj)
-            % Implement algorithm. Calculate y as a function of input u and
-            % discrete states.
-            response_header = fread(obj.sensor_channel, 4, 'uint8');
-            response_length = fread(obj.sensor_channel, 4, 'uint8'); 
-            response_length = fread(obj.sensor_channel, 4, 'uint8');
-            response_length = fread(obj.sensor_channel, 4, 'uint8');
-            response_length = 4*obj.width*obj.height;
-            response = zeros(1,response_length);
-            response = fread(obj.sensor_channel, response_length, 'uint8');
-            if length(response) == response_length
-                r = response(3:4:end);
+        
+        function y = parse(obj, data)
+            % parse to image
+            data_length = 4*obj.width*obj.height;
+            if length(data) == data_length
+                r = data(3:4:end);
                 redChannel = reshape(r, [obj.width,obj.height])';
-                g = response(2:4:end);
+                g = data(2:4:end);
                 greenChannel = reshape(g, [obj.width,obj.height])';
-                b = response(1:4:end);
+                b = data(1:4:end);
                 blueChannel = reshape(b, [obj.width,obj.height])';
-                obj.image = cat(3, redChannel, greenChannel, blueChannel)/255;
-                imshow(obj.image);
+                obj.image = cat(3, redChannel, greenChannel, blueChannel);
             end
             y = obj.image;
+            imshow(obj.image);
         end
-
+        
         function resetImpl(obj)
             % Initialize / reset discrete-state properties
         end
@@ -63,7 +55,7 @@ classdef Camera < Sensor
         end
         
         function dataout = getOutputDataTypeImpl(~)
-            dataout = 'double';
+            dataout = 'uint8';
         end
     end
 end

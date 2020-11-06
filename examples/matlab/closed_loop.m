@@ -15,8 +15,7 @@ vp_cam.setup();
 for n = 1:100
     vehicle.step(0.1, 0.0, 0.0);
     sim.sample_sensors();
-    pause(.1)
     disp(n);
-    %cam.step();
+    cam.step();
 end
 vehicle.step(0.0, 0.0, 1.0);

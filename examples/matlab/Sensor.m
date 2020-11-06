@@ -1,11 +1,10 @@
-classdef Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system.mixin.SampleTime
+classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system.mixin.SampleTime
     % Base Class for all Sensors
-
+    
     % Public, tunable properties
     properties
-        
     end
-
+    
     properties(Nontunable)
         SampleTime = 1.4; % Sample Time
         OffsetTime = 0.2; % Offset Time
@@ -19,13 +18,17 @@ classdef Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system
     % Pre-computed constants
     properties(Access = protected)
         sim = libpointer
-        sensor_channel = libpointer
+        connection = libpointer
         config_json = string
         config = struct()
     end
     
     properties(DiscreteState)
         Count
+    end
+    
+    methods (Abstract, Access = protected)
+        parse(obj)
     end
     
     methods(Access = protected)
@@ -43,8 +46,8 @@ classdef Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system
                     sts = createSampleTime(obj,'Type','Fixed In Minor Step');
                 case 'Discrete'
                     sts = createSampleTime(obj,'Type','Discrete',...
-                      'SampleTime',obj.SampleTime, ...
-                      'OffsetTime',obj.OffsetTime);
+                        'SampleTime',obj.SampleTime, ...
+                        'OffsetTime',obj.OffsetTime);
                 case 'Controllable'
                     sts = createSampleTime(obj,'Type','Controllable',...
                         'TickTime',obj.TickTime);
@@ -53,86 +56,83 @@ classdef Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system
         
         function setupImpl(obj)
             % Perform one-time calculations, such as computing constants
-                        % Perform one-time calculations, such as computing constants
-
+            % Perform one-time calculations, such as computing constants
+            
             obj.sim = Simulator();
             obj.sim.initialize();
             
             fid = fopen(obj.config_path,'r','n','UTF-8');
             obj.config_json = fscanf(fid, '%s');
             obj.config = struct(jsondecode(obj.config_json));
-            response = obj.config_sensor()
             fclose(fid);
-            
-            if  ~strcmp(obj.config.type,"ViewportCamera")
-                obj.config.listen_port
-                obj.sensor_channel = tcpip(obj.sim.server_ip, obj.config.listen_port, 'Timeout', 2);
-                fclose(obj.sensor_channel)
-                obj.sensor_channel.OutputBufferSize = 10000;
-                obj.sensor_channel.InputBufferSize = 1080*1080*4 + 8;
-                obj.sensor_channel.ByteOrder = 'bigEndian';
-                obj.sensor_channel.Terminator('');
-                obj.connect_sensor();
+            obj.configure();
+            if  ~strcmp(obj.config.type, "ViewportCamera")
+                obj.connect();
             end
-
-            
         end
         
         function sizeout = getOutputSizeImpl(~)
             sizeout = [512 512 3];
         end
         
-          function [sz,dt,cp] = getDiscreteStateSpecificationImpl(~,name)
-             if strcmp(name,'Count')
+        function [sz,dt,cp] = getDiscreteStateSpecificationImpl(~,name)
+            if strcmp(name,'Count')
                 sz = [1 1];
                 dt = 'double';
                 cp = false;
-             else
+            else
                 error(['Error: Incorrect State Name: ', name.']);
-             end
-          end
-          function dataout = getOutputDataTypeImpl(~)
-             dataout = 'double';
-          end
-
-          function cplxout = isOutputComplexImpl(~)
-             cplxout = false;
-          end
-          function fixedout = isOutputFixedSizeImpl(~)
-             fixedout = true;
-          end
-          function flag = isInputSizeMutableImpl(~,idx)
-             if idx == 1
-               flag = true;
-             else
-               flag = false;
-             end
-          end
-
-        
-        function Count  = stepImpl(obj,u)
-            % Implement algorithm. Calculate y as a function of input u and
-            % discrete states.
-            Count = obj.Count + u;
-            obj.Count = Count;
-            %Time = getCurrentTime(obj);
-            sts = getSampleTime(obj);
-            if strcmp(sts.Type,'Controllable')
-               setNumTicksUntilNextHit(obj,obj.Count);
             end
-            %SampleTime = sts.SampleTime;
         end
-
+        function dataout = getOutputDataTypeImpl(~)
+            dataout = 'double';
+        end
+        
+        function cplxout = isOutputComplexImpl(~)
+            cplxout = false;
+        end
+        function fixedout = isOutputFixedSizeImpl(~)
+            fixedout = true;
+        end
+        function flag = isInputSizeMutableImpl(~,idx)
+            if idx == 1
+                flag = true;
+            else
+                flag = false;
+            end
+        end
+        
+        
+        function count = stepImpl(obj)
+            % read header
+            length = read(obj.connection, 1, 'uint32');
+            wall_time = read(obj.connection, 1, 'uint32');
+            game_time = read(obj.connection, 1, 'single');
+            sample_count = read(obj.connection, 1, 'uint32');
+            
+            % read data body
+            data = read(obj.connection, length - 16, 'uint8');
+            
+            % hit sensor parse function
+            obj.parse(data);
+            
+            % update state
+            obj.Count = obj.Count + 1;
+            count = obj.Count;
+        end
+        
         function resetImpl(obj)
             % Initialize / reset discrete-state properties
             obj.Count = 0;
         end
-       
-       function connect_sensor(obj)
-           fopen(obj.sensor_channel);
-       end
         
-        function response = config_sensor(obj)
+        function connect(obj)
+            obj.connection = tcpclient(obj.sim.server_ip, obj.config.listen_port, 'Timeout', 2);
+            obj.connection.ByteOrder = 'big-endian';
+            obj.connection.Terminator('');
+        end
+        
+        function response = configure(obj)
             command = obj.sim.ID_REPLAY_CONFIGURE_SENSORS_COMMAND;
             response = jsondecode(obj.sim.send_message(command, obj.config));
         end
