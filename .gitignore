@@ -43,3 +43,11 @@ monodrive/ros/devel
 examples/ros/src/CMakeLists.txt
 monodrive/ros/src/CMakeLists.txt
 config_export
+
+# Matlab
+*.asv
+*.m~
+*.mex*
+slprj/
+octave-workspace
+.autosave

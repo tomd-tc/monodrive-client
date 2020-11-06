@@ -1,6 +1,0 @@
-{
-  "vehicle_dynamics": "physx",
-  "body": {
-    "type": "Blueprint'/Game/Vehicles/SUV_monoDrive_01.SUV_monoDrive_01_C'"
-  }
-}
