@@ -110,10 +110,12 @@ namespace road {
         GetAllSignalReferences() const;
 
     static double GetDistanceAtStartOfLane(const Lane &lane);
-    double GetDistanceAtStartOfLane(const Waypoint &waypoint);
+    double GetDistanceAtStartOfLane(const Waypoint &waypoint) const;
+    double GetDistanceToStartOfLane(const Waypoint &waypoint) const;
 
     static double GetDistanceAtEndOfLane(const Lane &lane);
-    double GetDistanceAtEndOfLane(const Waypoint &waypoint);
+    double GetDistanceAtEndOfLane(const Waypoint &waypoint) const;
+    double GetDistanceToEndOfLane(const Waypoint &waypoint) const;
     /// ========================================================================
     /// -- Waypoint generation -------------------------------------------------
     /// ========================================================================
