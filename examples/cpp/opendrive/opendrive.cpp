@@ -16,7 +16,7 @@ std::vector<road::element::Waypoint> create_path(
     while(true){
         waypoints.emplace_back(waypoint);
         double pathLength = map->GetDistanceToEndOfLane(waypoint);
-        std::cout << "max distance " << maxDistance << " path length " << pathLength << std::endl;
+        // std::cout << "max distance " << maxDistance << " path length " << pathLength << std::endl;
         // have we reached the end of the planning horizon distance?
         if(pathLength > maxDistance){
             auto endPoint = waypoint;
@@ -34,31 +34,84 @@ std::vector<road::element::Waypoint> create_path(
             return waypoints;
         waypoint = successors[0];
     }
-
-
-
-    // distanceTraveled += map->GetDistanceToEndOfLane(waypoint);
-    // if(distanceTraveled > maxDistance){
-    //     auto endPoint = waypoint;
-    //     endPoint.s = endPoint.lane_id 
-    //         ? waypoint.s + distanceTraveled - maxDistance
-    //         : waypoint.s - (distanceTraveled - maxDistance);
-    // }
-    // do{
-    //     auto successors = map->GetSuccessors(waypoint);
-    //     if(successors.size() == 0){
-    //         std::cerr << "The path hit a deadend." << std::endl;
-    //         return waypoints;
-    //     }
-    //     waypoint = successors[0];
-    //     waypoints.emplace_back(waypoint);
-    //     distanceTraveled += map->GetDistanceToEndOfLane(waypoint);
-    // } while(distanceTraveled < maxDistance);
-    // waypoints.back().s = waypoints.back().lane_id < 0 
-    //     ? waypoints.back().s + distanceTraveled - maxDistance
-    //     : distanceTraveled - maxDistance;
-    // return waypoints;
 }
+
+double GetPathLength(const std::vector<road::element::Waypoint>& path, const boost::optional<road::Map>& map){
+    // if there is only one point on path, it isn't a path, useful during construction
+	if (path.size() == 0)
+		return 0;
+	double length = 0;
+	for (auto& point : path) {
+		length += map->GetDistanceToEndOfLane(point);
+	}
+	// the last point is on same lane as predecessor
+	length -= map->GetDistanceToEndOfLane(path.back());
+	return length;
+}
+
+std::vector<road::element::Waypoint> create_path_3(
+    road::element::Waypoint waypoint, 
+    double maxDistance, 
+    boost::optional<road::Map>& map)
+{
+    std::vector<road::element::Waypoint> path;
+    path.emplace_back(waypoint);
+    // starts at 0 for a fresh path
+    // maxDistance = maxDistance - GetPathLength(path, map);
+    while(true){
+        auto& waypoint = path.back();
+        double pathLength = map->GetDistanceToEndOfLane(waypoint);
+        // std::cout << "max distance " << maxDistance << " path length " << pathLength << std::endl;
+        // have we reached the end of the planning horizon distance?
+        if(pathLength > maxDistance){
+            auto endPoint = waypoint;
+            endPoint.s = endPoint.lane_id < 0
+                ? waypoint.s + maxDistance
+                : waypoint.s - maxDistance;
+            path.emplace_back(endPoint);
+            return path;
+        }
+        // decrement the distance by the path traveled
+        maxDistance -= pathLength;
+        // get the successor waypoint on the path
+        auto successors = map->GetSuccessors(waypoint);
+        if(successors.size()==0)
+            return path;
+        path.emplace_back(successors[0]);
+    }
+}
+
+std::vector<road::element::Waypoint> create_path_2(
+    road::element::Waypoint waypoint, 
+    double maxDistance, 
+    boost::optional<road::Map>& map)
+{
+    std::vector<road::element::Waypoint> path;
+    path.emplace_back(waypoint);
+    while(true){
+        auto& lastWaypoint = path.back();
+        double extensionDistance = maxDistance - GetPathLength(path, map);
+		double distanceToEndOfLane = map->GetDistanceToEndOfLane(lastWaypoint);
+        if (extensionDistance >= distanceToEndOfLane) {
+            auto successors = map->GetSuccessors(lastWaypoint);
+            if (successors.size()==0) {
+                auto finalWaypoint = lastWaypoint;
+                finalWaypoint.s = map->GetDistanceAtEndOfLane(finalWaypoint);
+                path.push_back(finalWaypoint);
+                lastWaypoint.s = map->GetDistanceAtEndOfLane(lastWaypoint);
+                return path;
+            } else {
+                auto nextWaypoint = successors[0];
+                path.push_back(successors[0]);
+            }
+        }
+        else {
+            path.push_back(map->forward(lastWaypoint, extensionDistance));
+            return path;
+        }
+    }
+}
+
 
 int infinity()
 {
@@ -118,6 +171,20 @@ int infinity()
     {
         auto wayPoints = map->GetNext(wayPoint.get(), pathDistance);
         for(auto& waypoint : wayPoints){
+            std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
+        }
+    }
+    {
+        std::cout << "+++++++++++++  PATH 2 +++++++++++++" << std::endl;
+        auto path = create_path_2(wayPoint.get(), pathDistance, map);
+        for(auto& waypoint : path){
+            std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
+        }
+    }
+    {
+        std::cout << "+++++++++++++  PATH 3 +++++++++++++" << std::endl;
+        auto path = create_path_3(wayPoint.get(), pathDistance, map);
+        for(auto& waypoint : path){
             std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
         }
     }

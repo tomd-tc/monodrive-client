@@ -20,6 +20,7 @@
 #include <vector>
 #include <unordered_map>
 #include <stdexcept>
+#include <algorithm>
 
 namespace carla {
 namespace road {
@@ -45,6 +46,27 @@ namespace road {
         std::make_move_iterator(src.end()));
     return dst;
   }
+
+  Waypoint Map::forward(Waypoint waypoint, double s) const{
+    waypoint.s = waypoint.lane_id < 0 
+      ? waypoint.s+s
+      : waypoint.s-s;
+    waypoint.s = waypoint.s > GetLane(waypoint).GetLength() ? GetLane(waypoint).GetLength()
+      : waypoint.s < 0 ? EPSILON 
+      : waypoint.s;
+      return waypoint;
+  }
+  Waypoint Map::backward(Waypoint waypoint, double s) const{
+    waypoint.s = waypoint.lane_id < 0 
+      ? waypoint.s-s
+      : waypoint.s+s;
+    waypoint.s = waypoint.s > GetLane(waypoint).GetLength() ? GetLane(waypoint).GetLength()
+      : waypoint.s < 0 ? EPSILON 
+      : waypoint.s;
+    return waypoint;
+  }
+
+
   double Map::GetDistanceAtStartOfLane(const Waypoint &waypoint) const{
     return GetDistanceAtStartOfLane(GetLane(waypoint));
   }

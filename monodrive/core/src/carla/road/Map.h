@@ -109,6 +109,11 @@ namespace road {
     std::vector<const element::RoadInfoSignal*>
         GetAllSignalReferences() const;
 
+    // moves the waypoint forward along the lane clamping to lane length
+    Waypoint forward(Waypoint waypoint, double s) const;
+    // moves the waypoint backward along the lane clamping to lane length
+    Waypoint backward(Waypoint waypoint, double s) const;
+
     static double GetDistanceAtStartOfLane(const Lane &lane);
     double GetDistanceAtStartOfLane(const Waypoint &waypoint) const;
     double GetDistanceToStartOfLane(const Waypoint &waypoint) const;
