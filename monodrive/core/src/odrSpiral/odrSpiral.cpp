@@ -40,6 +40,7 @@
 #define _USE_MATH_DEFINES // Enable windows compatibility
 // --------------------------
 #include <math.h>
+#include "odrSpiral.h"
 
 /* ====== LOCAL VARIABLES ====== */
 

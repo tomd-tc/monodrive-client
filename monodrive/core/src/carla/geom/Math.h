@@ -84,6 +84,9 @@ namespace geom {
     /// Returns the angle between 2 vectors in radians
     static double GetVectorAngle(const Vector3D &a, const Vector3D &b);
 
+    /// Returns the cross product between two vectors
+    static Vector3D Cross(const Vector3D &a, const Vector3D &b);
+
     /// Returns a pair containing:
     /// - @b first:  distance from v to p' where p' = p projected on segment
     ///   (w - v)

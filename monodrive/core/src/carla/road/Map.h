@@ -50,6 +50,10 @@ namespace road {
     /// -- Geometry ------------------------------------------------------------
     /// ========================================================================
 
+    boost::optional<element::Waypoint> GetClosestWaypointOnRoadinSet(
+        const geom::Location &location,
+        const std::vector<Waypoint>& waypoints) const;
+
     boost::optional<element::Waypoint> GetClosestWaypointOnRoad(
         const geom::Location &location,
         int32_t lane_type = static_cast<int32_t>(Lane::LaneType::Driving)) const;
@@ -105,6 +109,18 @@ namespace road {
     std::vector<const element::RoadInfoSignal*>
         GetAllSignalReferences() const;
 
+    // moves the waypoint forward along the lane clamping to lane length
+    Waypoint forward(Waypoint waypoint, double s) const;
+    // moves the waypoint backward along the lane clamping to lane length
+    Waypoint backward(Waypoint waypoint, double s) const;
+
+    static double GetDistanceAtStartOfLane(const Lane &lane);
+    double GetDistanceAtStartOfLane(const Waypoint &waypoint) const;
+    double GetDistanceToStartOfLane(const Waypoint &waypoint) const;
+
+    static double GetDistanceAtEndOfLane(const Lane &lane);
+    double GetDistanceAtEndOfLane(const Waypoint &waypoint) const;
+    double GetDistanceToEndOfLane(const Waypoint &waypoint) const;
     /// ========================================================================
     /// -- Waypoint generation -------------------------------------------------
     /// ========================================================================

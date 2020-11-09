@@ -10,6 +10,15 @@
 
 namespace carla {
 namespace geom {
+                  //  myY * pos.myZ - myZ * pos.myY,
+                  //  myZ * pos.myX - myX * pos.myZ,
+                  //  myX * pos.myY - myY * pos.myX);
+  Vector3D Math::Cross(const Vector3D& a, const Vector3D& b){
+    return Vector3D(
+      a.y * b.z - a.z * b.y,
+      a.z * b.x - a.x * b.z,
+      a.x * b.y - a.y * b.x);
+  }
 
   double Math::GetVectorAngle(const Vector3D &a, const Vector3D &b) {
     return std::acos(Dot(a, b) / (a.Length() * b.Length()));

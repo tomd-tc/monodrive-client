@@ -68,14 +68,14 @@ namespace carla {
       boost::split(destination, str, boost::is_any_of(separators));
     }
 
-    /// Match @a str with the Unix shell-style @a wildcard_pattern.
-    static bool Match(const char *str, const char *wildcard_pattern);
+    // /// Match @a str with the Unix shell-style @a wildcard_pattern.
+    // static bool Match(const char *str, const char *wildcard_pattern);
 
     /// Match @a str with the Unix shell-style @a wildcard_pattern.
-    template <typename String1T, typename String2T>
-    static bool Match(const String1T &str, const String2T &wildcard_pattern) {
-      return Match(ToConstCharPtr(str), ToConstCharPtr(wildcard_pattern));
-    }
+    // template <typename String1T, typename String2T>
+    // static bool Match(const String1T &str, const String2T &wildcard_pattern) {
+    //   return Match(ToConstCharPtr(str), ToConstCharPtr(wildcard_pattern));
+    // }
   };
 
 } // namespace carla
