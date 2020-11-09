@@ -168,7 +168,7 @@ void perception(DataFrame* dataFrame) {
 
 int main(int argc, char** argv)
 {
-    MatrixXd data = read_csv<MatrixXd>("examples/cpp/lane_follower/speed_curve_data.csv");
+    MatrixXd speed_curve = read_csv<MatrixXd>("examples/cpp/lane_follower/speed_curve_data.csv");
     output.open("examples/cpp/lane_follower/speed_curve_reproduced.csv");
 
     // read JSON files from config directory
@@ -231,10 +231,10 @@ int main(int argc, char** argv)
 
     // start our main perception planning and control loop
     std::cout << "Sampling sensor loop" << std::endl;
-    for (int i = 0; i < data.rows(); i++)
+    for (int i = 0; i < speed_curve.rows(); i++)
     {
         // get target speed from curve
-        desired_speed = data(i, 1);
+        desired_speed = speed_curve(i, 1);
         // step the simulation one simulation frame
         ClosedLoopStepCommandConfig stepCommand;
         stepCommand.time_step = 0.01f;
