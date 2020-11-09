@@ -38,14 +38,14 @@ std::vector<road::element::Waypoint> create_path(
 
 double GetPathLength(const std::vector<road::element::Waypoint>& path, const boost::optional<road::Map>& map){
     // if there is only one point on path, it isn't a path, useful during construction
-	if (path.size() == 0)
+	if (path.size() < 2)
 		return 0;
 	double length = 0;
-	for (auto& point : path) {
-		length += map->GetDistanceToEndOfLane(point);
-	}
+    for(int i = 0;i < path.size()-2; ++i){
+		length += map->GetDistanceToEndOfLane(path[i]);
+    }
 	// the last point is on same lane as predecessor
-	length -= map->GetDistanceToEndOfLane(path.back());
+    length += map->GetDistanceToEndOfLane(path.end()[-2]) - map->GetDistanceToEndOfLane(path.end()[-1]);
 	return length;
 }
 
@@ -126,16 +126,27 @@ int infinity()
         return -1;
     auto topo = map->GenerateTopology();
     int count = 0;
-    // std::cout << "TOPO: " << std::endl;
-    // for(auto& points : topo){
-    //     std::cout << points.first.road_id << " " <<  points.first.lane_id << " " << points.first.section_id << " " << points.first.s;
-    //     std::cout << " :Point " << count++ << std::endl;
-    //     std::cout << points.second.road_id << " " <<  points.second.lane_id << " " << points.second.section_id << " " << points.second.s << std::endl;
-    // }
+    std::cout << "TOPO: " << std::endl;
+    for(auto& points : topo){
+        auto waypoint = points.first;
+        // std::cout << points.first.road_id << " " <<  points.first.lane_id << " " << points.first.section_id << " " << points.first.s;
+        // std::cout << " :Point " << count++ << std::endl;
+        // std::cout << points.second.road_id << " " <<  points.second.lane_id << " " << points.second.section_id << " " << points.second.s << std::endl;
+        std::cout << waypoint.road_id << " " 
+        << waypoint.lane_id << " " 
+        << waypoint.s << " " 
+        << map->GetDistanceAtEndOfLane(waypoint) << std::endl;
+    }
 
     std::cout << "FULL LOOP" << std::endl;
-    carla::geom::Vector3D location(0,0,0);
-    auto wayPoint = map->GetClosestWaypointOnRoad(location);
+    // carla::geom::Vector3D location(0,0,0);
+    // auto wayPoint = map->GetClosestWaypointOnRoad(location);
+    boost::optional<road::element::Waypoint> wayPoint{road::element::Waypoint()};
+    wayPoint->road_id = 2;
+    wayPoint->lane_id = -1;
+    wayPoint->section_id = 0;
+    wayPoint->s = 20.64;
+    auto location = map->ComputeTransform(wayPoint.get()).location;
     {
         // loop around
         auto waypoint = wayPoint.get();
@@ -154,7 +165,7 @@ int infinity()
         << map->GetDistanceAtEndOfLane(waypoint) << std::endl;
     }
 
-    const double pathDistance = 450;
+    const double pathDistance = 100;
 
     // start fresh
     wayPoint = map->GetClosestWaypointOnRoad(location).get();
@@ -187,6 +198,7 @@ int infinity()
         for(auto& waypoint : path){
             std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << std::endl;
         }
+        std::cout << GetPathLength(path, map) << std::endl;
     }
     return 0;
 }
