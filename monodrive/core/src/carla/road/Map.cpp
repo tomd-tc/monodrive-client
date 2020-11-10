@@ -92,8 +92,7 @@ namespace road {
     return GetDistanceAtEndOfLane(GetLane(waypoint));
   }
   double Map::GetDistanceToEndOfLane(const Waypoint &waypoint) const{
-    std::cout << "distance at end " << GetDistanceAtEndOfLane(waypoint) <<  " length " << GetLane(waypoint).GetLength() << " distance " << GetLane(waypoint).GetDistance() << std::endl;
-
+    // std::cout << "distance at end " << GetDistanceAtEndOfLane(waypoint) <<  " length " << GetLane(waypoint).GetLength() << " distance " << GetLane(waypoint).GetDistance() << std::endl;
     return std::abs(waypoint.s - GetDistanceAtEndOfLane(waypoint));
   }
 
@@ -854,6 +853,9 @@ namespace road {
 
   const Lane &Map::GetLane(Waypoint waypoint) const {
     return _data.GetRoad(waypoint.road_id).GetLaneById(waypoint.section_id, waypoint.lane_id);
+  }
+  const Road &Map::GetRoad(Waypoint waypoint) const {
+    return _data.GetRoad(waypoint.road_id);
   }
 
   // ===========================================================================

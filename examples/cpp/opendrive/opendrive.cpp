@@ -1,5 +1,6 @@
 #include "carla/road/Road.h"
 #include "carla/opendrive/OpenDriveParser.h"
+#include "carla/road/element/RoadInfoSpeed.h"
 #include <fstream>
 #include <streambuf>
 
@@ -165,7 +166,7 @@ int infinity()
         << map->GetDistanceAtEndOfLane(waypoint) << std::endl;
     }
 
-    const double pathDistance = 100;
+    const double pathDistance = 700;
 
     // start fresh
     wayPoint = map->GetClosestWaypointOnRoad(location).get();
@@ -200,6 +201,19 @@ int infinity()
         }
         std::cout << GetPathLength(path, map) << std::endl;
     }
+    auto& Map = map.get();
+    {
+        std::cout << "+++++++++++++  SPEED +++++++++++++" << std::endl;
+        auto path = create_path_3(wayPoint.get(), pathDistance, map);
+        for(auto& waypoint : path){
+            auto speed = map->GetRoad(waypoint).GetInfo<road::element::RoadInfoSpeed>(waypoint.s)->GetSpeed();
+            std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << speed << std::endl;
+        }
+        std::cout << GetPathLength(path, map) << std::endl;
+    }
+
+
+
     return 0;
 }
 
