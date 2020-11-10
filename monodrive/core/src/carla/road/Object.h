@@ -15,7 +15,7 @@
 namespace carla {
 namespace road {
 
-  class MONODRIVECORE_API Object : private MovableNonCopyable {
+  class  Object : private MovableNonCopyable {
   public:
 
     Object() = default;

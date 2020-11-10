@@ -23,7 +23,7 @@ namespace element {
   /// right lanes the right one. The style of the line separating left and right
   /// lanes is determined by the road mark entry for lane zero (i.e. the center
   /// lane)
-  class MONODRIVECORE_API RoadInfoMarkRecord final : public RoadInfo {
+  class  RoadInfoMarkRecord final : public RoadInfo {
   public:
 
     /// Can be used as flags

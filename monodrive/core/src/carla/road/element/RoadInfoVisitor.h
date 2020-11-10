@@ -30,7 +30,7 @@ namespace element {
   class RoadInfoCrosswalk;
   class RoadInfoSignal;
 
-  class MONODRIVECORE_API RoadInfoVisitor {
+  class  RoadInfoVisitor {
   public:
 
     RoadInfoVisitor() = default;

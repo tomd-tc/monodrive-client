@@ -36,7 +36,7 @@
 #include "UECompatability.h"
 
 #ifdef UE_BUILD
-void MONODRIVECORE_API odrSpiral( double s, double cDot, double *x, double *y, double *t );
+void  odrSpiral( double s, double cDot, double *x, double *y, double *t );
 #else
 extern void odrSpiral( double s, double cDot, double *x, double *y, double *t );
 #endif

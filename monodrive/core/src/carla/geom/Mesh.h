@@ -40,7 +40,7 @@ namespace geom {
   };
 
   /// Mesh data container, validator and exporter.
-  class MONODRIVECORE_API Mesh {
+  class  Mesh {
   public:
 
     using vertex_type = Vector3D;

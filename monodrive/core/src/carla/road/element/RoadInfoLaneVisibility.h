@@ -21,7 +21,7 @@ namespace element {
   /// For left lanes (positive ID), the forward direction is oriented opposite
   /// to the track’s direction, for right lanes, the forward direction and the
   /// track’s direction are identical.
-  class MONODRIVECORE_API RoadInfoLaneVisibility final : public RoadInfo {
+  class  RoadInfoLaneVisibility final : public RoadInfo {
   public:
 
     RoadInfoLaneVisibility(

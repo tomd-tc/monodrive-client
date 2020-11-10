@@ -20,7 +20,7 @@ namespace element {
     CrosswalkPoint(double _u, double _v, double _z) : u(_u), v(_v), z(_z) {};
   };
 
-  class MONODRIVECORE_API RoadInfoCrosswalk final : public RoadInfo {
+  class  RoadInfoCrosswalk final : public RoadInfo {
   public:
 
     RoadInfoCrosswalk(

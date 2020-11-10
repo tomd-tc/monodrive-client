@@ -37,7 +37,7 @@ namespace road {
 
   };
 
-  class MONODRIVECORE_API Signal : private MovableNonCopyable {
+  class  Signal : private MovableNonCopyable {
   public:
     Signal(
         RoadId road_id,

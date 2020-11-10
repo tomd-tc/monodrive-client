@@ -14,7 +14,7 @@ namespace road {
 
   /// Using OpenDRIVE 1.5M (6.10 Country Codes)
   ///
-  class MONODRIVECORE_API SignalType {
+  class  SignalType {
   public:
     static const std::string Danger();     // = "101" // danger types from 101 to 151
     static const std::string LanesMerging(); // = "121";

@@ -16,7 +16,7 @@ namespace element {
 
   /// This record defines rules that can be applied to lanes to describe
   /// additonal properties not covered by the other attributes.
-  class MONODRIVECORE_API RoadInfoLaneRule final : public RoadInfo {
+  class  RoadInfoLaneRule final : public RoadInfo {
   public:
 
     RoadInfoLaneRule(

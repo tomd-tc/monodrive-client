@@ -35,14 +35,14 @@ public:
 	virtual ~DataFrame() {}
 };
 
-class MONODRIVECORE_API BinaryDataFrame : public DataFrame{
+class  BinaryDataFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
     ByteBuffer data_frame;
 };
 
-class MONODRIVECORE_API RadarTargetListFrame : public DataFrame{
+class  RadarTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
@@ -50,7 +50,7 @@ public:
     std::vector<RadarTarget> gt_targets;
 };
 
-class MONODRIVECORE_API RadarCubeFrame : public DataFrame{
+class  RadarCubeFrame : public DataFrame{
 public:
     RadarCubeFrame(int numSweeps, int numSamplesPerSweep, int numElements) 
         : numSweeps(numSweeps),
@@ -70,7 +70,7 @@ public:
     std::vector<std::complex<float>> radar_cube;
 };
 
-class MONODRIVECORE_API RadarFrame : public DataFrame{
+class  RadarFrame : public DataFrame{
 public:
     RadarFrame(bool send_radar_cube, int numSweeps, int numSamplesPerSweep, int numElements) 
     : bSendRadarCube(send_radar_cube),
@@ -99,7 +99,7 @@ public:
     int currentFrameIndex;
 };
 
-class MONODRIVECORE_API ImuFrame : public DataFrame{
+class  ImuFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
@@ -111,7 +111,7 @@ public:
     int time_of_week;
 };
 
-class MONODRIVECORE_API WaypointFrame : public DataFrame {
+class  WaypointFrame : public DataFrame {
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
@@ -121,7 +121,7 @@ public:
 	int sample_count;
 };
 
-class MONODRIVECORE_API GPSFrame : public DataFrame{
+class  GPSFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
@@ -147,7 +147,7 @@ public:
     uint16_t crc;
 };
 
-class MONODRIVECORE_API StateFrame : public DataFrame{
+class  StateFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
@@ -158,7 +158,7 @@ public:
 	int sample_count;
 };
 
-class MONODRIVECORE_API CollisionFrame : public DataFrame{
+class  CollisionFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
@@ -170,7 +170,7 @@ public:
 };
 
 // for now 8 bit only, todo: add float higher bit rate etc enum
-class MONODRIVECORE_API ImageFrame : public DataFrame{
+class  ImageFrame : public DataFrame{
 public:
     ImageFrame(int x_res, int y_res, int channels, int channel_depth = 1) 
         : channels(channels), channel_depth(channel_depth)
@@ -197,14 +197,14 @@ public:
     virtual ByteBuffer write() const override;
 };
 
-class MONODRIVECORE_API CameraAnnotationFrame : public DataFrame{
+class  CameraAnnotationFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
 	std::map<std::string, AnnotationFrame2D> annotations;
 };
 
-class MONODRIVECORE_API CameraFrame : public DataFrame{
+class  CameraFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
@@ -233,14 +233,14 @@ public:
     int currentFrameIndex;
 };
 
-class MONODRIVECORE_API CubeCameraFrame : public CameraFrame{
+class  CubeCameraFrame : public CameraFrame{
 public:
     CubeCameraFrame(int width, int height) : CameraFrame(width, height, 4, 1, false)
     {
     }
 };
 
-class MONODRIVECORE_API LidarFrame : public DataFrame {
+class  LidarFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
@@ -261,7 +261,7 @@ public:
     uint64_t packetIndex = 0;
 };
 
-class MONODRIVECORE_API UltrasonicRawFrame : public DataFrame{
+class  UltrasonicRawFrame : public DataFrame{
 public:
     UltrasonicRawFrame(int numSamples){
         ultrasonic_raw.resize(numSamples);
@@ -271,14 +271,14 @@ public:
     std::vector<float> ultrasonic_raw;
 };
 
-class MONODRIVECORE_API UltrasonicTargetListFrame : public DataFrame{
+class  UltrasonicTargetListFrame : public DataFrame{
 public:
     virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
     std::vector<UltrasonicTarget> targets;
 };
 
-class MONODRIVECORE_API UltrasonicFrame : public DataFrame {
+class  UltrasonicFrame : public DataFrame {
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
@@ -305,7 +305,7 @@ public:
     int currentFrameIndex;
 };
 
-class MONODRIVECORE_API RPMFrame : public DataFrame{
+class  RPMFrame : public DataFrame{
 public:
 	virtual void parse(ByteBuffer& buffer) override;
 	virtual ByteBuffer write() const override;
