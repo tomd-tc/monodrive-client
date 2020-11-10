@@ -14164,9 +14164,9 @@ class serializer
                     {
                         case error_handler_t::strict:
                         {
-                            std::string sn(3, '\0');
-                            (std::snprintf)(&sn[0], sn.size(), "%.2X", byte);
-                            JSON_THROW(type_error::create(316, "invalid UTF-8 byte at index " + std::to_string(i) + ": 0x" + sn));
+                            std::string sn_local(3, '\0');
+                            (std::snprintf)(&sn_local[0], sn_local.size(), "%.2X", byte);
+                            JSON_THROW(type_error::create(316, "invalid UTF-8 byte at index " + std::to_string(i) + ": 0x" + sn_local));
                         }
 
                         case error_handler_t::ignore:
@@ -14258,9 +14258,9 @@ class serializer
             {
                 case error_handler_t::strict:
                 {
-                    std::string sn(3, '\0');
-                    (std::snprintf)(&sn[0], sn.size(), "%.2X", static_cast<std::uint8_t>(s.back()));
-                    JSON_THROW(type_error::create(316, "incomplete UTF-8 string; last byte: 0x" + sn));
+                    std::string sn_local(3, '\0');
+                    (std::snprintf)(&sn_local[0], sn_local.size(), "%.2X", static_cast<std::uint8_t>(s.back()));
+                    JSON_THROW(type_error::create(316, "incomplete UTF-8 string; last byte: 0x" + sn_local));
                 }
 
                 case error_handler_t::ignore:

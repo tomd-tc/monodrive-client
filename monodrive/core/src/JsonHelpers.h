@@ -12,13 +12,12 @@
 #include "UECompatability.h"
 
 
-//#ifndef UE_BUILD
+#ifndef UE_BUILD
 void inline json_log(const std::string& error_message)
 {
     std::cerr << error_message << std::endl;
 };
-
-//#endif
+#endif
 
 // update me, should do the at check and return false rather than rely on exception handling
 // this is nice for debugging but causes slow down on normal operations where we expect the 
@@ -120,6 +119,14 @@ bool json_contains_one(const nlohmann::json& j, T key, Args... keys) {
 
 #ifdef UE_BUILD
 #include "LogHelper.h"
+
+inline void json_log(const FString& error_message) {
+	EGO_LOG(LogLoad, Warning, "%s", *error_message);
+}
+
+inline void json_log(const std::string& error_message) {
+	EGO_LOG(LogLoad, Warning, "%s", UTF8_TO_TCHAR(error_message.c_str()));
+}
 
 inline void to_json(nlohmann::json& j, const FRotator& v) {
 	j = nlohmann::json{ 
