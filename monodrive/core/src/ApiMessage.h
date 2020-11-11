@@ -41,7 +41,7 @@
 using boost::asio::ip::tcp;
 
 
-class MONODRIVECORE_API ApiMessage
+class  ApiMessage
 {
 public:
 	enum { header_length = 8 };

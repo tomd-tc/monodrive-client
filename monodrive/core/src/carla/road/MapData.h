@@ -27,7 +27,7 @@ namespace road {
 
   class Lane;
 
-  class MONODRIVECORE_API MapData : private MovableNonCopyable {
+  class  MapData : private MovableNonCopyable {
   public:
 
     const geom::GeoLocation &GetGeoReference() const {

@@ -23,7 +23,7 @@ namespace road {
   class MapBuilder;
   class Road;
 
-  class MONODRIVECORE_API Lane : private MovableNonCopyable {
+  class  Lane : private MovableNonCopyable {
   public:
 
     /// Can be used as flags

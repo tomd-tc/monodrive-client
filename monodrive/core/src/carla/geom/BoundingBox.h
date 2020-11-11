@@ -21,7 +21,7 @@
 namespace carla {
 namespace geom {
 
-  class MONODRIVECORE_API BoundingBox {
+  class  BoundingBox {
   public:
 
     BoundingBox() = default;

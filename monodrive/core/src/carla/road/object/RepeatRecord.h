@@ -16,7 +16,7 @@ namespace carla {
 namespace road {
 namespace object {
 
-  class MONODRIVECORE_API RepeatRecord : private MovableNonCopyable {
+  class  RepeatRecord : private MovableNonCopyable {
   public:
 
     RepeatRecord() {}

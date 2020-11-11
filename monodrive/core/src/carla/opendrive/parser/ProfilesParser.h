@@ -20,7 +20,7 @@ namespace road {
 namespace opendrive {
 namespace parser {
 
-  class MONODRIVECORE_API ProfilesParser {
+  class  ProfilesParser {
   public:
 
     static void Parse(

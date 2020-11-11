@@ -20,7 +20,7 @@ namespace element {
   /// relative to the road’s referenceline. Especially the modeling of
   /// inner-city layouts or "2+1" cross-country road layouts can be facilitated
   /// considerably by this feature.
-  class MONODRIVECORE_API RoadInfoLaneOffset final : public RoadInfo {
+  class  RoadInfoLaneOffset final : public RoadInfo {
   public:
 
     RoadInfoLaneOffset(

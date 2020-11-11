@@ -21,7 +21,7 @@ namespace element {
   /// derived from measurements, this type of definition will provide a more
   /// convenient method without the need to tesselate road sections into too
   /// many parts. Note. Lane borders and widths are mutually exclusive.
-  class MONODRIVECORE_API RoadInfoLaneBorder final : public RoadInfo {
+  class  RoadInfoLaneBorder final : public RoadInfo {
   public:
 
     RoadInfoLaneBorder(

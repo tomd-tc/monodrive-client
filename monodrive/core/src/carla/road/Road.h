@@ -30,7 +30,7 @@ namespace road {
   class Elevation;
   class MapBuilder;
 
-  class MONODRIVECORE_API Road : private MovableNonCopyable {
+  class  Road : private MovableNonCopyable {
   public:
 
     Road() = default;

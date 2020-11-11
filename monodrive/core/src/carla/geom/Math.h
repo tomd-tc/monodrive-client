@@ -20,7 +20,7 @@ namespace geom {
 
   class Rotation;
 
-  class MONODRIVECORE_API Math {
+  class  Math {
   public:
 
     template <typename T>

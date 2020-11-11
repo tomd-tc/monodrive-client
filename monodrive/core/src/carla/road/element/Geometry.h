@@ -46,7 +46,7 @@ namespace element {
     }
   };
 
-  class MONODRIVECORE_API Geometry {
+  class  Geometry {
   public:
 
     GeometryType GetType() const {
@@ -97,7 +97,7 @@ namespace element {
     geom::Location _start_position; // [meters]
   };
 
-  class MONODRIVECORE_API GeometryLine final : public Geometry {
+  class  GeometryLine final : public Geometry {
   public:
 
     GeometryLine(
@@ -124,7 +124,7 @@ namespace element {
 
   };
 
-  class MONODRIVECORE_API GeometryArc final : public Geometry {
+  class  GeometryArc final : public Geometry {
   public:
 
     GeometryArc(
@@ -161,7 +161,7 @@ namespace element {
     double _curvature;
   };
 
-  class MONODRIVECORE_API GeometrySpiral final : public Geometry {
+  class  GeometrySpiral final : public Geometry {
   public:
 
     GeometrySpiral(
@@ -193,7 +193,7 @@ namespace element {
     double _curve_end;
   };
 
-  class MONODRIVECORE_API GeometryPoly3 final : public Geometry {
+  class  GeometryPoly3 final : public Geometry {
   public:
 
     GeometryPoly3(
@@ -252,7 +252,7 @@ namespace element {
     void PreComputeSpline();
   };
 
-  class MONODRIVECORE_API GeometryParamPoly3 final : public Geometry {
+  class  GeometryParamPoly3 final : public Geometry {
   public:
 
     GeometryParamPoly3(

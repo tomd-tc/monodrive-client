@@ -12,7 +12,7 @@ namespace geom {
 
   class Location;
 
-  class MONODRIVECORE_API GeoLocation {
+  class  GeoLocation {
   public:
 
     // =========================================================================

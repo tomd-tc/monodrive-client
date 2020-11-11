@@ -17,7 +17,7 @@ namespace road {
 
   class MapBuilder;
 
-  class MONODRIVECORE_API Controller : private MovableNonCopyable {
+  class  Controller : private MovableNonCopyable {
 
   public:
 

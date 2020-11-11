@@ -17,7 +17,7 @@
 namespace carla {
 namespace geom {
 
-  class MONODRIVECORE_API Rotation {
+  class  Rotation {
   public:
 
     // =========================================================================

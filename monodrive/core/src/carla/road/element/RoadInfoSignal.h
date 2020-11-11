@@ -14,7 +14,7 @@ namespace carla {
 namespace road {
 namespace element {
 
-  class MONODRIVECORE_API RoadInfoSignal final : public RoadInfo {
+  class  RoadInfoSignal final : public RoadInfo {
   public:
 
     RoadInfoSignal(

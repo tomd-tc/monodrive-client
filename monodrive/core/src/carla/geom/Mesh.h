@@ -13,7 +13,7 @@
 #include <carla/geom/Vector2D.h>
 
 #ifdef LIBCARLA_INCLUDED_FROM_UE4
-//#include "Util/ProceduralCustomMesh.h"
+    #include "ProceduralCustomMesh.h"
 #endif // LIBCARLA_INCLUDED_FROM_UE4
 
 namespace carla {
@@ -40,7 +40,7 @@ namespace geom {
   };
 
   /// Mesh data container, validator and exporter.
-  class MONODRIVECORE_API Mesh {
+  class  Mesh {
   public:
 
     using vertex_type = Vector3D;
@@ -150,66 +150,65 @@ namespace geom {
     // -- Conversions to UE4 types ---------------------------------------------
     // =========================================================================
 
-//#ifdef LIBCARLA_INCLUDED_FROM_UE4
-//
-//    operator FProceduralCustomMesh() const {
-//      FProceduralCustomMesh Mesh;
-//
-//      // Build the mesh
-//      for (const auto Vertex : GetVertices())
-//      {
-//        // From meters to centimeters
-//        Mesh.Vertices.Add(FVector{1e2f * Vertex.x, 1e2f * Vertex.y, 1e2f * Vertex.z});
-//      }
-//
-//      const auto Indexes = GetIndexes();
-//      TArray<FTriIndices> TriIndices;
-//      for (auto i = 0u; i < Indexes.size(); i += 3)
-//      {
-//        FTriIndices Triangle;
-//        // "-1" since mesh indexes in Unreal starts from index 0.
-//        Mesh.Triangles.Add(Indexes[i]     - 1);
-//        // Since Unreal's coords are left handed, invert the last 2 indices.
-//        Mesh.Triangles.Add(Indexes[i + 2] - 1);
-//        Mesh.Triangles.Add(Indexes[i + 1] - 1);
-//
-//        Triangle.v0 = Indexes[i]     - 1;
-//        Triangle.v1 = Indexes[i + 2] - 1;
-//        Triangle.v2 = Indexes[i + 1] - 1;
-//        TriIndices.Add(Triangle);
-//      }
-//
-//      // Compute the normals
-//      TArray<FVector> Normals;
-//      Mesh.Normals.Init(FVector::UpVector, Mesh.Vertices.Num());
-//
-//      for (const auto &Triangle : TriIndices) {
-//        FVector Normal;
-//        const FVector U = Mesh.Vertices[Triangle.v1] - Mesh.Vertices[Triangle.v0];
-//        const FVector V = Mesh.Vertices[Triangle.v2] - Mesh.Vertices[Triangle.v0];
-//        Normal.X = (U.Y * V.Z) - (U.Z * V.Y);
-//        Normal.Y = (U.Z * V.X) - (U.X * V.Z);
-//        Normal.Z = (U.X * V.Y) - (U.Y * V.X);
-//        Normal = -Normal;
-//        Normal = Normal.GetSafeNormal(.0001f);
-//        if (Normal != FVector::ZeroVector)
-//        {
-//          // fix to prevent ugly x-fighting in geometries with very large curvatures,
-//          // ensures that all road geometry is facing upwards
-//          if (FVector::DotProduct(Normal, FVector(0,0,1)) < 0)
-//          {
-//            Normal = -Normal;
-//          }
-//          Mesh.Normals[Triangle.v0] = Normal;
-//          Mesh.Normals[Triangle.v1] = Normal;
-//          Mesh.Normals[Triangle.v2] = Normal;
-//        }
-//      }
-//
-//      return Mesh;
-//    }
-//
-//#endif // LIBCARLA_INCLUDED_FROM_UE4
+#ifdef LIBCARLA_INCLUDED_FROM_UE4
+    operator FProceduralCustomMesh() const {
+      FProceduralCustomMesh Mesh;
+
+      // Build the mesh
+      for (const auto Vertex : GetVertices())
+      {
+        // From meters to centimeters
+        Mesh.Vertices.Add(FVector{1e2f * Vertex.x, 1e2f * Vertex.y, 1e2f * Vertex.z});
+      }
+
+      const auto Indexes = GetIndexes();
+      TArray<FTriIndices> TriIndices;
+      for (auto i = 0u; i < Indexes.size(); i += 3)
+      {
+        FTriIndices Triangle;
+        // "-1" since mesh indexes in Unreal starts from index 0.
+        Mesh.Triangles.Add(Indexes[i]     - 1);
+        // Since Unreal's coords are left handed, invert the last 2 indices.
+        Mesh.Triangles.Add(Indexes[i + 2] - 1);
+        Mesh.Triangles.Add(Indexes[i + 1] - 1);
+
+        Triangle.v0 = Indexes[i]     - 1;
+        Triangle.v1 = Indexes[i + 2] - 1;
+        Triangle.v2 = Indexes[i + 1] - 1;
+        TriIndices.Add(Triangle);
+      }
+
+      // Compute the normals
+      TArray<FVector> Normals;
+      Mesh.Normals.Init(FVector::UpVector, Mesh.Vertices.Num());
+
+      for (const auto &Triangle : TriIndices) {
+        FVector Normal;
+        const FVector U = Mesh.Vertices[Triangle.v1] - Mesh.Vertices[Triangle.v0];
+        const FVector V = Mesh.Vertices[Triangle.v2] - Mesh.Vertices[Triangle.v0];
+        Normal.X = (U.Y * V.Z) - (U.Z * V.Y);
+        Normal.Y = (U.Z * V.X) - (U.X * V.Z);
+        Normal.Z = (U.X * V.Y) - (U.Y * V.X);
+        Normal = -Normal;
+        Normal = Normal.GetSafeNormal(.0001f);
+        if (Normal != FVector::ZeroVector)
+        {
+          // fix to prevent ugly x-fighting in geometries with very large curvatures,
+          // ensures that all road geometry is facing upwards
+          if (FVector::DotProduct(Normal, FVector(0,0,1)) < 0)
+          {
+            Normal = -Normal;
+          }
+          Mesh.Normals[Triangle.v0] = Normal;
+          Mesh.Normals[Triangle.v1] = Normal;
+          Mesh.Normals[Triangle.v2] = Normal;
+        }
+      }
+
+      return Mesh;
+    }
+
+#endif // LIBCARLA_INCLUDED_FROM_UE4
 
   private:
 
