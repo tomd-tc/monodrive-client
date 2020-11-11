@@ -1,13 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
-include(ProcessorCount)
-
 project(monodrive_clients)
 
-add_subdirectory(monodrive)
-if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7)
-  add_subdirectory(examples)
-endif()
-
+include(ProcessorCount)
 if(MSVC)
   ProcessorCount(PROC_COUNT)
   if(NOT PROC_COUNT EQUAL 0) 
@@ -15,3 +9,7 @@ if(MSVC)
   endif()
 endif()
  
+add_subdirectory(monodrive)
+if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7)
+  add_subdirectory(examples)
+endif()

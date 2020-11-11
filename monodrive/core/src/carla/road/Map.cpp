@@ -1070,89 +1070,89 @@ namespace road {
    return out_mesh;
   }
 
-  //std::vector<std::unique_ptr<geom::Mesh>> Map::GenerateChunkedMesh(
-  //    const rpc::OpendriveGenerationParameters& params) const {
-  //  geom::MeshFactory mesh_factory(params);
-  //  std::vector<std::unique_ptr<geom::Mesh>> out_mesh_list;
+  std::vector<std::unique_ptr<geom::Mesh>> Map::GenerateChunkedMesh(
+      const rpc::OpendriveGenerationParameters& params) const {
+    geom::MeshFactory mesh_factory(params);
+    std::vector<std::unique_ptr<geom::Mesh>> out_mesh_list;
 
-  //  std::unordered_map<JuncId, geom::Mesh> junction_map;
-  //  for (auto &&pair : _data.GetRoads()) {
-  //    const auto &road = pair.second;
-  //    if (!road.IsJunction()) {
-  //      std::vector<std::unique_ptr<geom::Mesh>> road_mesh_list =
-  //          mesh_factory.GenerateAllWithMaxLen(road);
+    std::unordered_map<JuncId, geom::Mesh> junction_map;
+    for (auto &&pair : _data.GetRoads()) {
+      const auto &road = pair.second;
+      if (!road.IsJunction()) {
+        std::vector<std::unique_ptr<geom::Mesh>> road_mesh_list =
+            mesh_factory.GenerateAllWithMaxLen(road);
 
-  //      out_mesh_list.insert(
-  //          out_mesh_list.end(),
-  //          std::make_move_iterator(road_mesh_list.begin()),
-  //          std::make_move_iterator(road_mesh_list.end()));
-  //    }
-  //  }
+        out_mesh_list.insert(
+            out_mesh_list.end(),
+            std::make_move_iterator(road_mesh_list.begin()),
+            std::make_move_iterator(road_mesh_list.end()));
+      }
+    }
 
-  //  // Generate roads within junctions and smooth them
-  //  for (const auto &junc_pair : _data.GetJunctions()) {
-  //    const auto &junction = junc_pair.second;
-  //    std::vector<std::unique_ptr<geom::Mesh>> lane_meshes;
-  //    std::vector<std::unique_ptr<geom::Mesh>> sidewalk_lane_meshes;
-  //    for(const auto &connection_pair : junction.GetConnections()) {
-  //      const auto &connection = connection_pair.second;
-  //      const auto &road = _data.GetRoads().at(connection.connecting_road);
-  //      for (auto &&lane_section : road.GetLaneSections()) {
-  //        for (auto &&lane_pair : lane_section.GetLanes()) {
-  //          const auto &lane = lane_pair.second;
-  //          if (lane.GetType() != road::Lane::LaneType::Sidewalk) {
-  //            lane_meshes.push_back(mesh_factory.Generate(lane));
-  //          } else {
-  //            sidewalk_lane_meshes.push_back(mesh_factory.Generate(lane));
-  //          }
-  //        }
-  //      }
-  //    }
-  //    if(params.smooth_junctions) {
-  //      auto merged_mesh = mesh_factory.MergeAndSmooth(lane_meshes);
-  //      for(auto& lane : sidewalk_lane_meshes) {
-  //        *merged_mesh += *lane;
-  //      }
-  //      out_mesh_list.push_back(std::move(merged_mesh));
-  //    } else {
-  //      std::unique_ptr<geom::Mesh> junction_mesh = std::make_unique<geom::Mesh>();
-  //      for(auto& lane : lane_meshes) {
-  //        *junction_mesh += *lane;
-  //      }
-  //      for(auto& lane : sidewalk_lane_meshes) {
-  //        *junction_mesh += *lane;
-  //      }
-  //      out_mesh_list.push_back(std::move(junction_mesh));
-  //    }
-  //  }
+    // Generate roads within junctions and smooth them
+    for (const auto &junc_pair : _data.GetJunctions()) {
+      const auto &junction = junc_pair.second;
+      std::vector<std::unique_ptr<geom::Mesh>> lane_meshes;
+      std::vector<std::unique_ptr<geom::Mesh>> sidewalk_lane_meshes;
+      for(const auto &connection_pair : junction.GetConnections()) {
+        const auto &connection = connection_pair.second;
+        const auto &road = _data.GetRoads().at(connection.connecting_road);
+        for (auto &&lane_section : road.GetLaneSections()) {
+          for (auto &&lane_pair : lane_section.GetLanes()) {
+            const auto &lane = lane_pair.second;
+            if (lane.GetType() != road::Lane::LaneType::Sidewalk) {
+              lane_meshes.push_back(mesh_factory.Generate(lane));
+            } else {
+              sidewalk_lane_meshes.push_back(mesh_factory.Generate(lane));
+            }
+          }
+        }
+      }
+      if(params.smooth_junctions) {
+        auto merged_mesh = mesh_factory.MergeAndSmooth(lane_meshes);
+        for(auto& lane : sidewalk_lane_meshes) {
+          *merged_mesh += *lane;
+        }
+        out_mesh_list.push_back(std::move(merged_mesh));
+      } else {
+        std::unique_ptr<geom::Mesh> junction_mesh = std::make_unique<geom::Mesh>();
+        for(auto& lane : lane_meshes) {
+          *junction_mesh += *lane;
+        }
+        for(auto& lane : sidewalk_lane_meshes) {
+          *junction_mesh += *lane;
+        }
+        out_mesh_list.push_back(std::move(junction_mesh));
+      }
+    }
 
-  //  auto min_pos = geom::Vector2D(
-  //      out_mesh_list.front()->GetVertices().front().x,
-  //      out_mesh_list.front()->GetVertices().front().y);
-  //  auto max_pos = min_pos;
-  //  for (auto & mesh : out_mesh_list) {
-  //    auto vertex = mesh->GetVertices().front();
-  //    min_pos.x = std::min(min_pos.x, vertex.x);
-  //    min_pos.y = std::min(min_pos.y, vertex.y);
-  //    max_pos.x = std::max(max_pos.x, vertex.x);
-  //    max_pos.y = std::max(max_pos.y, vertex.y);
-  //  }
-  //  size_t mesh_amount_x = static_cast<size_t>((max_pos.x - min_pos.x)/params.max_road_length) + 1;
-  //  size_t mesh_amount_y = static_cast<size_t>((max_pos.y - min_pos.y)/params.max_road_length) + 1;
-  //  std::vector<std::unique_ptr<geom::Mesh>> result;
-  //  result.reserve(mesh_amount_x*mesh_amount_y);
-  //  for (size_t i = 0; i < mesh_amount_x*mesh_amount_y; ++i) {
-  //    result.emplace_back(std::make_unique<geom::Mesh>());
-  //  }
-  //  for (auto & mesh : out_mesh_list) {
-  //    auto vertex = mesh->GetVertices().front();
-  //    size_t x_pos = static_cast<size_t>((vertex.x - min_pos.x) / params.max_road_length);
-  //    size_t y_pos = static_cast<size_t>((vertex.y - min_pos.y) / params.max_road_length);
-  //    *(result[x_pos + mesh_amount_x*y_pos]) += *mesh;
-  //  }
+    auto min_pos = geom::Vector2D(
+        out_mesh_list.front()->GetVertices().front().x,
+        out_mesh_list.front()->GetVertices().front().y);
+    auto max_pos = min_pos;
+    for (auto & mesh : out_mesh_list) {
+      auto vertex = mesh->GetVertices().front();
+      min_pos.x = std::min(min_pos.x, vertex.x);
+      min_pos.y = std::min(min_pos.y, vertex.y);
+      max_pos.x = std::max(max_pos.x, vertex.x);
+      max_pos.y = std::max(max_pos.y, vertex.y);
+    }
+    size_t mesh_amount_x = static_cast<size_t>((max_pos.x - min_pos.x)/params.max_road_length) + 1;
+    size_t mesh_amount_y = static_cast<size_t>((max_pos.y - min_pos.y)/params.max_road_length) + 1;
+    std::vector<std::unique_ptr<geom::Mesh>> result;
+    result.reserve(mesh_amount_x*mesh_amount_y);
+    for (size_t i = 0; i < mesh_amount_x*mesh_amount_y; ++i) {
+      result.emplace_back(std::make_unique<geom::Mesh>());
+    }
+    for (auto & mesh : out_mesh_list) {
+      auto vertex = mesh->GetVertices().front();
+      size_t x_pos = static_cast<size_t>((vertex.x - min_pos.x) / params.max_road_length);
+      size_t y_pos = static_cast<size_t>((vertex.y - min_pos.y) / params.max_road_length);
+      *(result[x_pos + mesh_amount_x*y_pos]) += *mesh;
+    }
 
-  //  return result;
-  //}
+    return result;
+  }
 
   geom::Mesh Map::GetAllCrosswalkMesh() const {
     geom::Mesh out_mesh;
