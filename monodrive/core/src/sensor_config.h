@@ -207,10 +207,14 @@ public:
         bool cull_partial_frame{false};
         bool debug_draw{false};
     } annotation;
+    struct ColorFilterArray {
+        bool use_cfa{false};
+        std::string cfa{"rccc"};
+    } color_filter_array;
     Viewport viewport;
     virtual DataFrame* DataFrameFactory() override{
         int nChannels = 4;
-        if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0)
+        if(channels.compare("bgra") == 0 || channels.compare("rgba") == 0 || color_filter_array.use_cfa)
             nChannels = 4;
         else if(channels.compare("gray") == 0)
             nChannels = 1;
@@ -567,6 +571,17 @@ void inline from_json(const nlohmann::json& j, CameraConfig::Annotation& annotat
     json_get(j, "debug_draw", annotation.debug_draw);
 }
 
+void inline to_json(nlohmann::json& j, const CameraConfig::ColorFilterArray& cfa) {
+    j = nlohmann::json{
+        {"cfa", cfa.cfa},
+        {"use_cfa", cfa.use_cfa}
+    };
+}
+void inline from_json(const nlohmann::json& j, CameraConfig::ColorFilterArray& cfa) {
+    json_get(j, "cfa", cfa.cfa);
+    json_get(j, "use_cfa", cfa.use_cfa);
+}
+
 /// Camera Config JSON Parsing
 
 void inline to_json(nlohmann::json& j, const CameraConfig& config)
@@ -584,6 +599,7 @@ void inline to_json(nlohmann::json& j, const CameraConfig& config)
     j["channels"] = config.channels;
     j["channel_depth"] = config.channel_depth;
     j["annotation"] = config.annotation;
+    j["color_filter_array"] = config.color_filter_array;
     j["viewport"] = config.viewport;
 }
 
@@ -604,6 +620,7 @@ void inline from_json(const nlohmann::json& j, CameraConfig& config)
     json_get(j, "channels", config.channels);         
     json_get(j, "channel_depth", config.channel_depth);         
     json_get(j, "annotation", config.annotation);
+    json_get(j, "color_filter_array", config.color_filter_array);
     json_get(j, "viewport", config.viewport);
 }
 

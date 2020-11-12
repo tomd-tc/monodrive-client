@@ -33,6 +33,8 @@ add_executable(fisheye_camera_equidistant fisheye_camera_equidistant.cpp)
 add_executable(fisheye_camera_poly1 fisheye_camera_poly1.cpp)
 add_executable(sensors_from_json sensors_from_json.cpp)
 add_executable(multi_connection multi_connection.cpp)
+add_executable(imager_rggb imager_rggb.cpp)
+add_executable(imager_rccc imager_rccc.cpp)
 
 # link monodrive client
 target_link_libraries(camera_sensor monodrive)
@@ -62,6 +64,8 @@ target_link_libraries(fisheye_camera_equidistant monodrive)
 target_link_libraries(fisheye_camera_poly1 monodrive)
 target_link_libraries(sensors_from_json monodrive)
 target_link_libraries(multi_connection monodrive)
+target_link_libraries(imager_rggb monodrive)
+target_link_libraries(imager_rccc monodrive)
 
 # copy monodrive dll to runtime directory
 if(MSVC)
@@ -99,6 +103,8 @@ if(MSVC)
   add_dependencies(fisheye_camera_poly1 monodrive_lib_copy_dev)
   add_dependencies(sensors_from_json monodrive_lib_copy_dev)
   add_dependencies(multi_connection monodrive_lib_copy_dev)
+  add_dependencies(imager_rggb monodrive_lib_copy_dev)
+  add_dependencies(imager_rccc monodrive_lib_copy_dev)
 endif(MSVC)
 
 # eigen
@@ -163,6 +169,14 @@ target_link_libraries(sensors_from_json ${OpenCV_LIBRARIES})
 target_include_directories(multi_connection PUBLIC ${OpenCV_INCLUDE_DIRS})
 link_libraries(multi_connection ${OpenCV_LIBRARIES})
 target_link_libraries(multi_connection ${OpenCV_LIBRARIES})
+
+target_include_directories(imager_rggb PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(imager_rggb ${OpenCV_LIBRARIES})
+target_link_libraries(imager_rggb ${OpenCV_LIBRARIES})
+
+target_include_directories(imager_rccc PUBLIC ${OpenCV_INCLUDE_DIRS})
+link_libraries(imager_rccc ${OpenCV_LIBRARIES})
+target_link_libraries(imager_rccc ${OpenCV_LIBRARIES})
 
 # filesystem
 target_link_libraries(config_export -lstdc++fs)

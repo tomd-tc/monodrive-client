@@ -62,9 +62,9 @@ public:
 	std::string getEgoVehicleId();
 
 	Simulator(const std::string& serverIp, const short& serverPort);
+	Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort);
 private:
 	Simulator(const Configuration& config);
-	Simulator(const Configuration& config, const std::string& serverIp, const short& serverPort);
 	Simulator(const Simulator&)= delete;
 	void waitForSamples(const std::vector<std::shared_ptr<Sensor>>& sensors);
   	Simulator& operator=(const Simulator&)= delete;
