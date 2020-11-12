@@ -91,8 +91,10 @@ int main(int argc, char** argv)
             img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
                           imFrame->pixels);
         }
-        else
+        else{
+            std::cout << "Error, cfa cameras use 4 channels. channel set to " << imFrame->channels << std::endl;
             return;
+        }
         
         // just to make the rgb image smaller when saved
         cv::cvtColor(img, img, cv::COLOR_BGRA2BGR);
@@ -117,7 +119,7 @@ int main(int argc, char** argv)
                           imFrame->pixels);
         }
         else{
-            std::cout << "Error, cfa cameras use 4 channels. channel set to " << imFrame->channels << std::endl;
+            std::cout << "Error, rgb cameras are 4 channel. Channel set to " << imFrame->channels << std::endl;
             return;
         }
         cv::imshow("rgb", img);
