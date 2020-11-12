@@ -48,7 +48,6 @@ int main(int argc, char** argv)
     fc_config.listen_port = 8100;
     fc_config.location.x = 70;
     fc_config.location.z = 170;
-    // fc_config.color_filter_array.cfa = "rccc";
     fc_config.color_filter_array.cfa = "rggb";
     fc_config.color_filter_array.use_cfa = true;
 
@@ -83,8 +82,7 @@ int main(int argc, char** argv)
         sensor->configure();
     }
 
-    int count1 = 0;
-    sensors[0]->sampleCallback = [&count1](DataFrame *frame) {
+    sensors[0]->sampleCallback = [](DataFrame *frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
@@ -104,18 +102,12 @@ int main(int argc, char** argv)
 
         cv::Mat color;
         cv::cvtColor(rggb, color, cv::COLOR_BayerBG2BGR);
-        if(count1++ == 50){
-            // saving a copy of one of the streamed images
-            cv::imwrite("de_bayered.png", color);
-            cv::imwrite("rggb.png", rggb);
-        }
         cv::imshow("de-bayered", color);
         cv::imshow("bayer", rggb);
         cv::waitKey(1);
     };
     // an rgb rendered image for comparison
-    int count2 = 0;
-    sensors[1]->sampleCallback = [&count2](DataFrame *frame) {
+    sensors[1]->sampleCallback = [](DataFrame *frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
@@ -124,10 +116,9 @@ int main(int argc, char** argv)
             img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
                           imFrame->pixels);
         }
-        else
+        else{
+            std::cout << "Error, cfa cameras use 4 channels. channel set to " << imFrame->channels << std::endl;
             return;
-        if(count2++ == 50){
-            cv::imwrite("rgb.png", img);
         }
         cv::imshow("rgb", img);
         cv::waitKey(1);

@@ -84,8 +84,7 @@ int main(int argc, char** argv)
         sensor->configure();
     }
 
-    int count1 = 0;
-    sensors[0]->sampleCallback = [&count1](DataFrame *frame) {
+    sensors[0]->sampleCallback = [](DataFrame *frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
@@ -94,30 +93,24 @@ int main(int argc, char** argv)
             img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC4,
                           imFrame->pixels);
         }
-        else
+        else{
+            std::cout << "Error, cfa cameras use 4 channels. channel set to " << imFrame->channels << std::endl;
             return;
+        }
         
         // just to make the gray image smaller when saved
         cv::Mat1b rccc;
         cv::extractChannel(img, rccc, 2); 
-        if(count1++ == 50){
-            // saving a copy of one of the streamed images
-            cv::imwrite("rccc.png", rccc);
-        }
         cv::imshow("rccc", rccc);
         cv::waitKey(1);
     };
     // an gray rendered image for comparison
-    int count2 = 0;
-    sensors[1]->sampleCallback = [&count2](DataFrame *frame) {
+    sensors[1]->sampleCallback = [](DataFrame *frame) {
         auto camFrame = static_cast<CameraFrame*>(frame);
         auto imFrame = camFrame->imageFrame;
         cv::Mat img;
         img = cv::Mat(imFrame->resolution.y, imFrame->resolution.x, CV_8UC1,
                           imFrame->pixels);
-        if(count2++ == 50){
-            cv::imwrite("gray.png", img);
-        }
         cv::imshow("gray", img);
         cv::waitKey(1);
     };
