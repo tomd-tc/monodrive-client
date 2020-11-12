@@ -16,6 +16,7 @@
 #include "carla/road/element/RoadInfoLaneWidth.h"
 #include "carla/road/element/RoadInfoMarkRecord.h"
 #include "carla/road/element/RoadInfoSignal.h"
+#include "carla/road/element/RoadInfoSpeed.h"
 
 #include <vector>
 #include <unordered_map>
@@ -857,7 +858,10 @@ namespace road {
   const Road &Map::GetRoad(Waypoint waypoint) const {
     return _data.GetRoad(waypoint.road_id);
   }
-
+  double Map::GetSpeed(Waypoint waypoint) const{
+    return GetRoad(waypoint).GetInfo<carla::road::element::RoadInfoSpeed>(
+			waypoint.s)->GetSpeed();
+  }
   // ===========================================================================
   // -- Map: Private functions -------------------------------------------------
   // ===========================================================================

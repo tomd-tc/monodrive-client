@@ -6,6 +6,23 @@
 
 using namespace carla;
 
+void look_backward(
+    road::element::Waypoint waypoint,
+    double searchDistance,
+    std::vector<std::pair<road::element::Waypoint, double>>& waypoints,
+    boost::optional<road::Map>& map,
+    double totalSearchDistance = 0)
+{
+    if(totalSearchDistance >= searchDistance){
+        return;
+    }
+    waypoints.emplace_back(waypoint, totalSearchDistance);
+    totalSearchDistance += map->GetDistanceToStartOfLane(waypoint);
+    for(auto& predecessor : map->GetPredecessors(waypoint)){
+        look_backward(predecessor, searchDistance, waypoints, map, totalSearchDistance);
+    }
+}
+
 std::vector<road::element::Waypoint> create_path(
     road::element::Waypoint waypoint, 
     double maxDistance, 
@@ -210,6 +227,16 @@ int infinity()
             std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << speed << std::endl;
         }
         std::cout << GetPathLength(path, map) << std::endl;
+    }
+    {
+        std::cout << "+++++++++++++  Backward Search +++++++++++++" << std::endl;
+        std::vector<std::pair<road::element::Waypoint, double>> waypoins;
+        look_backward(wayPoint.get(), pathDistance, waypoins, map);
+        for(auto& point : waypoins){
+            auto waypoint = point.first;
+            std::cout << waypoint.road_id << " " << waypoint.lane_id << " " << waypoint.s << " " << point.second << std::endl;
+        }
+        // std::cout << GetPathLength(path, map) << std::endl;
     }
 
 

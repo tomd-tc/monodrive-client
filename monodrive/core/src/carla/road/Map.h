@@ -75,6 +75,7 @@ namespace road {
 
     const Lane &GetLane(Waypoint waypoint) const;
     const Road &GetRoad(Waypoint waypoint) const;
+    double GetSpeed(Waypoint waypoint) const;
 
     Lane::LaneType GetLaneType(Waypoint waypoint) const;
 
