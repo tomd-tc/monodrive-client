@@ -1,10 +1,8 @@
+%% closed loop example
+% example matlab script which configures the simulator in closed loop
+% mode with a camera sensor.
 sim = Simulator()
-sim.initialize()
-sim.configure()
-
-vehicle = monoDriveVehicle();
-%
-vehicle.setup();
+sim.setup()
 %
 cam = Camera();
 cam.setup();
@@ -13,9 +11,9 @@ vp_cam = Viewport_Camera();
 vp_cam.setup();
 
 for n = 1:100
-    vehicle.step(0.1, 0.0, 0.0);
-    sim.sample_sensors();
+    sim.step(0.2, 0.0, 0.0);
     disp(n);
-    cam.step();
+    im = cam.step();
+    imshow(im);
 end
-vehicle.step(0.0, 0.0, 1.0);
+sim.step_vehicle(0.0, 0.0, 1.0);

@@ -103,7 +103,7 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
         end
         
         
-        function count = stepImpl(obj)
+        function y = stepImpl(obj)
             % read header
             length = read(obj.connection, 1, 'uint32');
             wall_time = read(obj.connection, 1, 'uint32');
@@ -114,11 +114,10 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
             data = read(obj.connection, length - 16, 'uint8');
             
             % hit sensor parse function
-            obj.parse(data);
+            y = obj.parse(data);
             
-            % update state
+            % update count
             obj.Count = obj.Count + 1;
-            count = obj.Count;
         end
         
         function resetImpl(obj)

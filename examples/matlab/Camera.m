@@ -10,7 +10,7 @@ classdef Camera < Sensor
     end
     
     % Pre-computed constants
-    properties
+    properties(Access = protected)
         image = zeros(1024,1024,3);
         width
         height
@@ -37,7 +37,6 @@ classdef Camera < Sensor
                 obj.image = cat(3, redChannel, greenChannel, blueChannel);
             end
             y = obj.image;
-            imshow(obj.image);
         end
         
         function resetImpl(obj)
