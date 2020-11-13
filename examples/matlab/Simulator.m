@@ -1,5 +1,5 @@
-classdef Simulator < handle
-    
+classdef Simulator <  matlab.System
+    % constants
     properties (Constant)
         ID_SIMULATOR_CONFIG = "SimulatorConfig_ID"
         ID_REPLAY_CONFIGURE_TRAJECTORY_COMMAND = "REPLAY_ConfigureTrajectoryCommand_ID"
@@ -14,35 +14,53 @@ classdef Simulator < handle
         
         HEADER_CONTROL = uint32(hex2dec('6d6f6e6f'))
     end
+    % public tunable properties
     properties
-        sim_config_json
+        sim_config_path = 'configurations/simulator.json'
+        scenario_config_path = 'configurations/trajectories/scenario_config_single_vehicle.json'
+        weather_config_path = 'configurations/weather.json'
+        server_ip = '127.0.0.1'
+        server_port = 8999
+    end
+    % private attributes
+    properties(Access = private)
         sim_config
-        vehicle_config_json
-        vehicle_config
-        scenario_config_json
+        sim_config_json
         scenario_config
+        scenario_config_json
+        weather_config
+        weather_config_json
         connection
-        server_ip
-        server_port
+    end
+    methods(Access = protected)
+        function setupImpl(obj)
+           obj.initialize();
+           obj.configure();
+        end
+        function stepImpl(obj, forward, right, brake)
+            % apply controls if supplied
+            if nargin == 4
+                obj.step_vehicle(forward, right, brake);
+            end
+            % sample all sensors
+            obj.sample_sensors();
+        end
     end
     methods
         function initialize(obj)
             % TODO pass in programmatically
             
-            sim_config_path = 'configurations/simulator.json';
-            fid = fopen(sim_config_path,'r','n','UTF-8');
+            fid = fopen(obj.sim_config_path,'r','n','UTF-8');
             obj.sim_config_json = fscanf(fid, '%s');
             obj.sim_config = struct(jsondecode(obj.sim_config_json));
             fclose(fid);
             
-            vehicle_config_path = 'configurations/vehicle.json';
-            fid = fopen(vehicle_config_path,'r','n','UTF-8');
-            obj.vehicle_config_json = fscanf(fid, '%s');
-            obj.vehicle_config = struct(jsondecode(obj.vehicle_config_json));
+            fid = fopen(obj.weather_config_path,'r','n','UTF-8');
+            obj.weather_config_json = fscanf(fid, '%s');
+            obj.weather_config = struct(jsondecode(obj.weather_config_json));
             fclose(fid);
             
-            scenario_config_path = 'configurations/trajectories/scenario_config_single_vehicle.json';
-            fid = fopen(scenario_config_path,'r','n','UTF-8');
+            fid = fopen(obj.scenario_config_path,'r','n','UTF-8');
             obj.scenario_config_json = fscanf(fid, '%s');
             obj.scenario_config = struct(jsondecode(obj.scenario_config_json));
             fclose(fid);
