@@ -244,6 +244,27 @@ int infinity()
     return 0;
 }
 
+void search_tree(road::element::Waypoint waypoint,
+    boost::optional<road::Map>& map
+)
+{
+    std::cout << "----------------------------" << std::endl;
+    std::cout << waypoint.road_id << " " 
+        << waypoint.lane_id << " " 
+        << waypoint.s << " " 
+        << map->GetDistanceAtEndOfLane(waypoint) << std::endl;
+    for(auto& successor : map->GetSuccessors(waypoint)){
+        std::cout << successor.road_id << " " 
+            << successor.lane_id << " " 
+            << successor.s << " " 
+            << map->GetDistanceAtEndOfLane(successor) << std::endl;
+    }
+    for(auto& successor : map->GetSuccessors(waypoint)){
+        search_tree(successor, map);
+    }
+
+}
+
 int cross_roads(){
     std::vector<road::element::Waypoint> path;
     boost::optional<road::Map> map;
@@ -254,6 +275,26 @@ int cross_roads(){
     map = opendrive::OpenDriveParser::Load(openDriveFileString);
     if(!map)
         return -1;
+    auto& map2 = map.get();
+    std::cout << "XXXXXXXXXXXXXXXXXXXXXXX CROSS ROADS XXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+    auto topo = map->GenerateTopology();
+    int count = 0;
+    std::cout << "TOPO: " << std::endl;
+    for(auto& points : topo){
+        auto waypoint = points.first;
+        std::cout << waypoint.road_id << " " 
+        << waypoint.lane_id << " " 
+        << waypoint.s << " " 
+        << map->GetDistanceAtEndOfLane(waypoint) << std::endl;
+    }
+    {
+        road::element::Waypoint waypoint;
+        waypoint.road_id = 2;
+        waypoint.lane_id = -1;
+        waypoint.s = 2.22;
+        search_tree(waypoint, map);
+    }
+
     
 
 
@@ -265,6 +306,7 @@ int main(){
         return -1;
     if(cross_roads())
         return -1;
+
 
 
     return 0;
