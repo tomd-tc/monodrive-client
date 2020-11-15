@@ -295,8 +295,6 @@ int cross_roads(){
         search_tree(waypoint, map);
     }
 
-    
-
 
     return 0;
 }

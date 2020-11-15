@@ -859,8 +859,21 @@ namespace road {
     return _data.GetRoad(waypoint.road_id);
   }
   double Map::GetSpeed(Waypoint waypoint) const{
-    return GetRoad(waypoint).GetInfo<carla::road::element::RoadInfoSpeed>(
-			waypoint.s)->GetSpeed();
+    auto roadInfoSpeed = GetRoad(waypoint).GetInfo<RoadInfoSpeed>(waypoint.s);
+    // if this road has a speed limit set return it
+    if(roadInfoSpeed){
+      return roadInfoSpeed->GetSpeed();
+    }
+    // otherwise check the predecessors, sometimes speed isn't set at junction
+    else{
+      for(auto& predecessor : GetPredecessors(waypoint)){
+        roadInfoSpeed = GetRoad(predecessor).GetInfo<RoadInfoSpeed>(predecessor.s);
+        if(roadInfoSpeed)
+          return roadInfoSpeed->GetSpeed();
+      }
+    }
+    // no speed limit could be found return an invalid speed limit
+    return -1;
   }
   // ===========================================================================
   // -- Map: Private functions -------------------------------------------------
