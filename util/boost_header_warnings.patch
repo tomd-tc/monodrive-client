@@ -1,0 +1,52 @@
+diff --git a/include/boost/detail/no_exceptions_support.hpp b/include/boost/detail/no_exceptions_support.hpp
+index 2cf0938..5ddce1e 100644
+--- a/include/boost/detail/no_exceptions_support.hpp
++++ b/include/boost/detail/no_exceptions_support.hpp
+@@ -14,7 +14,7 @@
+ 
+ #include <boost/config/header_deprecated.hpp>
+ 
+-BOOST_HEADER_DEPRECATED("<boost/core/no_exceptions_support.hpp>")
++//BOOST_HEADER_DEPRECATED("<boost/core/no_exceptions_support.hpp>")
+ 
+ #include <boost/core/no_exceptions_support.hpp>
+ 
+diff --git a/include/boost/range/const_reverse_iterator.hpp b/include/boost/range/const_reverse_iterator.hpp
+index a0c3de9..aa9b969 100644
+--- a/include/boost/range/const_reverse_iterator.hpp
++++ b/include/boost/range/const_reverse_iterator.hpp
+@@ -17,7 +17,7 @@
+ 
+ #include <boost/config/header_deprecated.hpp>
+ 
+-BOOST_HEADER_DEPRECATED("<boost/range/reverse_iterator.hpp>")
++//BOOST_HEADER_DEPRECATED("<boost/range/reverse_iterator.hpp>")
+ 
+ #include <boost/range/reverse_iterator.hpp>
+ #include <boost/type_traits/remove_reference.hpp>
+diff --git a/include/boost/range/result_iterator.hpp b/include/boost/range/result_iterator.hpp
+index 48f88d7..77f6ed3 100644
+--- a/include/boost/range/result_iterator.hpp
++++ b/include/boost/range/result_iterator.hpp
+@@ -17,7 +17,7 @@
+ 
+ #include <boost/config/header_deprecated.hpp>
+ 
+-BOOST_HEADER_DEPRECATED("<boost/range/iterator.hpp>")
++//BOOST_HEADER_DEPRECATED("<boost/range/iterator.hpp>")
+ 
+ #include <boost/range/iterator.hpp>
+ 
+diff --git a/include/boost/range/reverse_result_iterator.hpp b/include/boost/range/reverse_result_iterator.hpp
+index e6e6f38..c58418c 100644
+--- a/include/boost/range/reverse_result_iterator.hpp
++++ b/include/boost/range/reverse_result_iterator.hpp
+@@ -17,7 +17,7 @@
+ 
+ #include <boost/config/header_deprecated.hpp>
+ 
+-BOOST_HEADER_DEPRECATED("<boost/range/reverse_iterator.hpp>")
++//BOOST_HEADER_DEPRECATED("<boost/range/reverse_iterator.hpp>")
+ 
+ #include <boost/range/reverse_iterator.hpp>
+ 

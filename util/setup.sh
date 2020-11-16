@@ -17,13 +17,12 @@ echo "Installing Boost C++ Library"
 echo "========================================================================="
 BOOST_VERSION=1.74.0 
 BOOST_TOOLSET="clang-8.0"
-BOOST_CFLAGS="-fPIC -std=c++14"
+BOOST_CFLAGS="-fPIC -std=c++14 -DBOOST_ERROR_CODE_HEADER_ONLY"
 BOOST_BASENAME="boost-${BOOST_VERSION}-${CXX_TAG}"
 BOOST_PACKAGE_BASENAME=boost_${BOOST_VERSION//./_}
 BOOST_DOWNLOAD="https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/${BOOST_PACKAGE_BASENAME}.tar.gz"
 
 PY_VERSION="3"
-SHOULD_BUILD_BOOST=true
 PYTHON_BINARY="/usr/bin/env python${PY_VERSION}"
 PYTHON_INCLUDE_DIR=$(python${PY_VERSION}-config --includes | cut -c 3- | awk {'print $1'})
 export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:${PYTHON_INCLUDE_DIR}"
@@ -36,6 +35,10 @@ tar -xzf ${BOOST_PACKAGE_BASENAME}.tar.gz
 mv ${BOOST_PACKAGE_BASENAME} ${BOOST_BASENAME}-source
 
 pushd ${BOOST_BASENAME}-source >/dev/null
+
+# Patch the header warnings for geometry libraries
+echo "Patching Boost library headers..."
+patch -p2 < ../../util/boost_header_warnings.patch 
 
 ./bootstrap.sh \
     --with-toolset=clang \

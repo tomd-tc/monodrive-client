@@ -41,7 +41,7 @@ To build the examples the following are required:
 - [VSCode](https://code.visualstudio.com/)
 - Run the prerequisite setup script from the root repository directory:
     ```bash
-    $ ./setup.sh
+    $ ./util/setup.sh
     ```
 
 ## Setup Using VSCode

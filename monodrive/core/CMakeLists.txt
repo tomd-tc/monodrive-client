@@ -37,8 +37,16 @@ IF(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
 	cmake_policy(SET CMP0074 NEW)
 ENDIF(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost 1.65 REQUIRED COMPONENTS system filesystem)
+set(Boost_USE_STATIC_LIBS ON)
+
+# Use custom Boost build if not on Windows
+if(NOT MSVC)
+  set(ENV{BOOST_ROOT} "../third-party/boost-install")
+endif()
+
+# Must be at least 1.68 to support waypoints
+find_package(Boost 1.68 REQUIRED COMPONENTS system filesystem)
+
 if(MSVC)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_ALL_NO_LIB)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_PROGRAM_OPTIONS_DYN_LINK)
