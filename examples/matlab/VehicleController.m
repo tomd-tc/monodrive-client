@@ -1,11 +1,7 @@
 classdef VehicleController < matlab.System
-    % Example usage
-    
-    % This template includes the minimum set of functions required
-    % to define a System object with discrete state.
-    
+    % Example vehicle controller
+
     % Public, tunable properties
-    
     properties
         Kp = 1.0;
         Ki = 0.0;
@@ -13,6 +9,7 @@ classdef VehicleController < matlab.System
     end
     properties(Nontunable)
     end
+
     properties(DiscreteState)
         count
     end
@@ -23,6 +20,7 @@ classdef VehicleController < matlab.System
     end
     
     methods(Access = protected)
+
         function setupImpl(obj)
             % Perform one-time calculations, such as computing constants
             obj.count = 0;

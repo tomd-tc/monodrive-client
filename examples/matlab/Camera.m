@@ -1,19 +1,16 @@
 classdef Camera < Sensor
     % Camera Sensor
-    %
-    % This template includes the minimum set of functions required
-    % to define a System object with discrete state.
     
-    % Public, tunable properties
-    properties
+    % Public, non-tunable properties
+    properties(Nontunable)
         config_path = 'configurations/camera.json'
     end
     
     % Pre-computed constants
     properties(Access = protected)
         image = zeros(1024,1024,3);
-        width
-        height
+        width = 1024
+        height = 1024
     end
     
     methods(Access = protected)
@@ -40,7 +37,7 @@ classdef Camera < Sensor
         end
         
         function resetImpl(obj)
-            % Initialize / reset discrete-state properties
+            resetImpl@Sensor(obj);
         end
         
         function c1 = isOutputFixedSizeImpl(obj)
@@ -49,8 +46,8 @@ classdef Camera < Sensor
         function c1 = isOutputComplexImpl(obj)
             c1 = false;
         end
-        function sizeout = getOutputSizeImpl(~)
-            sizeout = [1024 1024 3];
+        function sizeout = getOutputSizeImpl(obj)
+            sizeout = [obj.height obj.width 3];
         end
         
         function dataout = getOutputDataTypeImpl(~)

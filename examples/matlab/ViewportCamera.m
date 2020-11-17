@@ -1,11 +1,8 @@
 classdef ViewportCamera < Sensor
-    % Camera Sensor
-    %
-    % This template includes the minimum set of functions required
-    % to define a System object with discrete state.
+    % Viewport camera sensor
     
-    % Public, tunable properties
-    properties
+    % Public, non-tunable properties
+    properties(Nontunable)
         config_path = 'configurations/viewport_camera.json'
     end
     

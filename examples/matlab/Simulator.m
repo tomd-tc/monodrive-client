@@ -14,14 +14,23 @@ classdef Simulator <  matlab.System
         
         HEADER_CONTROL = uint32(hex2dec('6d6f6e6f'))
     end
-    % public tunable properties
-    properties
+    
+    % public non-tunable properties
+    properties(Nontunable)
         sim_config_path = 'configurations/simulator.json'
         scenario_config_path = 'configurations/trajectories/scenario_config_single_vehicle.json'
         weather_config_path = 'configurations/weather.json'
         server_ip = '127.0.0.1'
         server_port = 8999
+        SampleTime = 1.4; % Sample Time
+        OffsetTime = 0.2; % Offset Time
+        TickTime = 0.1;
+        SampleTimeTypeProp (1, 1) {mustBeMember(SampleTimeTypeProp, ...
+            ["Discrete","FixedInMinorStep","Controllable",...
+            "Inherited","InheritedNotControllable",...
+            "InheritedErrorConstant"])} = "Discrete"
     end
+    
     % private attributes
     properties(Access = private)
         sim_config
@@ -33,10 +42,54 @@ classdef Simulator <  matlab.System
         connection
     end
     methods(Access = protected)
-        function setupImpl(obj)
-           obj.initialize();
-           obj.configure();
+        % system object // get time implementation
+        function sts = getSampleTimeImpl(obj)
+            switch char(obj.SampleTimeTypeProp)
+                case 'Inherited'
+                    sts = createSampleTime(obj,'Type','Inherited');
+                case 'InheritedNotControllable'
+                    sts = createSampleTime(obj,'Type','Inherited',...
+                        'AlternatePropagation','Controllable');
+                case 'InheritedErrorConstant'
+                    sts = createSampleTime(obj,'Type','Inherited',...
+                        'ErrorOnPropagation','Constant');
+                case 'FixedInMinorStep'
+                    sts = createSampleTime(obj,'Type','Fixed In Minor Step');
+                case 'Discrete'
+                    sts = createSampleTime(obj,'Type','Discrete',...
+                        'SampleTime',obj.SampleTime, ...
+                        'OffsetTime',obj.OffsetTime);
+                case 'Controllable'
+                    sts = createSampleTime(obj,'Type','Controllable',...
+                        'TickTime',obj.TickTime);
+            end
         end
+        function flag = isInactivePropertyImpl(obj,prop)
+            flag = false;
+            switch char(obj.SampleTimeTypeProp)
+                case {'Inherited', ...
+                        'InheritedNotControllable', ...
+                        'FixedInMinorStep'}
+                    if any(strcmp(prop,{'SampleTime','OffsetTime','TickTime'}))
+                        flag = true;
+                    end
+                case 'Discrete'
+                    if any(strcmp(prop,{'TickTime'}))
+                        flag = true;
+                    end
+                case 'Controllable'
+                    if any(strcmp(prop,{'SampleTime','OffsetTime'}))
+                        flag = true;
+                    end
+            end
+        end
+        
+        % system object // setup implementation
+        function setupImpl(obj)
+            obj.initialize();
+            obj.configure();
+        end
+        % system object // step
         function stepImpl(obj, forward, right, brake)
             % apply controls if supplied
             if nargin == 4
@@ -77,8 +130,8 @@ classdef Simulator <  matlab.System
         function connect(obj)
             % TODO check if connected
             % connect to simulator server
-            obj.server_ip = obj.sim_config.server_ip;
-            obj.server_port = obj.sim_config.server_port;
+            %obj.server_ip = obj.sim_config.server_ip;
+            %obj.server_port = obj.sim_config.server_port;
             obj.connection = tcpclient(obj.sim_config.server_ip, obj.sim_config.server_port, 'Timeout', 2);
             obj.connection.ByteOrder = 'big-endian';
             obj.connection.Terminator('');

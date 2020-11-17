@@ -7,7 +7,7 @@ sim.setup()
 cam = Camera();
 cam.setup();
 %
-vp_cam = Viewport_Camera();
+vp_cam = ViewportCamera();
 vp_cam.setup();
 
 for n = 1:100

@@ -1,18 +1,17 @@
-classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & matlab.system.mixin.SampleTime
+classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates
     % Base Class for all Sensors
     
     % Public, tunable properties
     properties
     end
     
+    % Public, non-tunable properties
     properties(Nontunable)
-        SampleTime = 1.4; % Sample Time
-        OffsetTime = 0.2; % Offset Time
-        TickTime = 0.1;
-        SampleTimeTypeProp (1, 1) {mustBeMember(SampleTimeTypeProp, ...
-            ["Discrete","FixedInMinorStep","Controllable",...
-            "Inherited","InheritedNotControllable",...
-            "InheritedErrorConstant"])} = "Discrete"
+    end
+    
+    % Abstract
+    properties(Abstract)
+        config_path
     end
     
     % Pre-computed constants
@@ -24,7 +23,7 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
     end
     
     properties(DiscreteState)
-        Count
+        count
     end
     
     methods (Abstract, Access = protected)
@@ -32,32 +31,7 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
     end
     
     methods(Access = protected)
-        function sts = getSampleTimeImpl(obj)
-            switch char(obj.SampleTimeTypeProp)
-                case 'Inherited'
-                    sts = createSampleTime(obj,'Type','Inherited');
-                case 'InheritedNotControllable'
-                    sts = createSampleTime(obj,'Type','Inherited',...
-                        'AlternatePropagation','Controllable');
-                case 'InheritedErrorConstant'
-                    sts = createSampleTime(obj,'Type','Inherited',...
-                        'ErrorOnPropagation','Constant');
-                case 'FixedInMinorStep'
-                    sts = createSampleTime(obj,'Type','Fixed In Minor Step');
-                case 'Discrete'
-                    sts = createSampleTime(obj,'Type','Discrete',...
-                        'SampleTime',obj.SampleTime, ...
-                        'OffsetTime',obj.OffsetTime);
-                case 'Controllable'
-                    sts = createSampleTime(obj,'Type','Controllable',...
-                        'TickTime',obj.TickTime);
-            end
-        end
-        
         function setupImpl(obj)
-            % Perform one-time calculations, such as computing constants
-            % Perform one-time calculations, such as computing constants
-            
             obj.sim = Simulator();
             obj.sim.initialize();
             
@@ -66,17 +40,13 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
             obj.config = struct(jsondecode(obj.config_json));
             fclose(fid);
             obj.configure();
-            if  ~strcmp(obj.config.type, "ViewportCamera")
+            if ~strcmp(obj.config.type, "ViewportCamera")
                 obj.connect();
             end
         end
         
-        function sizeout = getOutputSizeImpl(~)
-            sizeout = [512 512 3];
-        end
-        
         function [sz,dt,cp] = getDiscreteStateSpecificationImpl(~,name)
-            if strcmp(name,'Count')
+            if strcmp(name,'count')
                 sz = [1 1];
                 dt = 'double';
                 cp = false;
@@ -94,14 +64,6 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
         function fixedout = isOutputFixedSizeImpl(~)
             fixedout = true;
         end
-        function flag = isInputSizeMutableImpl(~,idx)
-            if idx == 1
-                flag = true;
-            else
-                flag = false;
-            end
-        end
-        
         
         function y = stepImpl(obj)
             % read header
@@ -117,12 +79,12 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
             y = obj.parse(data);
             
             % update count
-            obj.Count = obj.Count + 1;
+            obj.count = obj.count + 1;
         end
         
         function resetImpl(obj)
             % Initialize / reset discrete-state properties
-            obj.Count = 0;
+            obj.count = 0;
         end
         
         function connect(obj)
@@ -135,27 +97,5 @@ classdef (Abstract) Sensor < matlab.System & matlab.system.mixin.Propagates & ma
             command = obj.sim.ID_REPLAY_CONFIGURE_SENSORS_COMMAND;
             response = jsondecode(obj.sim.send_message(command, obj.config));
         end
-        
-        function flag = isInactivePropertyImpl(obj,prop)
-            flag = false;
-            switch char(obj.SampleTimeTypeProp)
-                case {'Inherited', ...
-                        'InheritedNotControllable', ...
-                        'FixedInMinorStep'}
-                    if any(strcmp(prop,{'SampleTime','OffsetTime','TickTime'}))
-                        flag = true;
-                    end
-                case 'Discrete'
-                    if any(strcmp(prop,{'TickTime'}))
-                        flag = true;
-                    end
-                case 'Controllable'
-                    if any(strcmp(prop,{'SampleTime','OffsetTime'}))
-                        flag = true;
-                    end
-            end
-        end
     end
 end
-
-
