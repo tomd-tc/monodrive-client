@@ -39,9 +39,9 @@ To build the examples the following are required:
 ## Ubuntu 18.04 Prerequisites
 - Ubuntu 18.04
 - [VSCode](https://code.visualstudio.com/)
-- Install packages:
+- Run the prerequisite setup script from the root repository directory:
     ```bash
-    sudo apt-get update && sudo apt-get install libboost-dev libboost-system-dev build-essential libeigen3-dev
+    $ ./util/setup.sh
     ```
 
 ## Setup Using VSCode

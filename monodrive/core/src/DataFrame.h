@@ -193,7 +193,7 @@ public:
     inline int size() const{
         return resolution.x * resolution.y * channels * channel_depth;
     }
-    virtual void parse(ByteBuffer& buffer);
+    virtual void parse(ByteBuffer& buffer) override;
     virtual ByteBuffer write() const override;
 };
 
@@ -293,7 +293,7 @@ public:
         delete ultrasonicTargetListFrame;
         delete ultrasonicRawFrame;
     }
-    virtual bool parse_complete() const{
+    virtual bool parse_complete() const override {
         if(!bSendProcessed or currentFrameIndex % 2 == 0)
             return true;
         else
