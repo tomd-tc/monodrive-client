@@ -1,33 +1,5 @@
 {
-  "trigger_boxes": [
-    {
-      "can_stay_in_lane": false,
-      "center_turn_allowed": false,
-      "class_path": "/Script/monoDriveLaneSplineTool.VehicleBehaviorTriggerBox",
-      "lane_change_left_requested": false,
-      "lane_change_right_requested": true,
-      "left_turn_allowed": false,
-      "location": {
-        "x": -4950.0,
-        "y": 10710.0,
-        "z": 20.0
-      },
-      "name": "VehicleBehaviorTriggerBox_1",
-      "right_turn_allowed": false,
-      "rotation": {
-        "pitch": 0.0,
-        "roll": 0.0,
-        "yaw": 0.0
-      },
-      "scale": {
-        "x": 1.0,
-        "y": 1.0,
-        "z": 1.0
-      },
-      "speed_change_request": -1.0,
-      "tags": []
-    }
-  ],
+  "trigger_boxes": [],
   "vehicles": [
     {
       "behavior_settings": {
@@ -56,15 +28,15 @@
           "y": 0.0,
           "z": 0.0
         },
-        "steer_forward_distance": 550.0,
+        "steer_forward_distance": 600.0,
         "steer_forward_distance_lane_change": 1500.0
       },
       "location": {
-        "x": -7480.0,
-        "y": 10680.0,
-        "z": 20.0
+        "x": 7782.835449,
+        "y": -33.783367,
+        "z": 10.0
       },
-      "name": "crossover_monoDrive_01_ego",
+      "name": "crossover_monoDrive_01_5",
       "rotation": {
         "pitch": 0.0,
         "roll": 0.0,
@@ -78,7 +50,6 @@
       "tags": [
         "vehicle",
         "dynamic",
-        "car",
         "ego"
       ]
     }
