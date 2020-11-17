@@ -6,6 +6,16 @@
 #define GPS_DATA_PACKET_SIZE 66
 #define LIDAR_PACKET_SIZE 1206
 
+
+ByteBuffer BinaryDataFrame::write() const {
+    ByteBuffer buffer = data_frame;
+    write_mono_header(buffer);
+    return buffer;
+}
+void BinaryDataFrame::parse(ByteBuffer& buffer){
+    data_frame = buffer;
+}
+
 ByteBuffer UltrasonicTargetListFrame::write() const{
     nlohmann::json frame = {
         {"targets", targets}
@@ -29,7 +39,7 @@ ByteBuffer UltrasonicRawFrame::write() const{
 }
 
 void UltrasonicFrame::parse(ByteBuffer& buffer){
-    if(bSendUltrasonicRaw and currentFrameIndex % 2 == 1){
+    if(bSendProcessed and currentFrameIndex % 2 == 1){
         ultrasonicRawFrame->parse_header(buffer);
         ultrasonicRawFrame->parse(buffer);
     }
@@ -124,6 +134,8 @@ ByteBuffer StateFrame::write() const {
     write_mono_header(buffer);
 	return buffer;
 }
+
+
 
 void CollisionFrame::parse(ByteBuffer& buffer){
     auto j = buffer.BufferToJson();

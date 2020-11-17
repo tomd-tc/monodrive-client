@@ -5,13 +5,6 @@
   "map": "Almono",
   "client_ip": "127.0.0.1",
   "simulation_mode": 1,
-  "ego_config":{
-    "vehicle_dynamics": "physx",
-    "body":{
-      "type": "Blueprint'/Game/Vehicles/crossover_monoDrive_01.crossover_monoDrive_01_C'",
-      "color": "CarPaint_White.CarPaint_White"
-    }
-  },
   "phys_materials": {
     "Aluminum": {
       "specular_exponent": 15.0,

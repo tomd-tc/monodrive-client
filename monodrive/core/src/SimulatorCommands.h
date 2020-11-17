@@ -76,7 +76,6 @@
 #define GetVersion_ID				            "GetVersion"
 #define GetMapCommand_ID			            "GetMap"
 #define ImportMapCommand_ID			            "ImportMap"
-#define SpawnVehicleCommand_ID                  "SpawnVehicleCommand_ID"
 #define ClosedLoopConfigCommand_ID              "ClosedLoopConfigCommand_ID"
 #define ClosedLoopStepCommand_ID                "ClosedLoopStepCommand_ID"
 
@@ -84,6 +83,7 @@
  * Vehicle lights configuration command
  */
 #define VehicleLightsConfigCommand_ID           "VehicleLightsConfig_ID"
+#define VehicleLightsUpdateCommand_ID           "VehicleLightsUpdate_ID"
 
  /*
   * EGO autopilot control command
