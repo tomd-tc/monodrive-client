@@ -1,39 +1,29 @@
 # Benchmark for FPS
+
 Example for benchmarking frame rate of simulator
 
 
-## Requirements
-CMake, Git, Boost, GCC
-```
-apt-get update && \
-    apt-get install -y \
-    git \
-    build-essential \
-    gcc \
-    cmake \
-    libboost-all-dev
-```
+### Setup and build
+
+Follow instruction in the root directory of this repository.
 
 
-## Build
+**Note** that on Windows, these examples will be built to the `Debug` or `Release` folder
 ```
-mdkir build
-cd build
-cmake ..
-make -j 8
+./build/examples/cpp/benchmark/Release/benchmark.exe
 ```
 
 
 ## Run locally
-Run with full sensor suite
+
+Run benchmark with full sensor suite
 ```
-cd ..
-./build/benchmark --iterations 16 --workload full
+./build/examples/cpp/benchmark/benchmark --iterations 16 --sensors examples/cpp/benchmark/workload_full.json
 ```
 
 Other options
 ```
-./build/benchmark --help
+./build/examples/cpp/benchmark/benchmark --help
 ```
 
 

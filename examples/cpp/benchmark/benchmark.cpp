@@ -11,85 +11,12 @@
 
 // defaults
 int iterations = 64;
-std::string workload = "full";
+std::string sensors_path = "./examples/cpp/benchmark/workload_full.json";
 std::string mode = "closed_loop";
 std::string server_ip = "127.0.0.1";
 int server_port = 8999;
 
-
-// helper to create a single camera sensor suite
-std::vector<std::shared_ptr<Sensor>> create_camera_sensors(const std::string &ip)
-{
-	std::vector<std::shared_ptr<Sensor>> sensors;
-
-	CameraConfig cam_config;
-	cam_config.server_ip = ip;
-	cam_config.listen_port = 8100;
-	cam_config.location.z = 200;
-	cam_config.rotation.pitch = -5;
-	cam_config.resolution.x = 1280;
-	cam_config.resolution.y = 800;
-
-	sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(cam_config)));
-
-	return sensors;
-}
-
-
-// helper to create a full sensor suite
-std::vector<std::shared_ptr<Sensor>> create_full_sensors(const std::string &ip)
-{
-	std::vector<std::shared_ptr<Sensor>> sensors;
-
-	// camera
-	CameraConfig cam_config;
-	cam_config.server_ip = ip;
-	cam_config.listen_port = 8100;
-	cam_config.location.z = 200;
-	cam_config.rotation.pitch = -5;
-	cam_config.resolution.x = 512;
-	cam_config.resolution.y = 512;
-	sensors.push_back(std::make_shared<Sensor>(std::make_unique<CameraConfig>(cam_config)));
-
-	// lidar
-	LidarConfig lidar_config;
-	lidar_config.server_ip = ip;
-	lidar_config.listen_port = 8200;
-	lidar_config.location.z = 200;
-	sensors.push_back(std::make_shared<Sensor>(std::make_unique<LidarConfig>(lidar_config)));
-
-	// radar
-	RadarConfig radar_config;
-	radar_config.server_ip = ip;
-	radar_config.listen_port = 8300;
-	radar_config.location.x = 250;
-	radar_config.location.z = 50;
-	sensors.push_back(std::make_shared<Sensor>(std::make_unique<RadarConfig>(radar_config)));
-
-	// ultrasonic
-	UltrasonicConfig us_config;
-	us_config.server_ip = ip;
-	us_config.listen_port = 8400;
-	us_config.location.x = 300.f;
-	us_config.location.z = 50.f;
-	sensors.push_back(std::make_shared<Sensor>(std::make_unique<UltrasonicConfig>(us_config)));
-
-	// gps
-	GPSConfig gps_config;
-	gps_config.server_ip = ip;
-	gps_config.listen_port = 8500;
-	sensors.push_back(std::make_shared<Sensor>(std::make_unique<GPSConfig>(gps_config)));
-
-	// imu
-	IMUConfig imu_config;
-	imu_config.server_ip = ip;
-	imu_config.listen_port = 8600;
-	sensors.push_back(std::make_shared<Sensor>(std::make_unique<IMUConfig>(imu_config)));
-
-	return sensors;
-}
-
-
+// helper function to parse command line arguments
 int parse_options(int argc, char* argv[])
 {
     try {
@@ -97,9 +24,8 @@ int parse_options(int argc, char* argv[])
         options.show_positional_help();
         options.add_options()
             ("i,iterations", "Number of iterations", cxxopts::value<int>())
-            ("w,workload", "Workload option (camera or full)", cxxopts::value<std::string>())
+            ("s,sensors", "Path to sensor workload configuration", cxxopts::value<std::string>())
             ("m,mode", "Simulator mode (closed_loop or replay)", cxxopts::value<std::string>())
-			("c,config_file", "Path to config file (not currently used)", cxxopts::value<std::string>())
             ("h,help", "Print help")
             ;
         auto cla = options.parse(argc, argv);
@@ -118,11 +44,11 @@ int parse_options(int argc, char* argv[])
 				std::cerr << e.what() << '\n';
 			}
 		}
-		if (cla.count("w"))
+		if (cla.count("s"))
 		{
 			try
 			{
-				workload = cla["w"].as<std::string>();
+				sensors_path = cla["s"].as<std::string>();
 			}
 			catch (const std::exception& e)
 			{
@@ -162,28 +88,24 @@ int main(int argc, char* argv[])
 
 	for (int it = 0; it < iterations; it++)
 	{
-		// configure simulator from local files
+		// define configuration for benchmark
 		Configuration config(
-			"examples/config/simulator.json",
+			"examples/config/simulator_no_traffic.json",
 			"examples/config/weather.json",
 			mode == "closed_loop"
             ? "examples/config/scenario_multi_vehicle_almono.json"
-            : "examples/config/scenario.json"
+            : "examples/config/scenario.json",
+			sensors_path
 		);
 		config.simulator["simulation_mode"] = mode == "closed_loop" ? 0 : 2;
+
+		// load sensor workload
+		std::vector<std::shared_ptr<Sensor>> sensors;
+		config.loadSensors(sensors);
+
+		// configure sensors and simulator
 		Simulator& sim = Simulator::getInstance(config, server_ip, server_port);
 		if (!sim.configure()) {
-			return -1;
-		}
-
-		// setup and connect sensors
-		std::vector<std::shared_ptr<Sensor>> sensors;
-		if (workload == "full") {
-			sensors = create_full_sensors(server_ip);
-		} else if (workload == "camera") {
-			sensors = create_camera_sensors(server_ip);
-		} else {
-			std::cout << "Unknown workload: " << workload << std::endl;
 			return -1;
 		}
 		for (auto &sensor : sensors)
