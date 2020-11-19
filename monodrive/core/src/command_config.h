@@ -140,7 +140,7 @@ void inline to_json(nlohmann::json& j, const AutopilotControlConfig& config) {
     j["autopilot_engaged"] = config.autopilot_engaged;
     j["gear"] = config.gear;
     j["drive_mode"] = config.drive_mode;
-    bool manual_override = false;
+    //bool manual_override = false;
 }
 void inline from_json(const nlohmann::json& j, AutopilotControlConfig& config) {
     json_get(j, "set_speed", config.set_speed);

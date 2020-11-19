@@ -78,6 +78,7 @@ public:
 	{
 		recvBuffer.resize(header_length);
 		boost::asio::read(socket, boost::asio::buffer(recvBuffer.data(), recvBuffer.available()));
+
 		int32_t magic = recvBuffer.readInt();
 		int32_t size = recvBuffer.readInt();
 		int32_t payloadSize = size - header_length;
@@ -195,7 +196,7 @@ public:
 		try {
 			//std::cout << "write tcp socket" << std::endl;
 			std::string data = serialize().dump();
-			// std::cout << "ApiMessage::write: " << data << std::endl;
+			//std::cout << "ApiMessage::write: " << data << std::endl;
 
 			uint32_t length = header_length + (uint32_t)data.size();
 			sendBuffer.resize(length);
