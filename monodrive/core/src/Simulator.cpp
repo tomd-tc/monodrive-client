@@ -180,19 +180,33 @@ bool Simulator::sendCommandAsync(ApiMessage message, nlohmann::json *response)
 
 bool Simulator::sendCommand(ApiMessage message, nlohmann::json *response)
 {
-	message.write(controlSocket);
+	if(controlSocket.is_open()) {
+		message.write(controlSocket);
+	} else {
+		return false;
+	}
 	ApiMessage res;
-	res.read(controlSocket);
-	if (response != nullptr)
-	{
-		*response = res.get_message();
+	try {
+		if(controlSocket.is_open()) {
+			res.read(controlSocket);
+		} else {
+			return false;
+		}
+		if (response != nullptr)
+		{
+			*response = res.get_message();
+		}
+		if (res.get_success())
+		{
+			return true;
+		}
+		std::cerr << res.get_message().dump() << std::endl;
+		return false;
+	} catch(const std::exception& e) {
+		std::cerr << "Simulator::sendCommand - Exception caught!:" << std::endl;
+		std::cerr << e.what() << std::endl;
+		return false;
 	}
-	if (res.get_success())
-	{
-		return true;
-	}
-	std::cerr << res.get_message().dump() << std::endl;
-	return false;
 }
 
 bool Simulator::step(int stepIndex, int numSteps)
@@ -292,9 +306,11 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 		if (!sensor->config->enable_streaming) {
 			continue;
 		}
+		//std::cout << "Sampling sensor: " << sensor->config->type << std::endl;
 		sensor->sampleInProgress.store(true, std::memory_order::memory_order_relaxed);
+		//std::cout << "Completed sampling on sensor: " << sensor->config->type << std::endl;
 	}
-	
+
 	if(sendCommand(sampleMessage)){
 		waitForSamples(sensors);
 	}
@@ -302,6 +318,7 @@ bool Simulator::sampleAll(std::vector<std::shared_ptr<Sensor>>& sensors)
 		std::cerr << "ERROR! Failed to sample sensors." << std::endl;
 		return false;
 	}
+	
 	return true;
 }
 

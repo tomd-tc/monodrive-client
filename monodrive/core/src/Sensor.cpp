@@ -101,7 +101,9 @@ bool Sensor::startSampleLoop()
 			recvBuffer.resize(header_length);
 			if (listener->socket.is_open()) {
 				try {
+					//std::cout << "Sensor::startSampleLoop - Reading from port " << config->listen_port << std::endl;
 					listener->readSensorPacket(recvBuffer);
+					//std::cout << "Sensor::startSampleLoop - Read from port" << config->listen_port << std::endl;
 				}
 				catch (const std::exception& e) {
 					std::cout << e.what() << std::endl;
